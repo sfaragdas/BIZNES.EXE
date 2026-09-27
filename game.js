@@ -9,9 +9,18 @@ const BANKS=['Szwajcarski','Francuski','Angielski','Polski','USA','Kanadyjski'];
 const BANKSEN=['Swiss','French','English','Polish','US','Canadian'];
 const STOCKS=["Hotel 'Hilton' w Nowym Jorku","Hotel 'International' w Paryżu","Restauracje 'MacDonalda'","Akcje 'Philipsa'","Akcje 'JVC'","Akcje 'Toyoty'","PKO BP (GPW)","ORLEN (GPW)","HiPromine (NC)","Excellence (NC)"];
 const STOCKSEN=["Hilton Hotel, New York","International Hotel, Paris","McDonald's Restaurants","Philips shares","JVC shares","Toyota shares","PKO BP (GPW)","ORLEN (GPW)","HiPromine (NC)","Excellence (NC)"];
-const EVENTS=[['WIN','Wygrałeś na loterii!','You won the lottery!'],['THEFT','Okradziono cię!','You were robbed!'],['CARGO','Dostałeś darmowy towar.','You received free cargo.'],['LOSS','Straciłeś towar w drodze.','You lost cargo in transit.'],['FINE','Dostałeś mandat.','You got a fine.'],['CUSTOMS','Opłata celna.','Customs duty.'],['DELAY','Podróż się opóźniła.','Your trip was delayed.'],['FUEL','Tańsze paliwo na następną podróż.','Fuel is cheaper next trip.'],['PRIZE','Nagroda za podróż!','Travel prize!'],['BREAK','Awaria pojazdu.','Vehicle breakdown.'],['GIFT','Dostałeś prezent.','You received a gift.'],['BARGAIN','Okazja zmieniła ceny.','A bargain changed prices.']];
-const T=document.querySelector('#terminal');
+const EVENTS=[
+['WIN','Wygrana na loterii!','Lottery win!'],['THEFT','Złodziej zabrał część gotówki.','A thief took some cash.'],
+['CARGO','Prezent od zaprzyjaźnionego kupca.','A gift from a fellow trader.'],['LOSS','Uszkodzono część towaru w drodze.','Some goods were damaged in transit.'],
+['FINE','Mandat podczas podróży.','A fine during the trip.'],['CUSTOMS','Opłata celna na granicy.','Customs duty at the border.'],
+['DELAY','Opóźnienie podróży o dzień.','Trip delayed by one day.'],['REFUND','Zwrot nadpłaconego podatku.','An overpaid tax was refunded.'],
+['PRIZE','Nagroda od partnera handlowego.','A reward from a trading partner.'],['BREAK','Koszt naprawy pojazdu.','Vehicle repair costs.'],
+['GIFT','Ktoś przekazał Ci darowiznę.','Someone sent you a donation.'],['BARGAIN','Wyprzedaż obniżyła cenę towaru.','A sale reduced a market price.'],
+['TEA','Szkodniki zniszczyły liście herbaty.','Pests damaged your tea leaves.'],['TOBACCO','Plaga uszkodziła liście tytoniu.','A blight damaged your tobacco leaves.'],
+['TAX','Podatek od przewożonych towarów.','A tax on transported goods.'],['FIND','Znalazłeś pieniądze w drodze.','You found money along the way.']];
+const T=document.querySelector('#terminal'),D=document.querySelector('#journey-dialog');
 const SPONSORS=[['MojeDostawy.pl','https://mojedostawy.pl'],['LCSE.pl','https://lcse.pl']];
+let eventPopup=false;
 let handedness=localStorage.getItem('bx-hand')==='left'?'left':'right',mobileSelected=null;
 let sponsorIndex=0,lastProductKey='',lastProductIndex=-1,fontStyle=localStorage.getItem('bx-font')||'current';
 let lang=localStorage.getItem('bx-lang')||'pl',view='welcome',notice='',event=null,selected=0,CORE=null,input='',step='',mode='',table='goods',hasExistingSave=!!localStorage.getItem('bx-save');
@@ -28,7 +37,7 @@ const fmt=n=>String(Math.max(0,Math.floor(n))).padStart(7), money=n=>`${Number(n
 const actionToken=(id,key,label,hot=0)=>`[[${id}|${key}|${label}|${hot}]]`;
 function coreHydrate(){for(const [f,v] of [[0,S.cash],[1,S.bank],[2,S.debt],[3,S.city],[4,S.day],[9,S.rng|0]])CORE.core_set(f,0,v);S.prices.forEach((v,i)=>CORE.core_set(6,i,v));S.cargo.forEach((v,i)=>CORE.core_set(7,i,v));S.shares.forEach((v,i)=>CORE.core_set(8,i,v))}
 function coreSync(){S.cash=CORE.core_get(0,0);S.bank=CORE.core_get(1,0);S.debt=CORE.core_get(2,0);S.city=CORE.core_get(3,0);S.day=CORE.core_get(4,0);S.rng=CORE.core_get(9,0)>>>0;S.prices=S.prices.map((_,i)=>CORE.core_get(6,i));S.cargo=S.cargo.map((_,i)=>CORE.core_get(7,i));S.shares=S.shares.map((_,i)=>CORE.core_get(8,i));}
-if(location.protocol!=='file:'&&typeof WebAssembly!=='undefined'){fetch('target/wasm32-unknown-unknown/release/biznes_exe_core.wasm?v=4').then(r=>{if(!r.ok)throw Error('WASM missing');return r.arrayBuffer()}).then(b=>WebAssembly.instantiate(b,{})).then(({instance})=>{if(instance.exports.core_version?.()!==4)throw Error('Outdated core');CORE=instance.exports;CORE.core_init(S.rng);coreHydrate();document.querySelector('#engine-status').textContent='Rust/WASM';render()}).catch(()=>{document.querySelector('#engine-status').textContent='JS fallback'})}
+if(location.protocol!=='file:'&&typeof WebAssembly!=='undefined'){fetch('target/wasm32-unknown-unknown/release/biznes_exe_core.wasm?v=5').then(r=>{if(!r.ok)throw Error('WASM missing');return r.arrayBuffer()}).then(b=>WebAssembly.instantiate(b,{})).then(({instance})=>{if(instance.exports.core_version?.()!==5)throw Error('Outdated core');CORE=instance.exports;CORE.core_init(S.rng);coreHydrate();document.querySelector('#engine-status').textContent='Rust/WASM';render()}).catch(()=>{document.querySelector('#engine-status').textContent='JS fallback'})}
 function save(){S.bank=S.banks.reduce((a,b)=>a+b,0);localStorage.setItem('bx-save',JSON.stringify(S));hasExistingSave=true;document.querySelector('#save-status').textContent=t('Saved locally','Zapisano lokalnie')}
 function used(){return S.cargo.reduce((a,b)=>a+b,0)}
 function rand(n){S.rng^=S.rng<<13;S.rng^=S.rng>>>17;S.rng^=S.rng<<5;return(S.rng>>>0)%n}
@@ -56,7 +65,9 @@ function frame(rows){
   }).join('\n');
 }
 const center=s=>{const length=visibleText(s).length,left=Math.max(0,Math.floor((78-length)/2));return ' '.repeat(left)+s+' '.repeat(Math.max(0,78-length-left))};
-function statusText(){const engine=document.querySelector('#engine-status').textContent==='Rust/WASM'?'Rust/WASM':'JS';return `Offline · ${engine} · ${t('Autosave','Autozapis')}`}
+function pwaMessage(){return typeof window!=='undefined'?window.BiznesPWA?.message(lang)||'':''}
+function statusText(){const engine=document.querySelector('#engine-status').textContent==='Rust/WASM'?'Rust/WASM':'JS';const offline=typeof window!=='undefined'&&window.BiznesPWA?window.BiznesPWA.status(lang):'Offline';return `${offline} · ${engine} · ${t('Autosave','Autozapis')}`}
+
 function topbar(){const tail='  {SPONSOR}  {LANG}',brand='BIZNES.EXE  ·  '+t('Tiny economic game','Mała gra ekonomiczna');return `${brand.padEnd(78-visibleText(tail).length)}${tail}`}
 function header(){return [topbar(),` ${t('Cash','Gotówka')} $${fmt(S.cash)}  ${t('Bank','Bank')} $${fmt(S.bank)}  ${t('Debt','Dług')} $${fmt(S.debt)}     ${t('Cargo','Ładunek')}: ${used()}`,` ${t('Net worth','Majątek')}: $${fmt(S.cash+S.bank-S.debt+S.cargo.reduce((n,q,i)=>n+q*S.prices[i],0))}`, '─'.repeat(78)]}
 function welcome(){
@@ -149,8 +160,8 @@ const mobileCancel=()=>mobileButton('cancel',t('Esc · Cancel','Esc · Anuluj'))
 function mobileView(){
   const links=[...SPONSORS].reverse().map(([name,url])=>`<a href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`).join('    ');
   const [sponsorName,sponsorUrl]=SPONSORS[sponsorIndex];
-  const head=`<header class="mobile-head"><strong>BIZNES.EXE</strong><nav class="mobile-sponsors" aria-label="${t('Sponsors','Sponsorzy')}"><a href="${sponsorUrl}" target="_blank" rel="noopener noreferrer">${sponsorName}</a></nav>${mobileButton('language',lang==='pl'?'EN':'PL',`aria-label="${t('Switch language','Zmień język')}"`)}</header>`;
-  if(view==='welcome')return head+`<section class="mobile-list mobile-welcome"><div class="mobile-manifest"><h1>${t('Small game. Big business.','Mała gra. Wielki biznes.')}</h1><p>${t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.')}</p><p>${t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:')}<br>Biznesman (1988), M. Cwynar / Studio SAMBA.</p><p>${t('Project sponsors','Sponsorzy projektu')}: ${links}</p></div><h2>${t('How to play','Jak grać')}</h2><p>${t('Buy low, sell high. Travel freely between cities and watch your debt.','Kupuj tanio, sprzedawaj drożej. Podróżuj bez opłat i pilnuj długu.')}</p><p>${t('Choose an action below, then select an item and enter an amount. Progress saves automatically.','Wybierz działanie na dole, następnie pozycję i ilość. Postęp zapisuje się automatycznie.')}</p><small class="mobile-status">${esc(statusText())}</small></section><section class="mobile-dock mobile-welcome-dock"><div class="mobile-hand-row">${mobileButton('hand-toggle',handedness==='right'?t('Left-handed','Leworęczny'):t('Right-handed','Praworęczny'))}<span>${handedness==='right'?t('Right-handed ✓','Praworęczny ✓'):t('Left-handed ✓','Leworęczny ✓')}</span></div><div class="mobile-font-row">${mobileButton('font-toggle',t('Font: ','Czcionka: ')+(fontStyle==='retro'?'DOS PL':t('Standard','Standardowa')))}</div><div class="mobile-primary-row">${mobileButton('new-game',t('New game','Nowa gra'))}${mobileButton('welcome-continue',t('Continue','Kontynuuj'),'class="mobile-confirm"')}</div></section>`;
+  const head=`<header class="mobile-head"><div class="mobile-brand"><strong>BIZNES.EXE</strong>${view==='home'?`<span class="mobile-city">${esc(cities()[S.city])}</span>`:''}</div><nav class="mobile-sponsors" aria-label="${t('Sponsors','Sponsorzy')}"><a href="${sponsorUrl}" target="_blank" rel="noopener noreferrer">${sponsorName}</a></nav>${mobileButton('language',lang==='pl'?'EN':'PL',`aria-label="${t('Switch language','Zmień język')}"`)}</header>`;
+  if(view==='welcome')return head+`<section class="mobile-list mobile-welcome"><div class="mobile-manifest"><h1>${t('Small game. Big business.','Mała gra. Wielki biznes.')}</h1><p>${t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.')}</p><p>${t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:')}<br>Biznesman (1988), M. Cwynar / Studio SAMBA.</p><p>${t('Project sponsors','Sponsorzy projektu')}:<br>${links}</p></div><h2>${t('How to play','Jak grać')}</h2><p>${t('Buy low, sell high. Travel freely between cities and watch your debt.','Kupuj tanio, sprzedawaj drożej. Podróżuj bez opłat i pilnuj długu.')}</p><p>${t('Choose an action below, then select an item and enter an amount. Progress saves automatically.','Wybierz działanie na dole, następnie pozycję i ilość. Postęp zapisuje się automatycznie.')}</p>${pwaMessage()?`<p class="install-help" role="status">${esc(pwaMessage())}</p>`:''}</section><small class="mobile-status">${esc(statusText())}</small><section class="mobile-dock mobile-welcome-dock"><div class="mobile-hand-row">${mobileButton('hand-toggle',handedness==='right'?t('Left-handed','Leworęczny'):t('Right-handed','Praworęczny'))}<span>${handedness==='right'?t('Right-handed ✓','Praworęczny ✓'):t('Left-handed ✓','Leworęczny ✓')}</span></div><div class="mobile-font-row">${mobileButton('install-app',t('Install app','Zainstaluj'))}${mobileButton('font-toggle',t('Font: ','Czcionka: ')+(fontStyle==='retro'?'DOS PL':t('Standard','Standardowa')))}</div><div class="mobile-primary-row">${mobileButton('new-game',t('New game','Nowa gra'))}${mobileButton('welcome-continue',t('Continue','Kontynuuj'),'class="mobile-confirm"')}</div></section>`;
   const bank=table==='banks',totals={goods:S.cargo.reduce((n,q,i)=>n+q*S.prices[i],0),shares:S.shares.reduce((n,q,i)=>n+q*stockPrice(i),0),bank:S.bank};
   const tabs=[['goods',t('Goods','Towary')],['shares',t('Shares','Akcje')],['bank',t('Banks','Banki')]].map(([id,label])=>`<button type="button" data-ui-action="${id}" aria-pressed="${({goods:'goods',shares:'stocks',bank:'banks'}[id]===table)}" ${mode?'disabled':''}><span>${label}</span><b>${money(totals[id])}</b></button>`).join('');
   const cards=entries().map((e,i)=>{
@@ -158,11 +169,11 @@ function mobileView(){
     return `<button type="button" class="mobile-card" data-ui-action="pick-${i}" ${step==='row'?'':'disabled'}><span class="mobile-card-name">${esc(e.label)}</span><span class="mobile-card-details">${details}</span></button>`;
   }).join('');
   const operation=mobileOperation();
-  return head+`<section class="mobile-summary"><span>${t('Cash','Gotówka')} <b>${money(S.cash)}</b></span><span class="mobile-debt">${t('Debt','Dług')} <b>${money(S.debt)}</b></span><strong class="mobile-city">${esc(cities()[S.city])}</strong></section><nav class="mobile-tabs" aria-label="${t('Market totals','Łączna wartość')}">${tabs}</nav><section class="mobile-list">${operation.content||cards}</section><section class="mobile-dock">${operation.footer}</section>`;
+  return head+`<section class="mobile-summary"><span>${t('Cash','Gotówka')} <b>${money(S.cash)}</b></span><span class="mobile-debt">${t('Debt','Dług')} <b>${money(S.debt)}</b></span></section><nav class="mobile-tabs" aria-label="${t('Market totals','Łączna wartość')}">${tabs}</nav><section class="mobile-list">${!mode&&S.lastJourney?`<aside class="journey-report ${S.lastJourney.kind}" role="status"><strong>${t('Last journey','Ostatnia podróż')}</strong><p>${esc(S.lastJourney[lang])}</p></aside>`:''}${operation.content||cards}</section><section class="mobile-dock">${operation.footer}</section>`;
 }
 function mobileOperation(){
   const cancel=mobileCancel(),bank=table==='banks';
-  if(!mode)return {content:'',footer:`<p class="mobile-notice" role="status">${esc(notice||t('Choose an action.','Wybierz działanie.'))}</p><nav class="mobile-main-actions">${mobileButton('quit','Menu')}${mobileButton('debt',t('Debt','Dług'))}${mobileButton('travel',t('Travel','Wyjazd'))}</nav><div class="mobile-primary-row">${mobileButton('mobile-sell',bank?t('Withdraw','Odbierz'):t('Sell','Sprzedaj'))}${mobileButton('mobile-buy',bank?t('Deposit','Wpłać'):t('Buy','Kup'),'class="mobile-confirm"')}</div>`};
+  if(!mode)return {content:'',footer:`<p class="mobile-notice" role="status">${esc((S.lastJourney?.[lang]===notice?'':notice)||t('Choose an action.','Wybierz działanie.'))}</p><nav class="mobile-main-actions">${mobileButton('quit','Menu')}${mobileButton('debt',t('Debt','Dług'))}${mobileButton('travel',t('Travel','Wyjazd'))}</nav><div class="mobile-primary-row">${mobileButton('mobile-sell',bank?t('Withdraw','Odbierz'):t('Sell','Sprzedaj'))}${mobileButton('mobile-buy',bank?t('Deposit','Wpłać'):t('Buy','Kup'),'class="mobile-confirm"')}</div>`};
   if(mode==='travel')return {content:`<h2>${t('Where to?','Dokąd jedziemy?')}</h2><div class="mobile-cities">${cities().map((c,i)=>i===S.city?'':mobileButton(`city-${i}`,c)).join('')}</div>`,footer:`<div class="mobile-operation-footer">${cancel}</div>`};
   if(mode==='debt')return {content:`<h2>${t('Manage debt','Obsługa długu')}</h2><p>${t('Current debt','Obecny dług')}: ${money(S.debt)}</p><p>${t('Loan limit per operation: 5000 $.','Limit pożyczki na operację: 5000 $.')}</p>`,footer:`<div class="mobile-primary-row">${mobileButton('borrow',t('Borrow','Pożyczasz'))}${mobileButton('repay',t('Repay','Oddajesz'),'class="mobile-confirm"')}</div><div class="mobile-operation-footer">${cancel}</div>`};
   if(step==='row')return {content:'',footer:`<p>${t('Select an item from the list.','Zaznacz pozycję na liście.')}</p><div class="mobile-operation-footer">${cancel}</div>`};
@@ -180,7 +191,15 @@ function fitTerminal(){
 }
 
 function screen(){return view==='welcome'?welcome():home()}
-function render(persist=true){const scroll=M?.querySelector?.('.mobile-list')?.scrollTop||0;const id=document.activeElement?.id,focused=['amount-input','mobile-amount-input'].includes(id);if(persist)save();document.body.dataset.font=fontStyle;document.body.dataset.hand=handedness;T.innerHTML=screen();if(M){M.innerHTML=mobileView();const list=M.querySelector?.('.mobile-list');if(list)list.scrollTop=scroll}fitTerminal();if(focused)document.querySelector('#'+id)?.focus?.({preventScroll:true})}
+function render(persist=true){const scroll=M?.querySelector?.('.mobile-list')?.scrollTop||0;const id=document.activeElement?.id,focused=['amount-input','mobile-amount-input'].includes(id);if(persist)save();document.body.dataset.font=fontStyle;document.body.dataset.hand=handedness;T.innerHTML=screen();if(M){M.innerHTML=mobileView();const list=M.querySelector?.('.mobile-list');if(list)list.scrollTop=scroll}fitTerminal();renderJourneyPopup();if(focused)document.querySelector('#'+id)?.focus?.({preventScroll:true})}
+function renderJourneyPopup(){
+  if(!D)return;
+  if(!eventPopup){D.close?.();return}
+  if(D.open)return;
+  D.innerHTML=`<h2 id="journey-title">${t('Travel event','Zdarzenie w podróży')}</h2><p>${esc(S.lastJourney[lang])}</p>${mobileButton('close-event',t('Continue','Dalej'))}`;
+  D.oncancel=e=>{e.preventDefault();select('close-event')};
+  D.showModal?.();
+}
 function homeNotice(msg){view='home';step='';mode='';input='';notice=msg;render()}
 function stockPrice(i){return 80+((S.day*17+i*31)%90)}
 function maximum(){
@@ -216,29 +235,38 @@ function submit(){
 }
 function updateMarkets(){S.day++;S.debt+=Math.floor(S.debt/100);S.prices=S.prices.map(p=>Math.max(1,Math.floor(p*(85+rand(31))/100)))}
 function trigger(id){
-  const cash=rand(150)+50,g=rand(10);let detail='';
+  const cash=rand(150)+50,g=rand(10);let detail='',kind='good';
+  const gain=()=>{const n=Math.min(cash,2147483647-S.cash);S.cash+=n;detail=`+${n} $`};
+  const loss=()=>{const n=Math.min(S.cash,cash);S.cash-=n;detail=`-${n} $`;kind='bad'};
+  // Select only applicable events: a plague cannot destroy goods you do not own.
+  if(id===12&&!S.cargo[1]||id===13&&!S.cargo[2]||id===3&&!used()||id===14&&!used())id=15;
+  if([1,4,5,9,14].includes(id)&&!S.cash)id=2;
   switch(id){
-    case 0:case 7:case 8:case 10:S.cash+=cash;detail=`+${cash} $`;break;
-    case 1:case 4:case 5:case 9:{const n=Math.min(S.cash,cash);S.cash-=n;detail=`-${n} $`;break}
-    case 2:if(S.cargo[g]<65535){S.cargo[g]++;detail=`+1 ${goods()[g]}`}else{S.cash+=cash;detail=`+${cash} $`}break;
-    case 3:if(used()){const i=S.cargo.findIndex(x=>x);S.cargo[i]--;detail=`-1 ${goods()[i]}`}break;
-    case 6:S.day++;detail=t('+1 day','+1 dzień');break;
+    case 0:case 7:case 8:case 10:case 15:gain();break;
+    case 1:case 4:case 5:case 9:case 14:loss();break;
+    case 2:{const n=Math.min(1+rand(3),65535-S.cargo[g]);if(n){S.cargo[g]+=n;detail=`+${n} ${goods()[g]}`}else gain();break}
+    case 3:case 12:case 13:{const held=S.cargo.map((q,i)=>q?i:-1).filter(i=>i>=0),i=id===12?1:id===13?2:held[rand(held.length)];const n=Math.max(1,Math.ceil(S.cargo[i]*(10+rand(21))/100));S.cargo[i]-=n;detail=`-${n} ${goods()[i]}`;kind='bad';break}
+    case 6:S.day++;detail=t('+1 day','+1 dzień');kind='bad';break;
     case 11:S.prices[g]=Math.max(1,Math.floor(S.prices[g]*.65));detail=`${goods()[g]}: ${money(S.prices[g])}`;break;
   }
   if(CORE)coreHydrate();
-  homeNotice(t(EVENTS[id][2],EVENTS[id][1])+' '+detail);
+  S.lastJourney={pl:EVENTS[id][1]+' '+detail,en:EVENTS[id][2]+' '+detail,kind};
+  eventPopup=true;homeNotice(S.lastJourney[lang]);
 }
 function travelTo(city){
   if(city<0||city>=C.length)return;
   if(city===S.city)return homeNotice(t('You are already here.','Już tu jesteś.'));
   let result=-1;
   if(CORE){result=CORE.core_travel(city);coreSync()}
-  else{const fee=0;S.cash-=fee;S.city=city;updateMarkets();if(rand(100)<25)result=rand(EVENTS.length)}
+  else{const fee=0;S.cash-=fee;S.city=city;updateMarkets();if(rand(100)<35)result=rand(EVENTS.length)}
+  S.lastJourney=null;
   if(result>=0)return trigger(result);
   homeNotice(t('Trip complete. Prices changed.','Podróż zakończona. Ceny uległy zmianie.'));
 }
 function newGame(){mobileSelected=null;S=fresh();if(CORE){CORE.core_init(S.rng);coreHydrate()}table='goods';homeNotice(t('New game started.','Rozpoczęto nową grę.'))}
 function select(id){
+  if(eventPopup){eventPopup=false;D?.close?.();if(id==='close-event'){render(false);return}}
+  if(id==='install-app'){if(typeof window!=='undefined')window.BiznesPWA?.install();return}
   if(id==='language'){lang=lang==='pl'?'en':'pl';notice='';localStorage.setItem('bx-lang',lang);render();return}
   if(view==='welcome'){
     if(id==='hand-toggle'){handedness=handedness==='right'?'left':'right';localStorage.setItem('bx-hand',handedness)}
@@ -286,13 +314,14 @@ function action(k){
   const id=common[k]||(table==='banks'?{P:'deposit',O:'withdraw'}:{K:'buy',S:'sell'})[k];
   if(id)select(id);
 }
-for(const root of [T,M].filter(Boolean)){root.addEventListener('input',e=>{
+for(const root of [T,M,D].filter(Boolean)){root.addEventListener('input',e=>{
   if(!['amount-input','mobile-amount-input'].includes(e.target.id))return;
   input=e.target.value.replace(/[^0-9]/g,'').slice(0,10);e.target.value=input;
 });
 root.addEventListener('click',e=>{const f=e.target.closest?.('[data-frame-action]');if(f){select('language');return}const a=e.target.closest?.('[data-ui-action]');if(a)select(a.dataset.uiAction)});}
 document.addEventListener('keydown',e=>{
   if(e.ctrlKey||e.metaKey||e.altKey)return;
+  if(eventPopup&&(e.key==='Escape'||e.key==='Enter')){e.preventDefault();select('close-event');return}
   if(['amount-input','mobile-amount-input'].includes(e.target?.id)){
     if(e.key==='Enter'||e.key.toUpperCase()===(lang==='pl'?'Z':'C')){e.preventDefault();submit()}
     else if(e.key==='Escape'){e.preventDefault();select('cancel')}
@@ -304,6 +333,7 @@ document.addEventListener('keydown',e=>{
   if(k==='BACKSPACE'||k==='ENTER'||k==='ESC'||k.length===1){e.preventDefault();action(k)}
 });
 // Keep the bottom dock above the on-screen keyboard on mobile browsers.
+if(typeof window!=='undefined')window.addEventListener('pwa-state',()=>{if(view==='welcome'){render(false);if(pwaMessage())M?.querySelector?.('.install-help')?.scrollIntoView?.({block:'nearest'})}});
 if(typeof window!=='undefined'&&window.visualViewport){
   const viewport=window.visualViewport;
   const reposition=()=>{
@@ -318,5 +348,5 @@ if(typeof window!=='undefined'&&window.visualViewport){
 if(typeof ResizeObserver!=='undefined')new ResizeObserver(fitTerminal).observe(T);
 if(document.fonts){document.fonts.ready.then(fitTerminal);document.fonts.addEventListener?.('loadingdone',fitTerminal)}
 document.querySelector('#engine-status').textContent=location.protocol==='file:'?'JS fallback':'Loading WASM';render();
-if(typeof setInterval==='function')setInterval(()=>{sponsorIndex=(sponsorIndex+1)%SPONSORS.length;if(!['amount-input','mobile-amount-input'].includes(document.activeElement?.id))render(false)},7000);
+if(typeof setInterval==='function')setInterval(()=>{sponsorIndex=(sponsorIndex+1)%SPONSORS.length;if(!eventPopup&&!['amount-input','mobile-amount-input'].includes(document.activeElement?.id))render(false)},7000);
 })();

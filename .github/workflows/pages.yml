@@ -31,15 +31,17 @@ jobs:
       - name: Assemble the public site
         run: |
           mkdir -p _site/target/wasm32-unknown-unknown/release
-          cp index.html game.js style.css favicon.svg NOTICE LICENSE _site/
+          cp index.html game.js style.css pwa.js sw.js manifest.webmanifest favicon.svg NOTICE LICENSE _site/
           # Each deployment gets unique asset URLs, bypassing older browser/CDN entries.
           python - <<'PY'
           import os, re
           from pathlib import Path
           page = Path('_site/index.html')
           html = page.read_text(encoding='utf-8')
-          html = re.sub(r'(style\.css|game\.js)\?v=[^"\s]+', lambda m: m.group(1) + '?v=' + os.environ['GITHUB_SHA'], html)
+          html = re.sub(r'(style\.css|game\.js|pwa\.js)\?v=[^"\s]+', lambda m: m.group(1) + '?v=' + os.environ['GITHUB_SHA'], html)
           page.write_text(html, encoding='utf-8')
+          worker = Path('_site/sw.js')
+          worker.write_text(worker.read_text(encoding='utf-8').replace('20260927-pwa', os.environ['GITHUB_SHA']), encoding='utf-8')
           PY
           cp -r assets _site/
           cp target/wasm32-unknown-unknown/release/biznes_exe_core.wasm _site/target/wasm32-unknown-unknown/release/

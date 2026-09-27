@@ -60,3 +60,7 @@ Powitanie i gra mają przypięty nagłówek oraz dolny panel; przewija się śro
 ### Kolejność działań i klawiatura Safari
 
 Sterowanie mobilne: działanie → pozycja → ilość. Nagłówek pokazuje jednego rotującego sponsora, miasto pod saldami; dług jest wyrównany do prawej. Opis powitania skrócono do klimatu retro MS-DOS i niezależnej adaptacji. Kontener mobilny jest przypięty do wysokości oraz przesunięcia VisualViewport i reaguje na resize/scroll, aby panel ilości podążał za obszarem nad klawiaturą. Potwierdzenie na fizycznym iPhonie pozostaje konieczne.
+
+### PWA i widoczność zdarzeń
+
+Dodano manifest, ikony i wersjonowany service worker z pełnym pakietem offline. Status gotowości pojawia się po aktywacji workera. Na iOS instalacja wymaga menu udostępniania; przycisk pokazuje instrukcję. Czcionka pozostaje po stronie aktywnej ręki, instalacja po przeciwnej. Sponsor ma 14 px, miasto znajduje się pod standardowym napisem BIZNES.EXE. Losowość podróży zwiększono z 25% do 35%; zdarzenia mają popup i trwały raport ostatniej podróży. Instalację i ponowne otwieranie w trybie samolotowym należy jeszcze potwierdzić na urządzeniu.

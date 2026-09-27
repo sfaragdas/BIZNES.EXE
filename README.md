@@ -50,7 +50,7 @@ See [POROWNANIE-I-PLAN.md](POROWNANIE-I-PLAN.md) for the comparison with the sup
 
 Desktop keeps the DOS table. Phones up to 900px and touch tablets up to 1200px use a dedicated card list, three market tabs and a bottom operation panel. Only the list scrolls; action buttons stay available. Choose buy/sell or deposit/withdraw in the bottom dock first, then select an item row and enter an amount. Touch targets stay at least 44px tall. Header, market totals and dock stay pinned; only the middle content scrolls, including on welcome. The two layouts share the same state and autosave.
 
-Left/right-handed mode is saved locally and mirrors the primary action rows, confirmation and quantity controls. Welcome places New game left and Continue right by default, font centrally above them and the hand-mode switch above that. The compact header rotates one sponsor link every seven seconds. Both sponsors appear in the welcome description, LCSE.pl first. The city is yellow and centered below cash and right-aligned debt. Goods, shares and bank tabs contain their respective totals without repeated labels.
+Left/right-handed mode is saved locally and mirrors the primary action rows, confirmation and quantity controls. Welcome places New game left and Continue right by default, font centrally above them and the hand-mode switch above that. The compact header rotates one sponsor link every seven seconds. Both sponsors appear in the welcome description, LCSE.pl first. The city is yellow below the standard-font brand, above cash and right-aligned debt. Goods, shares and bank tabs contain their respective totals without repeated labels.
 
 Quantity and money entry use a native numeric-keyboard input with minus, plus and Max buttons. Enter or Z (Polish) / C (English) confirms; Esc cancels. Travel uses aligned city choices and excludes the current city. Sponsor rotation does not replace a focused amount input. Desktop font width is measured to fit 78 columns; the welcome background spans full rows.
 
@@ -62,7 +62,10 @@ The game is published at https://sfaragdas.github.io/BIZNES.EXE/ using GitHub Pa
 The `Publish game` workflow builds and checks the WASM core and publishes only the
 runtime files and licenses after pushes to main. The public address has its own
 browser-local save, separate from saves created by opening index.html directly.
-Opening the hosted version requires loading its files over the network; this is
-not yet a service-worker installation for guaranteed offline reopening.
+The first HTTPS visit downloads an offline app shell (HTML, scripts, stylesheet, DOS font, icons and WASM). Wait for “Offline ready” before disconnecting. Service-worker caches are versioned by deployment; navigation checks the network first and falls back to the cached shell. Browser storage can still be cleared or evicted.
+
+The mobile welcome screen offers Install opposite the font control. Supporting browsers show the native install prompt; iOS shows Share → Add to Home Screen instructions. Saving stays browser-local; Safari and an installed app may have separate storage. Physical iOS installation and airplane-mode reopening still need device validation.
+
+Travel has a 35% event chance, shared by JS and WASM. Sixteen event types cover gifts, cash finds, rewards, refunds, fines, customs, taxes, damage, theft, delay, sale prices and tea/tobacco pests. Inapplicable stock losses are replaced with a positive event; money losses never exceed held cash. Events open a dismissible popup with the impact and remain in the last-journey report. Ordinary trips do not open popups.
 
 The mobile container follows both visual viewport height and offset during resize and scroll, keeping its bottom controls within the visible area above the on-screen keyboard. Physical Safari verification is still required; implementation reference: https://developer.mozilla.org/en-US/docs/Web/API/VisualViewport
