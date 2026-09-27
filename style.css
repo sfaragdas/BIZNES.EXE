@@ -55,10 +55,10 @@ pre .city-row-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));g
 .city-row-inner .terminal-action{text-align:left}
 #mobile{display:none}
 @media(max-width:900px),(pointer:coarse) and (max-width:1200px){
-  body{height:var(--mobile-height,100dvh);min-height:0;overflow:hidden}
+  body{height:100dvh;min-height:0;overflow:hidden}
   main{width:100%;min-width:0;padding:0}
   .screen{display:none}
-  #mobile{position:fixed;top:0;left:0;transform:translateY(var(--mobile-top,0px));display:flex;flex-direction:column;width:100%;height:var(--mobile-height,100dvh);min-height:0;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(10px,env(safe-area-inset-left));font-size:15px;line-height:1.3;overflow:hidden}
+  #mobile{position:fixed;top:0;left:0;display:flex;flex-direction:column;width:100%;height:100dvh;min-height:0;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(10px,env(safe-area-inset-left));font-size:15px;line-height:1.3;overflow:hidden}
   body[data-font='retro'] #mobile{font-family:'DOS PL',monospace;font-size:18px;font-synthesis:none}
   #mobile h1{font-size:1.4em;margin:0 0 14px}
   #mobile h2{font-size:1em;margin:4px 0 12px}
@@ -71,7 +71,7 @@ pre .city-row-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));g
   .mobile-head strong{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--yellow);font-size:14px;white-space:nowrap}
   .mobile-brand .mobile-city{color:var(--yellow);font-size:14px}
   #mobile .mobile-head button{font-size:12px;padding:4px;min-width:36px}
-  .mobile-sponsors{display:flex;white-space:nowrap;align-items:center;font-size:14px;line-height:1.3;min-width:0}
+  .mobile-sponsors{display:flex;white-space:nowrap;align-items:center;font-size:15px;line-height:1.3;min-width:0}
   .mobile-sponsors a{color:var(--dim);text-decoration:none;padding:3px 2px}
   .mobile-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 8px;padding:4px 0 6px;font-size:.85em;flex:none;overflow-wrap:anywhere}
   .mobile-summary .mobile-city{grid-column:1/-1;color:var(--yellow);text-align:center;padding-top:3px}
@@ -85,7 +85,7 @@ pre .city-row-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));g
   .mobile-tabs b{font-size:.85em;font-weight:normal;overflow-wrap:anywhere;max-width:100%}
   #mobile .mobile-tabs [aria-pressed='true']{background:var(--dosbar);color:#000}
   .mobile-list{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:8px 0;scrollbar-gutter:stable}
-  #mobile .mobile-card{display:block;width:100%;text-align:left;padding:8px 6px;border:0;border-bottom:1px solid #444;color:var(--fg);background:var(--bg)}
+  #mobile .mobile-card{display:block;width:100%;text-align:left;padding:6px 6px;border:0;border-bottom:1px solid #444;color:var(--fg);background:var(--bg)}
   #mobile .mobile-card[aria-pressed='true']{background:#242400;box-shadow:inset 3px 0 var(--yellow)}
   #mobile .mobile-card:disabled{opacity:1;cursor:default}
   .mobile-card-name{display:block;overflow-wrap:anywhere;margin-bottom:2px}
@@ -95,7 +95,7 @@ pre .city-row-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));g
   .mobile-card-details>span:nth-child(3){text-align:right}
   .mobile-card-details>span:only-child{grid-column:1/-1}
   .mobile-card-details b{color:var(--yellow);font-weight:normal}
-  .mobile-dock{flex:none;border-top:1px dashed var(--dim);background:#000;padding:6px 0 2px}
+  .mobile-dock{position:relative;z-index:3;transform:translateY(calc(-1 * var(--keyboard-gap,0px)));flex:none;border-top:1px dashed var(--dim);background:var(--bg);padding:6px 0 2px}
   #mobile .mobile-notice{font-size:.8em;margin:0 0 5px;max-height:3.9em;overflow:auto}
   .mobile-primary-row{display:flex;gap:8px;margin-top:6px}
   .mobile-primary-row>button{flex:1}
@@ -117,7 +117,7 @@ pre .city-row-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));g
   .mobile-hand-row span{color:var(--dim)}
   .mobile-font-row{display:flex;justify-content:space-between;gap:8px;margin:4px 0}
   body[data-hand='left'] .mobile-font-row{flex-direction:row-reverse}
-  .mobile-status{display:block;text-align:right;color:var(--dim);font-size:10px;padding:8px 0}
+  .mobile-status{display:flex;justify-content:space-between;gap:8px;flex:none;color:var(--dim);font-size:10px;padding:8px 0}
 }
 
 .journey-report{border:1px solid var(--yellow);padding:10px;margin-bottom:10px;color:var(--yellow)}
@@ -134,3 +134,26 @@ body[data-hand='left'] #journey-dialog button{margin-left:0;margin-right:auto}
 
 .mobile-notice.has-message{color:var(--yellow)}
 #mobile>.install-help{flex:none;max-height:24dvh;overflow:auto;margin:0;padding:8px;border:0;border-top:1px dashed var(--dim);font-size:.85em}
+
+/* Styles are palette + type choices; no animation or extra font download. */
+body[data-font='matrix']{--bg:#001307;--fg:#89d99e;--dim:#61aa77;--yellow:#39ff75;--line:#367f4c;--dosbar:#8fe5aa}
+body[data-font='matrix'] pre,body[data-font='matrix'] #mobile{font-family:'DOS PL',monospace;font-synthesis:none}
+body[data-font='matrix'] button,body[data-font='matrix'] .frame-control{background:var(--bg);border-color:var(--line)}
+body[data-font='matrix'] #amount-input,body[data-font='matrix'] #mobile-amount-input,body[data-font='matrix'] #journey-dialog{background:var(--bg)}
+body[data-font='matrix'] #mobile .mobile-card[aria-pressed='true']{background:#073b19}
+@media(max-width:900px),(pointer:coarse) and (max-width:1200px){
+  body[data-font='matrix'] #mobile{font-size:18px}
+  .mobile-city-strip{flex:none;border-top:1px dashed var(--dim);color:var(--yellow);font-size:15px;text-align:center;padding:4px 0}
+  .mobile-columns{flex:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;font-size:10px;color:var(--dim);padding:3px 6px;border-bottom:1px dashed var(--dim);margin-right:0}
+  .mobile-columns>span:nth-child(2){text-align:center}
+  .mobile-columns>span:nth-child(3){text-align:right}
+  .mobile-columns.bank-columns{grid-template-columns:1fr}
+  .mobile-hand-row,.mobile-font-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:center}
+  .mobile-hand-row>span{text-align:center}
+  body[data-hand='left'] .mobile-hand-row,body[data-hand='left'] .mobile-font-row{direction:rtl}
+  .mobile-hand-row>*,.mobile-font-row>*{direction:ltr}
+  #mobile .mobile-hand-row button,#mobile .mobile-font-row button{width:100%;height:100%;min-height:44px;font-size:13px}
+}
+
+body[data-font='matrix'] button:hover,body[data-font='matrix'] button:focus-visible{color:var(--bg);background:var(--dosbar)}
+.mobile-status>span:last-child{text-align:right}

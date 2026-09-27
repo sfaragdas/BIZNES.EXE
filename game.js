@@ -22,7 +22,11 @@ const T=document.querySelector('#terminal'),D=document.querySelector('#journey-d
 const SPONSORS=[['MojeDostawy.pl','https://mojedostawy.pl'],['LCSE.pl','https://lcse.pl']];
 let eventPopup=false;
 let handedness=localStorage.getItem('bx-hand')==='left'?'left':'right',mobileSelected=null;
-let sponsorIndex=0,lastProductKey='',lastProductIndex=-1,fontStyle=localStorage.getItem('bx-font')||'current';
+const STYLES=[{id:'current',name:'Standard'},{id:'retro',name:'DOS'},{id:'matrix',name:'Matrix'}];
+let sponsorIndex=0,lastProductKey='',lastProductIndex=-1,fontStyle=localStorage.getItem('bx-style')||localStorage.getItem('bx-font')||'current';
+if(!STYLES.some(style=>style.id===fontStyle))fontStyle='current';
+const styleName=()=>STYLES.find(style=>style.id===fontStyle).name;
+const RELEASE='ALFA · 2026.09.28';
 let lang=localStorage.getItem('bx-lang')||'pl',view='welcome',notice='',event=null,selected=0,CORE=null,input='',step='',mode='',table='goods',hasExistingSave=!!localStorage.getItem('bx-save');
 const t=(en,pl)=>lang==='pl'?pl:en, goods=()=>lang==='pl'?GOODS:GEN, cities=()=>lang==='pl'?C:CEN, banks=()=>lang==='pl'?BANKS:BANKSEN, stocks=()=>lang==='pl'?STOCKS:STOCKSEN;
 const fresh=()=>({schema:2,cash:1000,bank:0,debt:25000,city:0,day:1,cargo:Array(10).fill(0),shares:Array(10).fill(0),banks:Array(6).fill(0),prices:[...BASE],rng:(Date.now()>>>0)||42,alive:true,seed:Date.now()>>>0});
@@ -71,7 +75,7 @@ function statusText(){const engine=document.querySelector('#engine-status').text
 function topbar(){const tail='  {SPONSOR}  {LANG}',brand='BIZNES.EXE  ·  '+t('Tiny economic game','Mała gra ekonomiczna');return `${brand.padEnd(78-visibleText(tail).length)}${tail}`}
 function header(){return [topbar(),` ${t('Cash','Gotówka')} $${fmt(S.cash)}  ${t('Bank','Bank')} $${fmt(S.bank)}  ${t('Debt','Dług')} $${fmt(S.debt)}     ${t('Cargo','Ładunek')}: ${used()}`,` ${t('Net worth','Majątek')}: $${fmt(S.cash+S.bank-S.debt+S.cargo.reduce((n,q,i)=>n+q*S.prices[i],0))}`, '─'.repeat(78)]}
 function welcome(){
-  const opts=[actionToken('welcome-continue','K',t('Continue','Kontynuuj')),actionToken('new-game','N',t('New game','Nowa gra')),actionToken('font-toggle','F',`F: ${t('Font','Czcionka')}: ${fontStyle==='retro'?'DOS PL':t('standard','standardowa')}`)];
+  const opts=[actionToken('welcome-continue','K',t('Continue','Kontynuuj')),actionToken('new-game','N',t('New game','Nowa gra')),actionToken('font-toggle','F',`F: ${t('Style','Styl')}: ${styleName()}`)];
   return frame([
     topbar(),'','',
     center(t('BIZNES.EXE · A tiny economic game','BIZNES.EXE · Mała gra ekonomiczna')),
@@ -160,16 +164,16 @@ const mobileCancel=()=>mobileButton('cancel',t('Esc · Cancel','Esc · Anuluj'))
 function mobileView(){
   const links=[...SPONSORS].reverse().map(([name,url])=>`<a href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`).join('    ');
   const [sponsorName,sponsorUrl]=SPONSORS[sponsorIndex];
-  const head=`<header class="mobile-head"><div class="mobile-brand"><strong>BIZNES.EXE</strong>${view==='home'?`<span class="mobile-city">${esc(cities()[S.city])}</span>`:''}</div><nav class="mobile-sponsors" aria-label="${t('Patrons','Patroni')}"><a href="${sponsorUrl}" target="_blank" rel="noopener noreferrer">${sponsorName}</a></nav>${mobileButton('language',lang==='pl'?'EN':'PL',`aria-label="${t('Switch language','Zmień język')}"`)}</header>`;
-  if(view==='welcome')return head+`<section class="mobile-list mobile-welcome"><div class="mobile-manifest"><h1>${t('Small game. Big business.','Mała gra. Wielki biznes.')}</h1><p>${t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.')}</p><p>${t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:')}<br>Biznesman (1988), M. Cwynar / SAMBA.</p><p>${t('Project patrons','Patroni projektu')}:<br>${links}</p></div><h2>${t('How to play','Jak grać')}</h2><p>${t('Buy low, sell high.','Kupuj tanio, sprzedawaj drożej.')}<br>${t('Travel for free and watch your debt.','Podróżuj bez opłat i pilnuj długu.')}<br>${t('Travel brings rewards and setbacks.','Podróże to korzyści i wpadki.')}</p><p>${t('Choose an action below, then select an item and enter an amount. Progress saves automatically.','Wybierz działanie na dole, następnie pozycję i ilość. Postęp zapisuje się automatycznie.')}</p></section>${pwaMessage()?`<p class="install-help" role="status">${esc(pwaMessage())}</p>`:''}<small class="mobile-status">${esc(statusText())}</small><section class="mobile-dock mobile-welcome-dock"><div class="mobile-hand-row">${mobileButton('hand-toggle',handedness==='right'?t('Left-handed','Leworęczny'):t('Right-handed','Praworęczny'))}<span>${handedness==='right'?t('Right-handed ✓','Praworęczny ✓'):t('Left-handed ✓','Leworęczny ✓')}</span></div><div class="mobile-font-row">${mobileButton('install-app',t('Install app','Zainstaluj'))}${mobileButton('font-toggle',t('Font: ','Czcionka: ')+(fontStyle==='retro'?'DOS PL':t('Standard','Standardowa')))}</div><div class="mobile-primary-row">${mobileButton('new-game',t('New game','Nowa gra'))}${mobileButton('welcome-continue',t('Continue','Kontynuuj'),'class="mobile-confirm"')}</div></section>`;
+  const head=`<header class="mobile-head"><div class="mobile-brand"><strong>BIZNES.EXE</strong></div><nav class="mobile-sponsors" aria-label="${t('Patrons','Patroni')}"><a href="${sponsorUrl}" target="_blank" rel="noopener noreferrer">${sponsorName}</a></nav>${mobileButton('language',lang==='pl'?'EN':'PL',`aria-label="${t('Switch language','Zmień język')}"`)}</header>`;
+  if(view==='welcome')return head+`<section class="mobile-list mobile-welcome"><div class="mobile-manifest"><h1>${t('Small game. Big business.','Mała gra. Wielki biznes.')}</h1><p>${t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.')}</p><p>${t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:')}<br>Biznesman (1988), M. Cwynar / SAMBA.</p><p>${t('Project patrons','Patroni projektu')}:<br>${links}</p></div><h2>${t('How to play','Jak grać')}</h2><p>${t('Buy low, sell high.','Kupuj tanio, sprzedawaj drożej.')}<br>${t('Travel for free and watch your debt.','Podróżuj bez opłat i pilnuj długu.')}<br>${t('Travel brings rewards and setbacks.','Podróże to korzyści i wpadki.')}</p><p>${t('Choose an action below, then select an item and enter an amount. Progress saves automatically.','Wybierz działanie na dole, następnie pozycję i ilość. Postęp zapisuje się automatycznie.')}</p></section>${pwaMessage()?`<p class="install-help" role="status">${esc(pwaMessage())}</p>`:''}<small class="mobile-status"><span>${RELEASE}</span><span>${esc(statusText())}</span></small><section class="mobile-dock mobile-welcome-dock"><div class="mobile-hand-row">${mobileButton('hand-toggle',handedness==='right'?t('Left-handed','Leworęczny'):t('Right-handed','Praworęczny'))}<span>${handedness==='right'?t('Right-handed ✓','Praworęczny ✓'):t('Left-handed ✓','Leworęczny ✓')}</span></div><div class="mobile-font-row">${mobileButton('install-app',t('Install app','Zainstaluj'))}${mobileButton('font-toggle',t('Style: ','Styl: ')+styleName())}</div><div class="mobile-primary-row">${mobileButton('new-game',t('New game','Nowa gra'))}${mobileButton('welcome-continue',t('Continue','Kontynuuj'),'class="mobile-confirm"')}</div></section>`;
   const bank=table==='banks',totals={goods:S.cargo.reduce((n,q,i)=>n+q*S.prices[i],0),shares:S.shares.reduce((n,q,i)=>n+q*stockPrice(i),0),bank:S.bank};
   const tabs=[['goods',t('Goods','Towary')],['shares',t('Shares','Akcje')],['bank',t('Banks','Banki')]].map(([id,label])=>`<button type="button" data-ui-action="${id}" aria-pressed="${({goods:'goods',shares:'stocks',bank:'banks'}[id]===table)}" ${mode&&mode!=='travel'?'disabled':''}><span>${label}</span><b>${money(totals[id])}</b></button>`).join('');
   const cards=entries().map((e,i)=>{
-    const details=bank?`<span>${t('Balance','Saldo')} <b>${money(e.balance)}</b></span>`:`<span>${t('Price','Cena')} <b>${money(e.price)}</b></span><span>${t('Owned','Masz')} ${e.qty} ${e.unit}</span><span>${t('Value','Wartość')} ${money(e.qty*e.price)}</span>`;
+    const details=bank?`<span><b>${money(e.balance)}</b></span>`:`<span><b>${money(e.price)}</b></span><span>${e.qty} ${e.unit}</span><span>${money(e.qty*e.price)}</span>`;
     return `<button type="button" class="mobile-card" data-ui-action="pick-${i}" ${step==='row'?'':'disabled'}><span class="mobile-card-name">${esc(e.label)}</span><span class="mobile-card-details">${details}</span></button>`;
   }).join('');
   const operation=mobileOperation();
-  return head+`<section class="mobile-summary"><span>${t('Cash','Gotówka')} <b>${money(S.cash)}</b></span><span class="mobile-debt">${t('Debt','Dług')} <b>${money(S.debt)}</b></span></section><nav class="mobile-tabs" aria-label="${t('Market totals','Łączna wartość')}">${tabs}</nav><section class="mobile-list">${!mode&&S.lastJourney?`<aside class="journey-report ${S.lastJourney.kind}" role="status"><strong>${t('Last journey','Ostatnia podróż')}</strong><p>${esc(S.lastJourney[lang])}</p></aside>`:''}${operation.content||cards}</section><section class="mobile-dock">${operation.footer}</section>`;
+  return head+`<div class="mobile-city-strip">${esc(cities()[S.city])}</div><section class="mobile-summary"><span>${t('Cash','Gotówka')} <b>${money(S.cash)}</b></span><span class="mobile-debt">${t('Debt','Dług')} <b>${money(S.debt)}</b></span></section><nav class="mobile-tabs" aria-label="${t('Market totals','Łączna wartość')}">${tabs}</nav>${!mode||step==='row'?`<div class="mobile-columns ${bank?'bank-columns':''}">${bank?`<span>${t('Balance','Saldo')}</span>`:`<span>${t('Price','Cena')}</span><span>${t('Owned','Masz')}</span><span>${t('Value','Wartość')}</span>`}</div>`:''}<section class="mobile-list">${!mode&&S.lastJourney?`<aside class="journey-report ${S.lastJourney.kind}" role="status"><strong>${t('Last journey','Ostatnia podróż')}</strong><p>${esc(S.lastJourney[lang])}</p></aside>`:''}${operation.content||cards}</section><section class="mobile-dock">${operation.footer}</section>`;
 }
 function mobileOperation(){
   const cancel=mobileCancel(),bank=table==='banks';
@@ -301,7 +305,7 @@ function select(id){
   if(id==='language'){lang=lang==='pl'?'en':'pl';notice='';localStorage.setItem('bx-lang',lang);render();return}
   if(view==='welcome'){
     if(id==='hand-toggle'){handedness=handedness==='right'?'left':'right';localStorage.setItem('bx-hand',handedness)}
-    else if(id==='font-toggle'){fontStyle=fontStyle==='retro'?'current':'retro';localStorage.setItem('bx-font',fontStyle)}
+    else if(id==='font-toggle'){fontStyle=STYLES[(STYLES.findIndex(style=>style.id===fontStyle)+1)%STYLES.length].id;localStorage.setItem('bx-style',fontStyle);localStorage.setItem('bx-font',fontStyle)}
     else if(id==='welcome-continue'){homeNotice('');return}
     else if(id==='new-game'){newGame();return}
 
@@ -367,13 +371,19 @@ document.addEventListener('keydown',e=>{
 // Keep the bottom dock above the on-screen keyboard on mobile browsers.
 if(typeof window!=='undefined')window.addEventListener('pwa-state',()=>{if(view==='welcome')render(false)});
 if(typeof window!=='undefined'&&window.visualViewport){
-  const viewport=window.visualViewport;
+  const viewport=window.visualViewport;let queued=false;
   const reposition=()=>{
-    M?.style.setProperty('--mobile-height',`${viewport.height}px`);
-    M?.style.setProperty('--mobile-top',`${viewport.offsetTop}px`);
+    if(queued)return;queued=true;
+    requestAnimationFrame(()=>{
+      queued=false;
+      // Only lift the dock: keep the header and content at their existing coordinates.
+      const gap=Math.max(0,(M?.getBoundingClientRect().bottom||window.innerHeight)-viewport.height-viewport.offsetTop);
+      M?.style.setProperty('--keyboard-gap',`${gap}px`);
+    });
   };
   viewport.addEventListener('resize',reposition);
   viewport.addEventListener('scroll',reposition);
+  window.addEventListener('resize',reposition);
   window.addEventListener('scroll',reposition);
   reposition();
 }
