@@ -58,7 +58,7 @@ pre .city-row-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));g
   body{height:100dvh;min-height:0;overflow:hidden}
   main{width:100%;min-width:0;padding:0}
   .screen{display:none}
-  #mobile{position:fixed;top:0;left:0;display:flex;flex-direction:column;width:100%;height:100dvh;min-height:0;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(10px,env(safe-area-inset-left));font-size:15px;line-height:1.3;overflow:hidden}
+  #mobile{position:fixed;top:var(--visible-top,0px);left:0;display:flex;flex-direction:column;width:100%;height:var(--visible-height,100dvh);min-height:0;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(10px,env(safe-area-inset-left));font-size:15px;line-height:1.3;overflow:hidden}
   body[data-font='retro'] #mobile{font-family:'DOS PL',monospace;font-size:15px;font-synthesis:none}
   #mobile h1{font-size:1.4em;margin:0 0 14px}
   #mobile h2{font-size:1em;margin:4px 0 12px}
@@ -79,7 +79,8 @@ pre .city-row-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));g
   .mobile-summary b{color:var(--yellow)}
   .mobile-summary small{grid-column:1/-1;color:var(--dim);font-size:.9em}
   .mobile-tabs,.mobile-main-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;flex:none}
-  .mobile-tabs{padding:5px 0;border-block:1px dashed var(--dim)}
+  .mobile-tabs{padding:5px 0;border:0}
+  .mobile-bottom{flex:none;background:var(--bg)}
   #mobile .mobile-tabs button{display:flex;flex-direction:column;gap:2px;align-items:center;padding:4px 2px;font-size:.85em;color:var(--fg)}
   .mobile-tabs small{font-size:.7em;color:inherit}
   .mobile-tabs b{font-size:.85em;font-weight:normal;overflow-wrap:anywhere;max-width:100%}
@@ -95,7 +96,7 @@ pre .city-row-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));g
   .mobile-card-details>span:nth-child(3){text-align:right}
   .mobile-card-details>span:only-child{grid-column:1/-1}
   .mobile-card-details b{color:var(--yellow);font-weight:normal}
-  .mobile-dock{position:relative;z-index:3;transform:translateY(calc(-1 * var(--keyboard-gap,0px)));flex:none;border-top:1px dashed var(--dim);background:var(--bg);padding:6px 0 2px}
+  .mobile-dock{position:relative;z-index:3;flex:none;border-top:1px dashed var(--dim);background:var(--bg);padding:6px 0 2px}
   #mobile .mobile-notice{font-size:.8em;margin:0 0 5px;max-height:3.9em;overflow:auto}
   .mobile-primary-row{display:flex;gap:8px;margin-top:6px}
   .mobile-primary-row>button{flex:1}
@@ -136,7 +137,7 @@ body[data-hand='left'] #journey-dialog button{margin-left:0;margin-right:auto}
 #mobile>.install-help{flex:none;max-height:24dvh;overflow:auto;margin:0;padding:8px;border:0;border-top:1px dashed var(--dim);font-size:.85em}
 
 /* Styles are palette + type choices; no animation or extra font download. */
-body[data-font='matrix']{--yellow:#39ff75}
+body[data-font='matrix']{--yellow:#58b878}
 body[data-font='matrix'] pre,body[data-font='matrix'] #mobile{font-family:'DOS PL',monospace;font-synthesis:none}
 @media(max-width:900px),(pointer:coarse) and (max-width:1200px){
   body[data-font='matrix'] #mobile{font-size:15px}

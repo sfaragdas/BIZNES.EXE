@@ -138,7 +138,7 @@ function inlineControls(){
   if(!mode){
     const tabs=[button('goods','T','Towary','Goods'),button('shares','A','Akcje','Shares'),button('bank','B','Banki','Banks')];
     const ops=table==='banks'?[button('deposit','P','Wpłata','Deposit',1),button('withdraw','O','Odbiór','Withdraw')]:[button('buy','K','Kupno','Buy'),button('sell','S','Sprzedaż','Sell')];
-    const middle=[button('quit','Q','Q Menu','Q Menu'),button('debt','D','Długi','Debt'),button('travel','W','Wyjazd','Travel')];
+    const middle=[button('debt','D','Długi','Debt'),button('quit','Q','Q Menu','Q Menu'),button('travel','W','Wyjazd','Travel')];
     return ['{LEFT}'+tabs.join(' ')+'{MID}'+middle.join(' ')+'{RIGHT}'+ops.join(' ')+'{END}','',notice,table==='stocks'?t('Game prices are fictional. Select a highlighted letter or click.','Kursy są fikcyjne. Wybierz wyróżnioną literę albo kliknij.'):t('Choose a highlighted letter or click.','Wybierz wyróżnioną literę albo kliknij.')];
   }
   if(mode==='travel'){
@@ -173,11 +173,11 @@ function mobileView(){
     return `<button type="button" class="mobile-card" data-ui-action="pick-${i}" ${step==='row'?'':'disabled'}><span class="mobile-card-name">${esc(e.label)}</span><span class="mobile-card-details">${details}</span></button>`;
   }).join('');
   const operation=mobileOperation();
-  return head+`<section class="mobile-summary"><span>${t('Cash','Gotówka')} <b>${money(S.cash)}</b></span><span class="mobile-debt">${t('Debt','Dług')} <b>${money(S.debt)}</b></span></section><nav class="mobile-tabs" aria-label="${t('Market totals','Łączna wartość')}">${tabs}</nav>${!mode||step==='row'?`<div class="mobile-columns ${bank?'bank-columns':''}">${bank?`<span>${t('Balance','Saldo')}</span>`:`<span>${t('Price','Cena')}</span><span>${t('Owned','Masz')}</span><span>${t('Value','Wartość')}</span>`}</div>`:''}<section class="mobile-list">${!mode&&S.lastJourney?`<aside class="journey-report ${S.lastJourney.kind}" role="status"><strong>${t('Last journey','Ostatnia podróż')}</strong><p>${esc(S.lastJourney[lang])}</p></aside>`:''}${operation.content||cards}</section><section class="mobile-dock">${operation.footer}</section>`;
+  return head+`<section class="mobile-summary"><span>${t('Cash','Gotówka')} <b>${money(S.cash)}</b></span><span class="mobile-debt">${t('Debt','Dług')} <b>${money(S.debt)}</b></span></section>${!mode||step==='row'?`<div class="mobile-columns ${bank?'bank-columns':''}">${bank?`<span>${t('Balance','Saldo')}</span>`:`<span>${t('Price','Cena')}</span><span>${t('Owned','Masz')}</span><span>${t('Value','Wartość')}</span>`}</div>`:''}<section class="mobile-list">${!mode&&S.lastJourney?`<aside class="journey-report ${S.lastJourney.kind}" role="status"><strong>${t('Last journey','Ostatnia podróż')}</strong><p>${esc(S.lastJourney[lang])}</p></aside>`:''}${operation.content||cards}</section><section class="mobile-bottom"><nav class="mobile-tabs" aria-label="${t('Market totals','Łączna wartość')}">${tabs}</nav><section class="mobile-dock">${operation.footer}</section></section>`;
 }
 function mobileOperation(){
   const cancel=mobileCancel(),bank=table==='banks';
-  if(!mode)return {content:'',footer:`<p class="mobile-notice ${notice&&notice!==S.lastJourney?.[lang]?'has-message':''}" role="status">${esc((S.lastJourney?.[lang]===notice?'':notice)||t('Choose an action.','Wybierz akcję.'))}</p><nav class="mobile-main-actions">${mobileButton('quit','Menu')}${mobileButton('debt',t('Debt','Dług'))}${mobileButton('travel',t('Travel','Wyjazd'))}</nav><div class="mobile-primary-row">${mobileButton('mobile-sell',bank?t('Withdraw','Odbierz'):t('Sell','Sprzedaj'))}${mobileButton('mobile-buy',bank?t('Deposit','Wpłać'):t('Buy','Kup'),'class="mobile-confirm"')}</div>`};
+  if(!mode)return {content:'',footer:`<p class="mobile-notice ${notice&&notice!==S.lastJourney?.[lang]?'has-message':''}" role="status">${esc((S.lastJourney?.[lang]===notice?'':notice)||t('Choose an action.','Wybierz akcję.'))}</p><nav class="mobile-main-actions">${mobileButton('debt',t('Debt','Dług'))}${mobileButton('quit','Menu')}${mobileButton('travel',t('Travel','Wyjazd'))}</nav><div class="mobile-primary-row">${mobileButton('mobile-sell',bank?t('Withdraw','Odbierz'):t('Sell','Sprzedaj'))}${mobileButton('mobile-buy',bank?t('Deposit','Wpłać'):t('Buy','Kup'),'class="mobile-confirm"')}</div>`};
   if(mode==='travel')return {content:`<h2>${t('Where to?','Dokąd jedziemy?')}</h2><div class="mobile-cities">${cities().map((c,i)=>i===S.city?'':mobileButton(`city-${i}`,c)).join('')}</div>`,footer:`<div class="mobile-operation-footer">${cancel}</div>`};
   if(mode==='debt')return {content:`<h2>${t('Manage debt','Obsługa długu')}</h2><p>${t('Current debt','Obecny dług')}: ${money(S.debt)}</p><p>${t('Loan limit per operation: 5000 $.','Limit pożyczki na operację: 5000 $.')}</p>`,footer:`<div class="mobile-primary-row">${mobileButton('borrow',t('Borrow','Pożyczasz'))}${mobileButton('repay',t('Repay','Oddajesz'),'class="mobile-confirm"')}</div><div class="mobile-operation-footer">${cancel}</div>`};
   if(step==='row')return {content:'',footer:`<p>${t('Select an item from the list.','Zaznacz pozycję na liście.')}</p><div class="mobile-operation-footer">${cancel}</div>`};
@@ -376,9 +376,9 @@ if(typeof window!=='undefined'&&window.visualViewport){
     if(queued)return;queued=true;
     requestAnimationFrame(()=>{
       queued=false;
-      // Only lift the dock: keep the header and content at their existing coordinates.
-      const gap=Math.max(0,(M?.getBoundingClientRect().bottom||window.innerHeight)-viewport.height-viewport.offsetTop);
-      M?.style.setProperty('--keyboard-gap',`${gap}px`);
+      // Anchor BOTH edges to Safari's visible viewport. Flex only shrinks the middle.
+      M?.style.setProperty('--visible-top',`${viewport.offsetTop}px`);
+      M?.style.setProperty('--visible-height',`${viewport.height}px`);
     });
   };
   viewport.addEventListener('resize',reposition);
