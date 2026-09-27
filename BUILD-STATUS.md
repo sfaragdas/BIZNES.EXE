@@ -28,3 +28,7 @@ The JavaScript fallback is selected automatically under `file://`, where browser
 ## Touch-input update
 
 JS and WASM interaction checks passed again after removing manual save and introducing the grouped action bar. Checks now cover welcome spacing, absence of the save button, native input events and Enter submission, and −/+/Max adjustment. Input occupies ten columns in the text harness; CSS layout and the actual iOS keyboard remain unverified on a physical device.
+
+## Welcome and travel layout update
+
+Sponsor links now target both sponsor sites within the welcome panel. One blank terminal row separates the sponsorship panel and instruction heading. City choices span each complete row with increased vertical line spacing; Esc remains in the final action row. Footer reduced to Offline · engine · Autozapis/Autosave. JS/WASM loop checks passed after these updates.

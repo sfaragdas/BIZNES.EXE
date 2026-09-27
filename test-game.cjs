@@ -8,13 +8,13 @@ vm.runInNewContext(fs.readFileSync('game.js','utf8'),context);
 const key=k=>listeners.keydown({key:k,preventDefault(){},ctrlKey:false,metaKey:false,altKey:false});
 function click(id){el('#terminal').handlers.click({target:{closest(selector){if(selector==='[data-frame-action]')return id==='language'?{dataset:{frameAction:id}}:null;if(selector==='[data-ui-action]')return{dataset:{uiAction:id}};return null}}})}
 const state=()=>JSON.parse(store.get('bx-save'));
-const checkScreen=(text)=>{const e=el('#terminal');assert.ok(e.textContent.includes(text),`screen should contain: ${text}; got ${e.textContent}`);const rows=e.textContent.split('\n');assert.equal(rows.length,23);assert.equal(rows.find(r=>r.length!==78),undefined)};
+const checkScreen=(text)=>{const e=el('#terminal');assert.ok(e.textContent.includes(text),`screen should contain: ${text}; got ${e.textContent}`);const rows=e.textContent.split('\n');assert.equal(rows.length,23);assert.equal(rows.find(r=>r.length!==78),undefined,rows.map(r=>r.length).join(','))};
 const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
 (async()=>{
   if(useWasm){for(let i=0;i<40&&el('#engine-status').textContent!=='Rust/WASM';i++)await new Promise(r=>setTimeout(r,25));assert.equal(el('#engine-status').textContent,'Rust/WASM')}
-  checkScreen('Sponsorzy projektu');checkScreen('Czcionka');checkScreen('-'.repeat(78));
+  checkScreen('Sponsorzy projektu');checkScreen('Czcionka');checkScreen('-'.repeat(78));assert.ok(el('#terminal').innerHTML.includes('href=\"https://mojedostawy.pl\"'));assert.ok(el('#terminal').innerHTML.includes('href=\"https://lcse.pl\"'));checkScreen(`Offline · ${useWasm?'Rust/WASM':'JS'} · Autozapis`);
   assert.ok(!el('#terminal').innerHTML.includes('welcome-save'));
-  const welcomeRows=el('#terminal').textContent.split('\n');assert.equal(welcomeRows[7].trim(),'*                                                                          *'.trim());assert.equal(welcomeRows[16].trim(),'');
+  const welcomeRows=el('#terminal').textContent.split('\n');assert.equal(welcomeRows[7].trim(),'*                                                                          *'.trim());assert.equal(welcomeRows[17].trim(),'');
   click('font-toggle');assert.equal(document.body.dataset.font,'retro');click('font-toggle');assert.equal(document.body.dataset.font,'current');
   key('Enter');checkScreen('Towar:');checkScreen('Towary');
   key('K');assert.ok(!el('#terminal').innerHTML.includes('data-ui-action="debt"'));checkScreen('Jaki towar kupujesz?');key('K');checkScreen('możesz kupić 55 ton');click('amount-max');assert.ok(el('#terminal').innerHTML.includes('value="55"'));click('amount-minus');assert.ok(el('#terminal').innerHTML.includes('value="54"'));click('amount-plus');assert.ok(el('#terminal').innerHTML.includes('value="55"'));
@@ -31,7 +31,7 @@ const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
   key('S');key('E');pressAmount(1);assert.equal(state().shares[9],0);checkScreen('Akcje:');
   key('B');key('D');key('P');checkScreen('Ile pożyczasz?');key('Escape');key('A');
   key('D');key('O');pressAmount(10);assert.equal(state().debt,25990);checkScreen('Akcje:');
-  const before=state().cash;key('W');checkScreen('Akcje:');checkScreen('Tokio');key('B');assert.equal(state().city,1);checkScreen('Akcje:');
+  const before=state().cash;key('W');checkScreen('Akcje:');checkScreen('Tokio');assert.ok(el('#terminal').innerHTML.includes('city-row-inner'));assert.ok(el('#terminal').innerHTML.indexOf('data-ui-action=\"city-0\"')<el('#terminal').innerHTML.indexOf('data-ui-action=\"cancel\"'));key('B');assert.equal(state().city,1);checkScreen('Akcje:');
   assert.ok(!el('#terminal').textContent.includes('Wciśnij ENTER'));key('T');checkScreen('Towar:');
   // Travel results and events all remain inline and accept the next action.
   for(let i=0;i<20;i++){key('W');click('city-'+((state().city+1)%9));checkScreen('Towar:');key('D');checkScreen('Pożyczasz');key('Escape')}

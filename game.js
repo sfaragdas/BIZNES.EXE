@@ -30,7 +30,7 @@ if(location.protocol!=='file:'&&typeof WebAssembly!=='undefined'){fetch('target/
 function save(){S.bank=S.banks.reduce((a,b)=>a+b,0);localStorage.setItem('bx-save',JSON.stringify(S));hasExistingSave=true;document.querySelector('#save-status').textContent=t('Saved locally','Zapisano lokalnie')}
 function used(){return S.cargo.reduce((a,b)=>a+b,0)}
 function rand(n){S.rng^=S.rng<<13;S.rng^=S.rng>>>17;S.rng^=S.rng<<5;return(S.rng>>>0)%n}
-function visibleText(s){return s.replace(/\{(?:LEFT|MID|RIGHT|END)\}/g,'').replace(/\{AMOUNT\}/g,' '.repeat(10)).replace(/\{LANG\}/g,lang==='pl'?'L/EN':'L/PL').replace(/\{SPONSOR\}/g,SPONSORS[sponsorIndex][0]).replace(/\{([A-Z])\}/g,'$1').replace(/\[\[([^|]+)\|([^|]+)\|([^|]+)(?:\|([^\]]+))?\]\]/g,'$3')}
+function visibleText(s){return s.replace(/\{(?:LEFT|MID|RIGHT|END|CITYROW|CITYEND)\}/g,'').replace(/\{AMOUNT\}/g,' '.repeat(10)).replace(/\{SPONSOR_LINKS\}/g,'MojeDostawy.pl  ·  LCSE.pl').replace(/\{LANG\}/g,lang==='pl'?'L/EN':'L/PL').replace(/\{SPONSOR\}/g,SPONSORS[sponsorIndex][0]).replace(/\{([A-Z])\}/g,'$1').replace(/\[\[([^|]+)\|([^|]+)\|([^|]+)(?:\|([^\]]+))?\]\]/g,'$3')}
 function frame(rows){
   const content=rows.slice(0,22);while(content.length<22)content.push('');
   content.push(statusText().padStart(78));
@@ -41,20 +41,20 @@ function frame(rows){
     const panel=view==='welcome'&&i>=2&&i<=9;
     if(panel){
       const edge=i===2||i===9;
-      const text=edge?'*'.repeat(76):'* '+r.trim().padEnd(72)+' *';
+      const trimmed=r.trim(),text=edge?'*'.repeat(76):'* '+trimmed+' '.repeat(Math.max(0,72-visibleText(trimmed).length))+' *';
       html=` <span class="welcomepanel${edge?' panel-edge':''}">${esc(text)}</span> `;
     }
     html=html.replace(/\[\[([^|]+)\|([^|]+)\|([^|]+)(?:\|([^\]]+))?\]\]/g,(_,id,key,label,hot='0')=>{const n=Math.max(0,Math.min(label.length-1,Number(hot)||0));return `<button class="terminal-action" data-ui-action="${esc(id)}" data-hotkey="${esc(key)}">${esc(label.slice(0,n))}<span class="key">${esc(label.slice(n,n+1))}</span>${esc(label.slice(n+1))}</button>`});
     html=html.replace(/\{LANG\}/g,`<button class="frame-control" data-frame-action="language">L/${lang==='pl'?'EN':'PL'}</button>`).replace(/\{SPONSOR\}/g,`<a class="sponsor-link" href="${SPONSORS[sponsorIndex][1]}" target="_blank" rel="noopener noreferrer">${SPONSORS[sponsorIndex][0]}</a>`).replace(/BIZNES\.EXE/g,'<span class="accent">BIZNES.EXE</span>').replace(/\{([A-Z])\}/g,'<span class="key">$1</span>').replace(/(\$\s*)([\d,]+(?:\.\d{2})?)/g,'$1<span class="accent">$2</span>').replace(/([\d,]+(?:\.\d{2})?)(\s*\$)/g,'<span class="accent">$1</span>$2');
     for(const city of [...C,...CEN])html=html.replace(new RegExp(esc(city),'g'),`<span class="accent">${esc(city)}</span>`);
 
-    const cls=raw.includes('{LEFT}')?'action-bar':raw.includes('{AMOUNT}')?'amount-row':i===22?'footer-status':i===0?'statusline':view==='welcome'&&i===10?'welcome-instructions':view==='welcome'&&i>=12&&i<=17?'welcome-copy':view==='home'&&((notice&&i===20)||(mode&&i===18))?'promptline':view==='home'&&i===1?'tablehead':view==='home'&&i===17?'section-divider':'';
-    html=html.replace(/\{LEFT\}/g,'<span class="action-group group-left">').replace(/\{MID\}/g,'</span><span class="action-group group-middle">').replace(/\{RIGHT\}/g,'</span><span class="action-group group-right">').replace(/\{END\}/g,'</span>').replace(/\{AMOUNT\}/g,`<input id="amount-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="10" autocomplete="off" enterkeyhint="done" aria-label="${t('Quantity or amount','Ilość lub kwota')}" value="${esc(input)}">`);
+    const cls=raw.includes('{CITYROW}')?'city-row':raw.includes('{LEFT}')?'action-bar':raw.includes('{AMOUNT}')?'amount-row':i===22?'footer-status':i===0?'statusline':view==='welcome'&&i===11?'welcome-instructions':view==='welcome'&&i>=13&&i<=17?'welcome-copy':view==='home'&&((notice&&i===20)||(mode&&i===18))?'promptline':view==='home'&&i===1?'tablehead':view==='home'&&i===17?'section-divider':'';
+    html=html.replace(/\{LEFT\}/g,'<span class="action-group group-left">').replace(/\{MID\}/g,'</span><span class="action-group group-middle">').replace(/\{RIGHT\}/g,'</span><span class="action-group group-right">').replace(/\{END\}/g,'</span>').replace(/\{CITYROW\}/g,'<span class="city-row-inner">').replace(/\{CITYEND\}/g,'</span>').replace(/\{SPONSOR_LINKS\}/g,SPONSORS.map(([name,url])=>`<a class="sponsor-link" href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`).join('  ·  ')).replace(/\{AMOUNT\}/g,`<input id="amount-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="10" autocomplete="off" enterkeyhint="done" aria-label="${t('Quantity or amount','Ilość lub kwota')}" value="${esc(input)}">`);
     return `<span class="terminal-row ${cls}">${html}</span>`;
   }).join('\n');
 }
 const center=s=>{const length=visibleText(s).length,left=Math.max(0,Math.floor((78-length)/2));return ' '.repeat(left)+s+' '.repeat(Math.max(0,78-length-left))};
-function statusText(){const engine=document.querySelector('#engine-status').textContent,saveText=lang==='pl'?'Zapisano lokalnie':'Saved locally';return `100% offline · ${engine} · ${saveText}`}
+function statusText(){const engine=document.querySelector('#engine-status').textContent==='Rust/WASM'?'Rust/WASM':'JS';return `Offline · ${engine} · ${t('Autosave','Autozapis')}`}
 function topbar(){const tail='  {SPONSOR}  {LANG}',brand='BIZNES.EXE  ·  '+t('Tiny economic game','Mała gra ekonomiczna');return `${brand.padEnd(78-visibleText(tail).length)}${tail}`}
 function header(){return [topbar(),` ${t('Cash','Gotówka')} $${fmt(S.cash)}  ${t('Bank','Bank')} $${fmt(S.bank)}  ${t('Debt','Dług')} $${fmt(S.debt)}     ${t('Cargo','Ładunek')}: ${used()}/${S.capacity}`,` ${t('Net worth','Majątek')}: $${fmt(S.cash+S.bank-S.debt+S.cargo.reduce((n,q,i)=>n+q*S.prices[i],0))}`, '─'.repeat(78)]}
 function welcome(){
@@ -66,15 +66,15 @@ function welcome(){
     center(t('Inspired by Biznesman (1988), by M. Cwynar / Studio SAMBA.','Inspiracja: Biznesman (1988), M. Cwynar / Studio SAMBA.')),
     center(t('An independent game inspired by the original, not made by its authors.','Niezależna gra inspirowana oryginałem, nie jest dziełem jego autorów.')),
     '',
-    center(t('Project sponsors: MojeDostawy.pl and LCSE.pl.','Sponsorzy projektu: MojeDostawy.pl oraz LCSE.pl.')),
-    '',center(t('HOW TO PLAY','INSTRUKCJA')),'',
+    center(t('Project sponsors: {SPONSOR_LINKS}','Sponsorzy projektu: {SPONSOR_LINKS}')),
+    '','',center(t('HOW TO PLAY','INSTRUKCJA')),'',
     center(t('Buy low, sell high; prices change between cities.','Kupuj tanio, sprzedawaj drożej — ceny różnią się między miastami.')),
     center(t('Travel is free. Random events may help or hurt.','Podróż jest bezpłatna. Zdarzenia mogą pomóc albo zaszkodzić.')),
     center(t('Watch your debt and cargo capacity. Your game saves automatically.','Pilnuj długu i ładowni. Gra zapisuje się automatycznie.')),
     center(t('{K} buy · {S} sell · {W} travel · {A} shares · {D} debt · {B} banks · {Q} menu','{K} kupno · {S} sprzedaż · {W} wyjazd · {A} akcje · {D} długi · {B} banki · {Q} menu')),
     '',
     center(t('Click a choice or press its highlighted letter.','Kliknij wybór albo naciśnij wyróżnioną literę.')),
-    '-'.repeat(78),'{LEFT}'+opts.slice(0,2).join('   ')+'{MID}{RIGHT}'+opts[2]+'{END}','-'.repeat(78),''
+    '-'.repeat(78),'{LEFT}'+opts.slice(0,2).join('   ')+'{MID}{RIGHT}'+opts[2]+'{END}','-'.repeat(78)
   ]);
 }
 // Two screens; the active table is independent of the inline operation.
@@ -126,7 +126,7 @@ function inlineControls(){
   }
   if(mode==='travel'){
     const opts=cities().map((c,i)=>actionToken(`city-${i}`,c[0].toUpperCase(),c));
-    return [t('Cities you can travel to:','Miasta, do których możesz się wybrać:'),' '+opts.slice(0,5).join('   '),' '+opts.slice(5).join('   '),' '+cancel];
+    return [t('Cities you can travel to:','Miasta, do których możesz się wybrać:'),'{CITYROW}'+opts.slice(0,5).join('   ')+'{CITYEND}','{CITYROW}'+opts.slice(5).join('   ')+'{CITYEND}',' '+cancel];
   }
   if(mode==='debt'&&step==='choice')return [t('Borrow, repay, or return?','Pożyczasz, oddajesz, czy wracasz?'),
     '',' '+button('borrow','P','Pożyczasz','Borrow')+'   '+button('repay','O','Oddajesz','Repay')+'   '+cancel,t('Loan limit per operation: 5000 $.','Limit pożyczki na operację: 5000 $.')];
@@ -139,7 +139,7 @@ function inlineControls(){
   const genitive=['kawy','herbaty','tytoniu','zboża','ropy naftowej','leków','złota','wideo','drukarek','samochodów'];
   const tradeTitle=t(`How many ${item.label} do you ${mode}?`,table==='goods'?`Ile ${genitive[selected]} ${mode==='buy'?'kupujesz':'sprzedajesz'}?`:`Ile akcji ${item.label} ${mode==='buy'?'kupujesz':'sprzedajesz'}?`);
   const title=mode==='borrow'?t('How much do you borrow?','Ile pożyczasz?'):mode==='repay'?t('How much do you repay?','Ile oddajesz?'):mode==='deposit'?t('How much do you deposit?','Ile wpłacasz?'):mode==='withdraw'?t('How much do you withdraw?','Ile odbierasz?'):tradeTitle;
-  return [' '+title,' < '+hint+' >',' '+button('amount-minus','−','−','−')+'  {AMOUNT}  '+button('amount-plus','+','+','+')+'   '+button('amount-max','MAX','Maks','Max'),' '+button('submit','ENTER','ENTER zatwierdź','ENTER confirm')+'   '+cancel];
+  return [' '+title,' < '+hint+' >','',' '+button('amount-minus','−','−','−')+'  {AMOUNT}  '+button('amount-plus','+','+','+')+'   '+button('amount-max','MAX','Maks','Max')+'   '+button('submit','ENTER','Zatwierdź','Confirm')+'   '+cancel];
 }
 function screen(){return view==='welcome'?welcome():home()}
 function render(persist=true){const focused=document.activeElement?.id==='amount-input';if(persist)save();document.body.dataset.font=fontStyle;T.innerHTML=screen();if(focused)document.querySelector('#amount-input')?.focus?.({preventScroll:true})}

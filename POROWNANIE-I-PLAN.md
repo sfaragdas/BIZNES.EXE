@@ -50,3 +50,5 @@ W poprzedniej próbie narzędzie przeglądarki zablokowało dostęp do lokalnej 
 ### Najnowsze dopracowanie interfejsu
 
 Usunięto ręczny zapis, dodano puste wiersze przed sponsorami i instrukcją kliknięcia. Powitanie ma Kontynuuj/Nowa gra po lewej i czcionkę po prawej. Gra ma jeden pasek z trzema grupami działań. Przy długu tekst przycisków jest szary, żółte pozostają skróty. Wprowadzono natywne pole ilości/kwoty, −/+/Maks i większe cele dotykowe. Przewijanie na małym ekranie zachowuje czytelność tabeli. Testy interakcji nie zastępują sprawdzenia Safari na fizycznym iPadzie.
+
+Powitanie linkuje obu sponsorów, ma wolny wiersz przed instrukcją i krótką stopkę „Offline · JS · Autozapis” lub „Offline · Rust/WASM · Autozapis”. Lista miast rozkłada się na szerokość w dwóch wierszach, z większym odstępem; Esc zostaje w najniższym wierszu działań. Ilość ma własny wolny wiersz przed kompaktowymi przyciskami.
