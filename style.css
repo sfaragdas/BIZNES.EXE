@@ -137,7 +137,7 @@ body[data-hand='left'] #journey-dialog button{margin-left:0;margin-right:auto}
 #mobile>.install-help{flex:none;max-height:24dvh;overflow:auto;margin:0;padding:8px;border:0;border-top:1px dashed var(--dim);font-size:.85em}
 
 /* Styles are palette + type choices; no animation or extra font download. */
-body[data-font='matrix']{--yellow:#58b878}
+body[data-font='matrix']{--yellow:#008f39}
 body[data-font='matrix'] pre,body[data-font='matrix'] #mobile{font-family:'DOS PL',monospace;font-synthesis:none}
 @media(max-width:900px),(pointer:coarse) and (max-width:1200px){
   body[data-font='matrix'] #mobile{font-size:15px}
