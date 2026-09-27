@@ -24,7 +24,7 @@ pre .welcomepanel.panel-edge{line-height:inherit}
 pre .welcome-instructions{font-size:1.15em;font-weight:bold;white-space:normal;text-align:center}
 pre .welcome-copy{font-size:1.06em;white-space:normal;text-align:center}
 pre .promptline{color:var(--yellow)}
-@font-face{font-family:'DOS PL';src:url('assets/PxPlus_IBM_VGA8.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:'DOS PL';size-adjust:120%;src:url('assets/PxPlus_IBM_VGA8.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
 body[data-font='retro'] pre{font-family:'DOS PL',monospace;font-size:var(--terminal-font,calc(100cqi / 40));font-synthesis:none}
 @media(max-width:640px){main{padding:6px}.screen{max-width:min(100%,calc((100dvh - 80px)*1.6));max-height:calc(100dvh - 80px)}footer{gap:7px}}
 
@@ -59,7 +59,7 @@ pre .city-row-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));g
   main{width:100%;min-width:0;padding:0}
   .screen{display:none}
   #mobile{position:fixed;top:0;left:0;display:flex;flex-direction:column;width:100%;height:100dvh;min-height:0;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(10px,env(safe-area-inset-left));font-size:15px;line-height:1.3;overflow:hidden}
-  body[data-font='retro'] #mobile{font-family:'DOS PL',monospace;font-size:18px;font-synthesis:none}
+  body[data-font='retro'] #mobile{font-family:'DOS PL',monospace;font-size:15px;font-synthesis:none}
   #mobile h1{font-size:1.4em;margin:0 0 14px}
   #mobile h2{font-size:1em;margin:4px 0 12px}
   #mobile p{margin:0 0 10px}
@@ -67,9 +67,9 @@ pre .city-row-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));g
   #mobile button:disabled{opacity:.45;cursor:default}
   #mobile button:focus-visible,#mobile input:focus-visible{outline:2px solid var(--yellow);outline-offset:-2px}
   .mobile-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:3px 0;flex:none}
-  .mobile-brand{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .mobile-brand{display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:0;min-height:44px;align-self:stretch}
   .mobile-head strong{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--yellow);font-size:14px;white-space:nowrap}
-  .mobile-brand .mobile-city{color:var(--yellow);font-size:14px}
+  .mobile-brand .mobile-city{color:var(--yellow);font-size:15px;border-top:1px dashed var(--dim);padding-top:2px;text-align:left}
   #mobile .mobile-head button{font-size:12px;padding:4px;min-width:36px}
   .mobile-sponsors{display:flex;white-space:nowrap;align-items:center;font-size:15px;line-height:1.3;min-width:0}
   .mobile-sponsors a{color:var(--dim);text-decoration:none;padding:3px 2px}
@@ -136,14 +136,10 @@ body[data-hand='left'] #journey-dialog button{margin-left:0;margin-right:auto}
 #mobile>.install-help{flex:none;max-height:24dvh;overflow:auto;margin:0;padding:8px;border:0;border-top:1px dashed var(--dim);font-size:.85em}
 
 /* Styles are palette + type choices; no animation or extra font download. */
-body[data-font='matrix']{--bg:#001307;--fg:#89d99e;--dim:#61aa77;--yellow:#39ff75;--line:#367f4c;--dosbar:#8fe5aa}
+body[data-font='matrix']{--yellow:#39ff75}
 body[data-font='matrix'] pre,body[data-font='matrix'] #mobile{font-family:'DOS PL',monospace;font-synthesis:none}
-body[data-font='matrix'] button,body[data-font='matrix'] .frame-control{background:var(--bg);border-color:var(--line)}
-body[data-font='matrix'] #amount-input,body[data-font='matrix'] #mobile-amount-input,body[data-font='matrix'] #journey-dialog{background:var(--bg)}
-body[data-font='matrix'] #mobile .mobile-card[aria-pressed='true']{background:#073b19}
 @media(max-width:900px),(pointer:coarse) and (max-width:1200px){
-  body[data-font='matrix'] #mobile{font-size:18px}
-  .mobile-city-strip{flex:none;border-top:1px dashed var(--dim);color:var(--yellow);font-size:15px;text-align:center;padding:4px 0}
+  body[data-font='matrix'] #mobile{font-size:15px}
   .mobile-columns{flex:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;font-size:10px;color:var(--dim);padding:3px 6px;border-bottom:1px dashed var(--dim);margin-right:0}
   .mobile-columns>span:nth-child(2){text-align:center}
   .mobile-columns>span:nth-child(3){text-align:right}
@@ -155,5 +151,4 @@ body[data-font='matrix'] #mobile .mobile-card[aria-pressed='true']{background:#0
   #mobile .mobile-hand-row button,#mobile .mobile-font-row button{width:100%;height:100%;min-height:44px;font-size:13px}
 }
 
-body[data-font='matrix'] button:hover,body[data-font='matrix'] button:focus-visible{color:var(--bg);background:var(--dosbar)}
 .mobile-status>span:last-child{text-align:right}
