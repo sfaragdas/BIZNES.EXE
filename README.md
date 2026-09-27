@@ -51,3 +51,12 @@ See [POROWNANIE-I-PLAN.md](POROWNANIE-I-PLAN.md) for the comparison with the sup
 The single action bar groups table navigation on the left, Menu/Debt/Travel in the middle, and transactions on the right. On narrow screens it scrolls horizontally instead of shrinking touch targets. The DOS table also permits horizontal scrolling on small phones. Touch targets are enlarged on coarse-pointer devices.
 
 Quantity and money entry use a native numeric-keyboard input with minus, plus and Max buttons. Rows, cities and every action are clickable; letter shortcuts are optional. Enter confirms a typed amount and Esc cancels. Sponsor rotation does not replace a focused input, so it cannot interrupt typing. Actual iPad/iOS rendering has not been device-tested.
+
+## Public version
+
+The game is published at https://sfaragdas.github.io/BIZNES.EXE/ using GitHub Pages.
+The `Publish game` workflow builds and checks the WASM core and publishes only the
+runtime files and licenses after pushes to main. The public address has its own
+browser-local save, separate from saves created by opening index.html directly.
+Opening the hosted version requires loading its files over the network; this is
+not yet a service-worker installation for guaranteed offline reopening.
