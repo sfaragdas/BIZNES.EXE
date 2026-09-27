@@ -1,7 +1,21 @@
-# Start here
+# Uruchomienie
 
-1. For a quick offline start, open `index.html`. This runs with the built-in JavaScript fallback.
-2. For the Rust/WASM core, build once with `cargo build --release --target wasm32-unknown-unknown`, then serve this folder (`python -m http.server 8000`) and visit `http://localhost:8000`.
-3. Check the footer: it reports `Rust/WASM` when the compiled core loaded, otherwise `JS fallback`.
+Otwórz `index.html`, aby grać offline. W tym trybie działa silnik JavaScript.
+Opcjonalnie zbuduj Rust/WASM: `cargo build --release --target wasm32-unknown-unknown`,
+uruchom lokalny serwer w tym folderze i otwórz jego adres. Stopka pokaże wybrany silnik.
 
-The welcome screen has a DOS-style asterisk panel, larger instructions, and clickable Save, Continue, New game, and font choices (S/K/N/F on the keyboard). The font switch selects a locally bundled DOS 8×16 pixel font. The game saves automatically as state changes; Q returns to the welcome menu, where a manual save option remains available. Keyboard input works while the game has focus; main choices and table rows are also clickable. Buy/sell and travel stay under the market table; the main choices disappear while an action is underway, and quantities are typed there. The game has no account, cloud, tracking, required Internet, or runtime dependencies. Saved games stay in browser localStorage.
+## Sterowanie
+
+- Powitanie: Z/S — zapisz, K/Enter — kontynuuj, N — nowa gra, F — czcionka.
+- T — towary, A — akcje, B — banki: zmieniają tabelę na tym samym ekranie.
+- K — kupno, S — sprzedaż. W bankach: P — wpłata, O — odbiór.
+- W — wyjazd bez opłaty, D — dług pod aktualną tabelą, Q — zapis i powrót do menu.
+- Przy długu: P — pożyczasz, O — oddajesz.
+- W tabeli wybieraj wyróżnioną literę lub klikaj nazwę. Złoto ma skrót O, zboże Z.
+- Wpisaną ilość lub kwotę zatwierdź Enterem; Esc anuluje. Obie opcje są klikalne.
+- Po wyniku operacji od razu wybierasz kolejną czynność — bez dodatkowego Entera.
+- L — polski/angielski. W wersji EN kieruj się wyróżnionymi literami.
+
+Zapis jest lokalny dla przeglądarki. Q zapisuje automatycznie; ręczny zapis pozostaje
+na powitaniu. Nowa gra zastępuje bieżący zapis. Czcionka standardowa korzysta z
+systemowego kroju monospace; DOS PL zawiera polskie litery w stylu VGA.

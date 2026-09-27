@@ -1,0 +1,11 @@
+PxPlus IBM VGA8 — VileR, The Ultimate Oldschool PC Font Pack.
+Source and documentation: https://int10h.org/oldschool-pc-fonts/
+Font file mirror: https://github.com/pocketfood/Fontpkg-PxPlus_IBM_VGA8
+
+Licensed under Creative Commons Attribution-ShareAlike 4.0 International.
+License: https://creativecommons.org/licenses/by-sa/4.0/
+Legal text: https://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+The font file is redistributed without modification. This license applies to
+the font, independently of the game's source-code license. The extended Plus
+character set supplies Polish letters in the same pixel style.

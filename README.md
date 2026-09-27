@@ -1,4 +1,4 @@
-BIZNES.EXE — Tiny economic game in an 80x25 DOS-style terminal. The welcome screen introduces an independent game inspired by Biznesman (1988), by M. Cwynar / Studio SAMBA, and its lightweight retro approach. It clearly states that this version was not made by the original authors. Choose the standard or DOS 8×16 font on the welcome screen. The bundled Modern DOS font is based on IBM VGA and Verite OEM fonts and is CC0; attribution is in NOTICE. Sponsor links rotate in the top line.
+BIZNES.EXE — Tiny economic game in an 80x25 DOS-style terminal. The welcome screen introduces an independent game inspired by Biznesman (1988), by M. Cwynar / Studio SAMBA, and its lightweight retro approach. It clearly states that this version was not made by the original authors. Choose the standard or DOS PL font on the welcome screen. The bundled PxPlus IBM VGA8 font by VileR includes Polish glyphs and is licensed under CC BY-SA 4.0; attribution is in NOTICE. The standard font uses the original system monospace stack (Consolas on Windows). Sponsor links rotate in the top line.
 
 No account, cloud, tracking, required Internet, or runtime dependencies.
 Start. Play. Quit.
@@ -18,9 +18,13 @@ Run the deterministic full-loop checks with `node test-game.cjs` for the `file:/
 
 ## Play
 
-Keyboard and mouse both work when the game has focus. The main DOS menu is clickable; shortcuts are K buy, S sell, W travel, A shares, D debt, B banks, Q return to welcome, H help, and L language. The game saves automatically as state changes; the welcome menu also offers explicit save, continue, and new game options. Buy/sell and travel prompts stay below the persistent market table; the main options menu hides while an action is underway. Choose goods by clicking or their first letter, then type a quantity and press Enter. Destination, bank, and company choices use letters. Travel costs nothing. The market keeps fixed DOS-style columns, left-aligned labels, right-aligned values, dotted leaders, gray inverse headings, and translated units. Medicines replace weapons and gold replaces narcotics; gold is measured in kg. The 80×25-style viewport contains 23 content rows with 78 columns and one continuous CSS border. The footer status stays inside the frame, and `favicon.svg` uses the DOS-inspired palette.
+Keyboard and mouse both work. There are two screens: welcome and one common table view. Switch the table with T (goods), A (shares), or B (banks). K buys and S sells goods/shares; P deposits and O withdraws in the bank table. W travels, D opens debt operations below the current table, and Q saves and returns to welcome. L changes the language. English labels show the actual shortcut, adding a letter prefix where needed. Use the highlighted letter in each row (some are inside the name to avoid collisions) or click it.
 
-Trade across Amsterdam, Bangkok, Gdynia, Hong Kong, London, Munich, New York, Rome, and Tokyo. Visit six banks, trade shares in six companies, manage debt and cargo capacity, and survive random trip events.
+All operations run below the table. Type a quantity/amount, confirm with Enter or the clickable confirmation, and cancel with Esc. Result messages do not need acknowledgment: the next key selects the next operation. Travel and random events also stay inline; travel costs zero. Action choices are separated by dashed lines and hide during an operation. The welcome screen includes manual Save, Continue, New game, and standard/DOS PL font selection.
+
+Trade across nine cities, use six separate bank accounts, and trade ten share positions. The first six historical positions retain their saved indexes; PKO BP, ORLEN, HiPromine and Excellence occupy the new four. Share prices are fictional game values. Sources and selection rationale are in [SOURCES.md](SOURCES.md). Older six-position saves are extended without losing holdings.
+
+The game autosaves to browser localStorage. The common table includes quantity, value and total; financial summaries stay in place for every table. Medicines replace weapons and gold replaces narcotics. The 80×25-style viewport has 23 content rows of 78 columns and one continuous CSS border. The small status footer stays inside the bottom right corner.
 
 ## Build the Rust/WASM core
 
@@ -40,4 +44,4 @@ The name and related designations require separate verification before commercia
 
 ## Comparison and next steps
 
-See [POROWNANIE-I-PLAN.md](POROWNANIE-I-PLAN.md) for the comparison with the supplied DOS screenshots, known differences between the two engines, and the prioritized improvement plan. Current interaction checks do not establish visual equivalence or engine parity.
+See [POROWNANIE-I-PLAN.md](POROWNANIE-I-PLAN.md) for the comparison with the supplied DOS screenshots, remaining limitations, and the prioritized improvement plan. Interaction checks do not establish pixel-level visual equivalence. A deterministic sequence also compares the JS and WASM state after 21 trips; this is not exhaustive engine validation.

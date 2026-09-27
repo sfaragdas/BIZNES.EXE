@@ -11,23 +11,43 @@ const state=()=>JSON.parse(store.get('bx-save'));
 const checkScreen=(text)=>{const e=el('#terminal');assert.ok(e.textContent.includes(text),`screen should contain: ${text}; got ${e.textContent}`);const rows=e.textContent.split('\n');assert.equal(rows.length,23);assert.equal(rows.find(r=>r.length!==78),undefined)};
 const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
 (async()=>{
-  if(useWasm){for(let i=0;i<40&&el('#engine-status').textContent!=='Rust/WASM';i++)await new Promise(r=>setTimeout(r,25));}
-  checkScreen('Biznesman (1988)');checkScreen('M. Cwynar');checkScreen('Manifest');checkScreen('MojeDostawy.pl');checkScreen('Zapisz stan');checkScreen('100% offline');
-  checkScreen('Sponsorzy projektu: MojeDostawy.pl oraz LCSE.pl.');checkScreen('Czcionka');assert.ok(el('#terminal').innerHTML.includes('<span class="key">K</span> kupno'));assert.ok(!el('#terminal').textContent.includes('│'));
-  assert.ok(el('#terminal').innerHTML.includes('welcomepanel'),'welcome info should share one gray panel');assert.ok(el('#terminal').innerHTML.includes('panel-edge">*****'),'welcome panel should use the DOS-style asterisk border');assert.equal(document.body.dataset.font,'current');click('font-toggle');assert.equal(document.body.dataset.font,'retro');click('font-toggle');assert.equal(document.body.dataset.font,'current');
-  key('Enter');checkScreen('Masz do wyboru');assert.ok(el('#terminal').innerHTML.includes('href="https://mojedostawy.pl"'));
-  click('buy');checkScreen('Jaki towar kupujesz? < wybierz towar w tabeli');assert.ok(!el('#terminal').innerHTML.includes('data-ui-action="debt"'),'main options should hide during trade');key('K');checkScreen('Ile Kawy kupujesz');checkScreen('możesz kupić 55 ton');assert.ok(el('#terminal').innerHTML.includes('promptline'));pressAmount('10');checkScreen('Transakcja zakończona');assert.equal(state().cargo[0],10);
-  click('sell');click('good-0');pressAmount('3');checkScreen('Transakcja zakończona');assert.equal(state().cargo[0],7);
-  click('buy');click('good-0');pressAmount('48');assert.equal(state().cash,10);click('buy');click('good-9');checkScreen('Nie masz pieniędzy na ten towar.');key('Enter');click('sell');click('good-9');checkScreen('Przecież nie posiadasz: Samochody.');key('Enter');click('sell');click('good-0');pressAmount('45');assert.equal(state().cargo[0],10);
-  click('bank');checkScreen('Możesz złożyć swoje pieniądze');assert.ok(el('#terminal').innerHTML.includes('Bank <span class="key">S</span>zwajcarski'));click('bank-0');click('deposit');pressAmount('50');assert.equal(state().banks[0],50);assert.equal(state().bank,50);
-  click('bank');click('bank-0');click('withdraw');pressAmount('20');assert.equal(state().banks[0],30);assert.equal(state().bank,30);
-  click('debt');click('repay');pressAmount('25');assert.equal(state().debt,24975);
-  key('Enter');const cashBeforeTravel=state().cash;key('W');checkScreen('Bangkok');checkScreen('Tokio');assert.ok(!el('#terminal').innerHTML.includes('data-ui-action="buy"'),'main options should hide during travel');assert.ok(el('#terminal').innerHTML.includes('data-ui-action="city-1"'));key('B');checkScreen('Bangkok');assert.equal(state().city,1);assert.equal(state().cash,cashBeforeTravel);click('continue');
-  click('shares');checkScreen("Hotel 'Hilton'");click('stock-4');click('stock-buy');pressAmount('1');assert.equal(state().shares[4],1);
-  click('language');assert.ok(el('#terminal').textContent.includes('Towar:')||el('#terminal').textContent.includes('Goods:'));assert.equal(el('#terminal').textContent.includes('Warszawa'),false);click('language');assert.ok(el('#terminal').textContent.includes('Towar:')||el('#terminal').textContent.includes('Goods:'));
-  click('quit');checkScreen('Kontynuuj');assert.ok(store.has('bx-save'),'Q should preserve the current saved state');click('welcome-continue');checkScreen('Masz do wyboru');click('new-game');assert.equal(state().cash,1000);assert.ok(el('#terminal').textContent.includes('Rozpoczęto nową grę'));
-  click('quit');click('welcome-save');assert.ok(store.has('bx-save'));
-  const html=fs.readFileSync('index.html','utf8'),css=fs.readFileSync('style.css','utf8');assert.ok(!html.includes('class="controls"'));assert.ok(html.includes('favicon.svg'));assert.ok(css.includes("body[data-font='retro']"));assert.ok(css.includes('ModernDOS8x16.ttf'));assert.ok(css.includes('pre .footer-status'));assert.ok(css.includes('border:0'));assert.ok(css.includes('overflow:hidden'));
-  if(useWasm){await new Promise(r=>setTimeout(r,40));assert.equal(el('#engine-status').textContent,'Rust/WASM')}
-  console.log(`PASS (${useHttp?'HTTP Rust/WASM':useWasm?'Rust/WASM':'JS fallback'}): welcome, sponsor links, inline trade, keyboard input, bank, debt, travel, shares, localization and 80x25 frame.`)
+  if(useWasm){for(let i=0;i<40&&el('#engine-status').textContent!=='Rust/WASM';i++)await new Promise(r=>setTimeout(r,25));assert.equal(el('#engine-status').textContent,'Rust/WASM')}
+  checkScreen('Sponsorzy projektu');checkScreen('Czcionka');checkScreen('-'.repeat(78));
+  click('font-toggle');assert.equal(document.body.dataset.font,'retro');click('font-toggle');assert.equal(document.body.dataset.font,'current');
+  key('Enter');checkScreen('Towar:');checkScreen('Towary');
+  key('K');assert.ok(!el('#terminal').innerHTML.includes('data-ui-action="debt"'));checkScreen('Jaki towar kupujesz?');key('K');checkScreen('możesz kupić 55 ton');pressAmount(10);assert.equal(state().cargo[0],10);
+  key('S');checkScreen('Jaki towar sprzedajesz?');key('S');checkScreen('Nie posiadasz: Samochody.');
+  key('K');checkScreen('Jaki towar kupujesz?');key('Escape');key('S');key('K');pressAmount(3);assert.equal(state().cargo[0],7);
+  key('K');key('K');pressAmount(999);checkScreen('Nieprawidłowa ilość');key('B');checkScreen('Stan konta:');
+  key('P');key('S');pressAmount(100);assert.equal(state().banks[0],100);checkScreen('Stan konta:');
+  key('O');key('S');pressAmount(40);assert.equal(state().banks[0],60);
+  key('D');checkScreen('Stan konta:');checkScreen('Pożyczasz');key('P');pressAmount(1000);assert.equal(state().debt,26000);checkScreen('Stan konta:');
+  key('A');checkScreen('Akcje:');checkScreen('Excellence (NC)');assert.equal(state().shares.length,10);
+  for(let i=0;i<10;i++){click('buy');click('stock-'+i);pressAmount(1);assert.equal(state().shares[i],1)}
+  key('S');key('E');pressAmount(1);assert.equal(state().shares[9],0);checkScreen('Akcje:');
+  key('B');key('D');key('P');checkScreen('Ile pożyczasz?');key('Escape');key('A');
+  key('D');key('O');pressAmount(10);assert.equal(state().debt,25990);checkScreen('Akcje:');
+  const before=state().cash;key('W');checkScreen('Akcje:');checkScreen('Tokio');key('B');assert.equal(state().city,1);checkScreen('Akcje:');
+  assert.ok(!el('#terminal').textContent.includes('Wciśnij ENTER'));key('T');checkScreen('Towar:');
+  // Travel results and events all remain inline and accept the next action.
+  for(let i=0;i<20;i++){key('W');click('city-'+((state().city+1)%9));checkScreen('Towar:');key('D');checkScreen('Pożyczasz');key('Escape')}
+  if(process.argv.includes('--snapshot'))console.log('SNAPSHOT '+JSON.stringify(state()));
+  click('language');checkScreen('Goods:');key('K');checkScreen('Which good do you buy?');key('Escape');key('A');checkScreen('Shares:');key('B');checkScreen('Balance:');
+  key('P');key('S');pressAmount(1);checkScreen('Transaction completed.');key('D');checkScreen('Borrow, repay');key('Escape');
+  click('language');key('Q');checkScreen('Kontynuuj');const saved=state();key('Enter');assert.deepEqual(state(),saved);
+  key('Q');click('welcome-save');key('N');assert.equal(state().cash,1000);assert.equal(state().shares.length,10);
+  const css=fs.readFileSync('style.css','utf8');assert.ok(css.includes('PxPlus_IBM_VGA8.ttf'));assert.ok(!css.includes('Courier New'));
+  // Load a real previous-format save: the first six positions keep their identity.
+  const legacy={...state(),cash:2000,bank:20,banks:[20,0,0,0,0,0],shares:[1,2,3,4,5,6],rng:0xf1234567};
+  store.set('bx-save',JSON.stringify(legacy));
+  async function reload(){
+    vm.runInNewContext(fs.readFileSync('game.js','utf8'),context);
+    if(useWasm){for(let i=0;i<40&&el('#engine-status').textContent!=='Rust/WASM';i++)await new Promise(r=>setTimeout(r,25));assert.equal(el('#engine-status').textContent,'Rust/WASM')}
+  }
+  await reload();key('Enter');key('A');
+  assert.deepEqual(state().shares,[1,2,3,4,5,6,0,0,0,0]);
+  key('K');key('E');pressAmount(1);assert.equal(state().shares[9],1);
+  key('Q');const savedTen=state();await reload();key('Enter');assert.deepEqual(state(),savedTen);
+  key('A');key('S');key('E');pressAmount(1);assert.equal(state().shares[9],0);
+  console.log(`PASS (${useWasm?'Rust/WASM':'JS'}): two screens, 10 stocks, all inline operations, notices, travel/events, PL/EN, fonts, save and 23x78 rows.`);
 })().catch(e=>{console.error(e);process.exitCode=1});
