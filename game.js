@@ -77,9 +77,9 @@ function welcome(){
     center(t('BIZNES.EXE · A tiny economic game','BIZNES.EXE · Mała gra ekonomiczna')),
     center(t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.')),
     center(t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:')),
-    center(t('Biznesman (1988), M. Cwynar / Studio SAMBA.','Biznesman (1988), M. Cwynar / Studio SAMBA.')),
+    center(t('Biznesman (1988), M. Cwynar / SAMBA.','Biznesman (1988), M. Cwynar / SAMBA.')),
     '',
-    center(t('Project sponsors: {SPONSOR_LINKS}','Sponsorzy projektu: {SPONSOR_LINKS}')),
+    center(t('Project patrons: {SPONSOR_LINKS}','Patroni projektu: {SPONSOR_LINKS}')),
     '','',center(t('HOW TO PLAY','INSTRUKCJA')),'',
     center(t('Buy low, sell high; prices change between cities.','Kupuj tanio, sprzedawaj drożej — ceny różnią się między miastami.')),
     center(t('Travel is free. Random events may help or hurt.','Podróż jest bezpłatna. Zdarzenia mogą pomóc albo zaszkodzić.')),
@@ -160,10 +160,10 @@ const mobileCancel=()=>mobileButton('cancel',t('Esc · Cancel','Esc · Anuluj'))
 function mobileView(){
   const links=[...SPONSORS].reverse().map(([name,url])=>`<a href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`).join('    ');
   const [sponsorName,sponsorUrl]=SPONSORS[sponsorIndex];
-  const head=`<header class="mobile-head"><div class="mobile-brand"><strong>BIZNES.EXE</strong>${view==='home'?`<span class="mobile-city">${esc(cities()[S.city])}</span>`:''}</div><nav class="mobile-sponsors" aria-label="${t('Sponsors','Sponsorzy')}"><a href="${sponsorUrl}" target="_blank" rel="noopener noreferrer">${sponsorName}</a></nav>${mobileButton('language',lang==='pl'?'EN':'PL',`aria-label="${t('Switch language','Zmień język')}"`)}</header>`;
-  if(view==='welcome')return head+`<section class="mobile-list mobile-welcome"><div class="mobile-manifest"><h1>${t('Small game. Big business.','Mała gra. Wielki biznes.')}</h1><p>${t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.')}</p><p>${t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:')}<br>Biznesman (1988), M. Cwynar / Studio SAMBA.</p><p>${t('Project sponsors','Sponsorzy projektu')}:<br>${links}</p></div><h2>${t('How to play','Jak grać')}</h2><p>${t('Buy low, sell high. Travel freely between cities and watch your debt.','Kupuj tanio, sprzedawaj drożej. Podróżuj bez opłat i pilnuj długu.')}</p><p>${t('Choose an action below, then select an item and enter an amount. Progress saves automatically.','Wybierz działanie na dole, następnie pozycję i ilość. Postęp zapisuje się automatycznie.')}</p>${pwaMessage()?`<p class="install-help" role="status">${esc(pwaMessage())}</p>`:''}</section><small class="mobile-status">${esc(statusText())}</small><section class="mobile-dock mobile-welcome-dock"><div class="mobile-hand-row">${mobileButton('hand-toggle',handedness==='right'?t('Left-handed','Leworęczny'):t('Right-handed','Praworęczny'))}<span>${handedness==='right'?t('Right-handed ✓','Praworęczny ✓'):t('Left-handed ✓','Leworęczny ✓')}</span></div><div class="mobile-font-row">${mobileButton('install-app',t('Install app','Zainstaluj'))}${mobileButton('font-toggle',t('Font: ','Czcionka: ')+(fontStyle==='retro'?'DOS PL':t('Standard','Standardowa')))}</div><div class="mobile-primary-row">${mobileButton('new-game',t('New game','Nowa gra'))}${mobileButton('welcome-continue',t('Continue','Kontynuuj'),'class="mobile-confirm"')}</div></section>`;
+  const head=`<header class="mobile-head"><div class="mobile-brand"><strong>BIZNES.EXE</strong>${view==='home'?`<span class="mobile-city">${esc(cities()[S.city])}</span>`:''}</div><nav class="mobile-sponsors" aria-label="${t('Patrons','Patroni')}"><a href="${sponsorUrl}" target="_blank" rel="noopener noreferrer">${sponsorName}</a></nav>${mobileButton('language',lang==='pl'?'EN':'PL',`aria-label="${t('Switch language','Zmień język')}"`)}</header>`;
+  if(view==='welcome')return head+`<section class="mobile-list mobile-welcome"><div class="mobile-manifest"><h1>${t('Small game. Big business.','Mała gra. Wielki biznes.')}</h1><p>${t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.')}</p><p>${t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:')}<br>Biznesman (1988), M. Cwynar / SAMBA.</p><p>${t('Project patrons','Patroni projektu')}:<br>${links}</p></div><h2>${t('How to play','Jak grać')}</h2><p>${t('Buy low, sell high.','Kupuj tanio, sprzedawaj drożej.')}<br>${t('Travel for free and watch your debt.','Podróżuj bez opłat i pilnuj długu.')}<br>${t('Travel brings rewards and setbacks.','Podróże to korzyści i wpadki.')}</p><p>${t('Choose an action below, then select an item and enter an amount. Progress saves automatically.','Wybierz działanie na dole, następnie pozycję i ilość. Postęp zapisuje się automatycznie.')}</p></section>${pwaMessage()?`<p class="install-help" role="status">${esc(pwaMessage())}</p>`:''}<small class="mobile-status">${esc(statusText())}</small><section class="mobile-dock mobile-welcome-dock"><div class="mobile-hand-row">${mobileButton('hand-toggle',handedness==='right'?t('Left-handed','Leworęczny'):t('Right-handed','Praworęczny'))}<span>${handedness==='right'?t('Right-handed ✓','Praworęczny ✓'):t('Left-handed ✓','Leworęczny ✓')}</span></div><div class="mobile-font-row">${mobileButton('install-app',t('Install app','Zainstaluj'))}${mobileButton('font-toggle',t('Font: ','Czcionka: ')+(fontStyle==='retro'?'DOS PL':t('Standard','Standardowa')))}</div><div class="mobile-primary-row">${mobileButton('new-game',t('New game','Nowa gra'))}${mobileButton('welcome-continue',t('Continue','Kontynuuj'),'class="mobile-confirm"')}</div></section>`;
   const bank=table==='banks',totals={goods:S.cargo.reduce((n,q,i)=>n+q*S.prices[i],0),shares:S.shares.reduce((n,q,i)=>n+q*stockPrice(i),0),bank:S.bank};
-  const tabs=[['goods',t('Goods','Towary')],['shares',t('Shares','Akcje')],['bank',t('Banks','Banki')]].map(([id,label])=>`<button type="button" data-ui-action="${id}" aria-pressed="${({goods:'goods',shares:'stocks',bank:'banks'}[id]===table)}" ${mode?'disabled':''}><span>${label}</span><b>${money(totals[id])}</b></button>`).join('');
+  const tabs=[['goods',t('Goods','Towary')],['shares',t('Shares','Akcje')],['bank',t('Banks','Banki')]].map(([id,label])=>`<button type="button" data-ui-action="${id}" aria-pressed="${({goods:'goods',shares:'stocks',bank:'banks'}[id]===table)}" ${mode&&mode!=='travel'?'disabled':''}><span>${label}</span><b>${money(totals[id])}</b></button>`).join('');
   const cards=entries().map((e,i)=>{
     const details=bank?`<span>${t('Balance','Saldo')} <b>${money(e.balance)}</b></span>`:`<span>${t('Price','Cena')} <b>${money(e.price)}</b></span><span>${t('Owned','Masz')} ${e.qty} ${e.unit}</span><span>${t('Value','Wartość')} ${money(e.qty*e.price)}</span>`;
     return `<button type="button" class="mobile-card" data-ui-action="pick-${i}" ${step==='row'?'':'disabled'}><span class="mobile-card-name">${esc(e.label)}</span><span class="mobile-card-details">${details}</span></button>`;
@@ -173,7 +173,7 @@ function mobileView(){
 }
 function mobileOperation(){
   const cancel=mobileCancel(),bank=table==='banks';
-  if(!mode)return {content:'',footer:`<p class="mobile-notice" role="status">${esc((S.lastJourney?.[lang]===notice?'':notice)||t('Choose an action.','Wybierz działanie.'))}</p><nav class="mobile-main-actions">${mobileButton('quit','Menu')}${mobileButton('debt',t('Debt','Dług'))}${mobileButton('travel',t('Travel','Wyjazd'))}</nav><div class="mobile-primary-row">${mobileButton('mobile-sell',bank?t('Withdraw','Odbierz'):t('Sell','Sprzedaj'))}${mobileButton('mobile-buy',bank?t('Deposit','Wpłać'):t('Buy','Kup'),'class="mobile-confirm"')}</div>`};
+  if(!mode)return {content:'',footer:`<p class="mobile-notice ${notice&&notice!==S.lastJourney?.[lang]?'has-message':''}" role="status">${esc((S.lastJourney?.[lang]===notice?'':notice)||t('Choose an action.','Wybierz akcję.'))}</p><nav class="mobile-main-actions">${mobileButton('quit','Menu')}${mobileButton('debt',t('Debt','Dług'))}${mobileButton('travel',t('Travel','Wyjazd'))}</nav><div class="mobile-primary-row">${mobileButton('mobile-sell',bank?t('Withdraw','Odbierz'):t('Sell','Sprzedaj'))}${mobileButton('mobile-buy',bank?t('Deposit','Wpłać'):t('Buy','Kup'),'class="mobile-confirm"')}</div>`};
   if(mode==='travel')return {content:`<h2>${t('Where to?','Dokąd jedziemy?')}</h2><div class="mobile-cities">${cities().map((c,i)=>i===S.city?'':mobileButton(`city-${i}`,c)).join('')}</div>`,footer:`<div class="mobile-operation-footer">${cancel}</div>`};
   if(mode==='debt')return {content:`<h2>${t('Manage debt','Obsługa długu')}</h2><p>${t('Current debt','Obecny dług')}: ${money(S.debt)}</p><p>${t('Loan limit per operation: 5000 $.','Limit pożyczki na operację: 5000 $.')}</p>`,footer:`<div class="mobile-primary-row">${mobileButton('borrow',t('Borrow','Pożyczasz'))}${mobileButton('repay',t('Repay','Oddajesz'),'class="mobile-confirm"')}</div><div class="mobile-operation-footer">${cancel}</div>`};
   if(step==='row')return {content:'',footer:`<p>${t('Select an item from the list.','Zaznacz pozycję na liście.')}</p><div class="mobile-operation-footer">${cancel}</div>`};
@@ -191,7 +191,34 @@ function fitTerminal(){
 }
 
 function screen(){return view==='welcome'?welcome():home()}
-function render(persist=true){const scroll=M?.querySelector?.('.mobile-list')?.scrollTop||0;const id=document.activeElement?.id,focused=['amount-input','mobile-amount-input'].includes(id);if(persist)save();document.body.dataset.font=fontStyle;document.body.dataset.hand=handedness;T.innerHTML=screen();if(M){M.innerHTML=mobileView();const list=M.querySelector?.('.mobile-list');if(list)list.scrollTop=scroll}fitTerminal();renderJourneyPopup();if(focused)document.querySelector('#'+id)?.focus?.({preventScroll:true})}
+function updateMobile(html){
+  if(!M)return;
+  if(!document.createElement){M.innerHTML=html;return}
+  const template=document.createElement('template');template.innerHTML=html;
+  function patch(parent,next){
+    for(let i=0;i<next.childNodes.length;i++){
+      const fresh=next.childNodes[i],old=parent.childNodes[i];
+      if(!old){parent.appendChild(fresh.cloneNode(true));continue}
+      if(old.nodeType!==fresh.nodeType||old.nodeName!==fresh.nodeName||old.nodeType===1&&old.id!==fresh.id){old.replaceWith(fresh.cloneNode(true));continue}
+      if(old.nodeType===3){if(old.nodeValue!==fresh.nodeValue)old.nodeValue=fresh.nodeValue;continue}
+      if(old.nodeType!==1)continue;
+      for(const attr of [...old.attributes])if(!fresh.hasAttribute(attr.name))old.removeAttribute(attr.name);
+      for(const attr of fresh.attributes)if(old.getAttribute(attr.name)!==attr.value)old.setAttribute(attr.name,attr.value);
+      if(old.tagName==='INPUT'){if(old.value!==fresh.value)old.value=fresh.value;}
+      else patch(old,fresh);
+    }
+    while(parent.childNodes.length>next.childNodes.length)parent.lastChild.remove();
+  }
+  patch(M,template.content);
+}
+function render(persist=true){
+  const id=document.activeElement?.id,focused=['amount-input','mobile-amount-input'].includes(id);
+  if(persist)save();
+  document.body.dataset.font=fontStyle;document.body.dataset.hand=handedness;
+  T.innerHTML=screen();updateMobile(mobileView());fitTerminal();renderJourneyPopup();
+  if(focused&&document.activeElement?.id!==id)document.querySelector('#'+id)?.focus?.({preventScroll:true});
+}
+let noticeSerial=0;
 function renderJourneyPopup(){
   if(!D)return;
   if(!eventPopup){D.close?.();return}
@@ -200,7 +227,11 @@ function renderJourneyPopup(){
   D.oncancel=e=>{e.preventDefault();select('close-event')};
   D.showModal?.();
 }
-function homeNotice(msg){view='home';step='';mode='';input='';notice=msg;render()}
+function homeNotice(msg){
+  view='home';step='';mode='';input='';notice=msg;render();
+  const serial=++noticeSerial;
+  if(msg&&typeof setTimeout==='function')setTimeout(()=>{if(serial===noticeSerial&&notice===msg){notice='';render(false)}},7000);
+}
 function stockPrice(i){return 80+((S.day*17+i*31)%90)}
 function maximum(){
   if(mode==='borrow')return Math.min(5000,2147483647-S.cash,2147483647-S.debt);
@@ -291,6 +322,7 @@ function select(id){
   const row=/^(good|stock|bank)-(\d+)$/.exec(id);
   if(row){if(row[1]==={goods:'good',stocks:'stock',banks:'bank'}[table])chooseRow(Number(row[2]));return}
   if(mode==='debt'&&step==='choice'&&['repay','borrow'].includes(id)){mode=id;step='quantity';input='';render();return}
+  if(mode==='travel'&&['goods','shares','bank'].includes(id)){mode='';step=''}
   if(mode)return;
   notice='';input='';
   if(['goods','shares','bank'].includes(id)){mobileSelected=null;table={goods:'goods',shares:'stocks',bank:'banks'}[id]}
@@ -333,7 +365,7 @@ document.addEventListener('keydown',e=>{
   if(k==='BACKSPACE'||k==='ENTER'||k==='ESC'||k.length===1){e.preventDefault();action(k)}
 });
 // Keep the bottom dock above the on-screen keyboard on mobile browsers.
-if(typeof window!=='undefined')window.addEventListener('pwa-state',()=>{if(view==='welcome'){render(false);if(pwaMessage())M?.querySelector?.('.install-help')?.scrollIntoView?.({block:'nearest'})}});
+if(typeof window!=='undefined')window.addEventListener('pwa-state',()=>{if(view==='welcome')render(false)});
 if(typeof window!=='undefined'&&window.visualViewport){
   const viewport=window.visualViewport;
   const reposition=()=>{

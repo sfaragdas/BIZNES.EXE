@@ -12,7 +12,7 @@ const checkScreen=(text)=>{const e=el('#terminal');assert.ok(e.textContent.inclu
 const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
 (async()=>{
   if(useWasm){for(let i=0;i<40&&el('#engine-status').textContent!=='Rust/WASM';i++)await new Promise(r=>setTimeout(r,25));assert.equal(el('#engine-status').textContent,'Rust/WASM')}
-  checkScreen('Sponsorzy projektu');checkScreen('Czcionka');checkScreen('-'.repeat(78));assert.ok(el('#terminal').innerHTML.includes('href=\"https://mojedostawy.pl\"'));assert.ok(el('#terminal').innerHTML.includes('href=\"https://lcse.pl\"'));checkScreen(`Offline · ${useWasm?'Rust/WASM':'JS'} · Autozapis`);
+  checkScreen('Patroni projektu');checkScreen('Czcionka');checkScreen('-'.repeat(78));assert.ok(el('#terminal').innerHTML.includes('href=\"https://mojedostawy.pl\"'));assert.ok(el('#terminal').innerHTML.includes('href=\"https://lcse.pl\"'));checkScreen(`Offline · ${useWasm?'Rust/WASM':'JS'} · Autozapis`);
   assert.ok(!el('#terminal').innerHTML.includes('welcome-save'));
   const welcomeRows=el('#terminal').textContent.split('\n');assert.equal(welcomeRows[7].trim(),'*                                                                          *'.trim());assert.equal(welcomeRows[17].trim(),'');
   click('font-toggle');assert.equal(document.body.dataset.font,'retro');click('font-toggle');assert.equal(document.body.dataset.font,'current');
