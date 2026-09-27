@@ -69,12 +69,14 @@ const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
     assert.equal(state().cargo[0],0);
   }
   enterMobile('2');tap('submit');assert.equal(state().cargo[0],2);
-  assert.ok(el('#mobile').textContent.includes('Kupno: Zaznacz'));
+  assert.ok(el('#mobile').innerHTML.includes('data-ui-action="mobile-buy"'));
+  assert.ok(!el('#mobile').textContent.includes('Kupno: Zaznacz'));
   tap('cancel');tap('mobile-sell');tap('pick-9');
   assert.ok(el('#mobile').textContent.includes('Nie posiadasz: Samochody.'));
   assert.ok(el('#mobile').textContent.includes('Sprzedaż: Zaznacz'));
   tap('pick-0');enterMobile('1');tap('submit');assert.equal(state().cargo[0],1);
-  assert.ok(el('#mobile').textContent.includes('Sprzedaż: Zaznacz'));
+  assert.ok(el('#mobile').innerHTML.includes('data-ui-action="mobile-sell"'));
+  tap('mobile-sell');
   tap('shares');assert.ok(el('#mobile').textContent.includes('Sprzedaż: Zaznacz'));
   tap('bank');assert.ok(el('#mobile').textContent.includes('Odbiór: Zaznacz'));
   tap('cancel');tap('debt');
