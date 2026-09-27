@@ -56,3 +56,7 @@ Powitanie linkuje obu sponsorów, ma wolny wiersz przed instrukcją i krótką s
 ### Mobilne sterowanie jedną ręką
 
 Powitanie i gra mają przypięty nagłówek oraz dolny panel; przewija się środkowa zawartość. Zaznacza się cały wiersz, a transakcje wykonuje przyciskami na dole. Tryb lewej/prawej ręki jest zapamiętywany i odwraca główne działania. Zakładki pokazują sumy towarów, akcji i banków. Sponsorzy są w nagłówku, status silnika tylko na powitaniu. Usunięto limit 100 jednostek ładowni w JS i WASM; techniczna granica zapisu to 65 535 jednostek jednej pozycji. Przegląd na fizycznym iOS, zwłaszcza z klawiaturą ekranową i większym tekstem, pozostaje do wykonania.
+
+### Kolejność działań i klawiatura Safari
+
+Sterowanie mobilne: działanie → pozycja → ilość. Nagłówek pokazuje jednego rotującego sponsora, miasto pod saldami; dług jest wyrównany do prawej. Opis powitania skrócono do klimatu retro MS-DOS i niezależnej adaptacji. Kontener mobilny jest przypięty do wysokości oraz przesunięcia VisualViewport i reaguje na resize/scroll, aby panel ilości podążał za obszarem nad klawiaturą. Potwierdzenie na fizycznym iPhonie pozostaje konieczne.

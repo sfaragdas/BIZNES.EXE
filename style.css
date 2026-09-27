@@ -58,7 +58,7 @@ pre .city-row-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));g
   body{height:var(--mobile-height,100dvh);min-height:0;overflow:hidden}
   main{width:100%;min-width:0;padding:0}
   .screen{display:none}
-  #mobile{display:flex;flex-direction:column;width:100%;height:var(--mobile-height,100dvh);min-height:0;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(10px,env(safe-area-inset-left));font-size:15px;line-height:1.3;overflow:hidden}
+  #mobile{position:fixed;top:0;left:0;transform:translateY(var(--mobile-top,0px));display:flex;flex-direction:column;width:100%;height:var(--mobile-height,100dvh);min-height:0;padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(10px,env(safe-area-inset-left));font-size:15px;line-height:1.3;overflow:hidden}
   body[data-font='retro'] #mobile{font-family:'DOS PL',monospace;font-size:18px;font-synthesis:none}
   #mobile h1{font-size:1.4em;margin:0 0 14px}
   #mobile h2{font-size:1em;margin:4px 0 12px}
@@ -69,10 +69,11 @@ pre .city-row-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));g
   .mobile-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:3px 0;flex:none}
   .mobile-head strong{color:var(--yellow);font-size:1em;white-space:nowrap}
   #mobile .mobile-head button{font-size:12px;padding:4px;min-width:36px}
-  .mobile-sponsors{display:flex;flex-direction:column;align-items:center;font-size:11px;line-height:1.3;min-width:0}
+  .mobile-sponsors{display:flex;white-space:nowrap;align-items:center;font-size:11px;line-height:1.3;min-width:0}
   .mobile-sponsors a{color:var(--dim);text-decoration:none;padding:3px 2px}
   .mobile-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 8px;padding:4px 0 6px;font-size:.85em;flex:none;overflow-wrap:anywhere}
-  .mobile-summary .mobile-city{grid-column:1/-1;color:var(--fg)}
+  .mobile-summary .mobile-city{grid-column:1/-1;color:var(--yellow);text-align:center;padding-top:3px}
+  .mobile-debt{text-align:right}
   .mobile-summary b{color:var(--yellow)}
   .mobile-summary small{grid-column:1/-1;color:var(--dim);font-size:.9em}
   .mobile-tabs,.mobile-main-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;flex:none}
@@ -84,6 +85,7 @@ pre .city-row-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));g
   .mobile-list{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:8px 0;scrollbar-gutter:stable}
   #mobile .mobile-card{display:block;width:100%;text-align:left;padding:8px 6px;border:0;border-bottom:1px solid #444;color:var(--fg);background:var(--bg)}
   #mobile .mobile-card[aria-pressed='true']{background:#242400;box-shadow:inset 3px 0 var(--yellow)}
+  #mobile .mobile-card:disabled{opacity:1;cursor:default}
   .mobile-card-name{display:block;overflow-wrap:anywhere;margin-bottom:2px}
   .mobile-card-details{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:.8em}
   .mobile-card-details b{color:var(--yellow);font-weight:normal}

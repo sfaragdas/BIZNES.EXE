@@ -1,4 +1,4 @@
-BIZNES.EXE — Tiny economic game in an 80x25 DOS-style terminal. The welcome screen introduces an independent game inspired by Biznesman (1988), by M. Cwynar / Studio SAMBA, and its lightweight retro approach. It clearly states that this version was not made by the original authors. Choose the standard or DOS PL font on the welcome screen. The bundled PxPlus IBM VGA8 font by VileR includes Polish glyphs and is licensed under CC BY-SA 4.0; attribution is in NOTICE. The standard font uses the original system monospace stack (Consolas on Windows). Sponsor links appear in the welcome panel.
+BIZNES.EXE — Tiny economic game in an 80x25 DOS-style terminal. The welcome screen introduces an independent game inspired by Biznesman (1988), by M. Cwynar / Studio SAMBA, and its lightweight retro approach. It identifies this version as an independent adaptation. Choose the standard or DOS PL font on the welcome screen. The bundled PxPlus IBM VGA8 font by VileR includes Polish glyphs and is licensed under CC BY-SA 4.0; attribution is in NOTICE. The standard font uses the original system monospace stack (Consolas on Windows). Sponsor links appear in the welcome panel.
 
 No account, cloud, tracking, required Internet, or runtime dependencies.
 Start. Play. Quit.
@@ -48,9 +48,9 @@ See [POROWNANIE-I-PLAN.md](POROWNANIE-I-PLAN.md) for the comparison with the sup
 
 ## Touch controls
 
-Desktop keeps the DOS table. Phones up to 900px and touch tablets up to 1200px use a dedicated card list, three market tabs and a bottom operation panel. Only the list scrolls; action buttons stay available. Select a compact item row, then use the two-level bottom action dock to buy/sell or deposit/withdraw. Touch targets stay at least 44px tall. Header, market totals and dock stay pinned; only the middle content scrolls, including on welcome. The two layouts share the same state and autosave.
+Desktop keeps the DOS table. Phones up to 900px and touch tablets up to 1200px use a dedicated card list, three market tabs and a bottom operation panel. Only the list scrolls; action buttons stay available. Choose buy/sell or deposit/withdraw in the bottom dock first, then select an item row and enter an amount. Touch targets stay at least 44px tall. Header, market totals and dock stay pinned; only the middle content scrolls, including on welcome. The two layouts share the same state and autosave.
 
-Left/right-handed mode is saved locally and mirrors the primary action rows, confirmation and quantity controls. Welcome places New game left and Continue right by default, font centrally above them and the hand-mode switch above that. Sponsor links remain in the compact game header. Goods, shares and bank tabs contain their respective totals.
+Left/right-handed mode is saved locally and mirrors the primary action rows, confirmation and quantity controls. Welcome places New game left and Continue right by default, font centrally above them and the hand-mode switch above that. The compact header rotates one sponsor link every seven seconds. Both sponsors appear in the welcome description, LCSE.pl first. The city is yellow and centered below cash and right-aligned debt. Goods, shares and bank tabs contain their respective totals without repeated labels.
 
 Quantity and money entry use a native numeric-keyboard input with minus, plus and Max buttons. Enter or Z (Polish) / C (English) confirms; Esc cancels. Travel uses aligned city choices and excludes the current city. Sponsor rotation does not replace a focused amount input. Desktop font width is measured to fit 78 columns; the welcome background spans full rows.
 
@@ -64,3 +64,5 @@ runtime files and licenses after pushes to main. The public address has its own
 browser-local save, separate from saves created by opening index.html directly.
 Opening the hosted version requires loading its files over the network; this is
 not yet a service-worker installation for guaranteed offline reopening.
+
+The mobile container follows both visual viewport height and offset during resize and scroll, keeping its bottom controls within the visible area above the on-screen keyboard. Physical Safari verification is still required; implementation reference: https://developer.mozilla.org/en-US/docs/Web/API/VisualViewport
