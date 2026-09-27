@@ -10,15 +10,25 @@ pub const BASE: [i32; 10] = [18, 14, 22, 9, 31, 75, 110, 160, 350, 240];
 pub const STOCKS: [&str; 10] = ["HILTON", "INTERNATIONAL", "MCDONALDS", "PHILIPS", "JVC", "TOYOTA", "PKOBP", "ORLEN", "HIPROMINE", "EXCELLENCE"];
 
 #[derive(Clone, Copy)]
-pub struct State { pub cash: i32, pub bank: i32, pub debt: i32, pub city: u8, pub day: u16, pub cargo: [u16; 10], pub shares: [u16; 10], pub prices: [i32; 10], pub rng: u32, pub capacity: u16 }
+pub struct State { pub cash: i32, pub bank: i32, pub debt: i32, pub city: u8, pub day: u16, pub cargo: [u16; 10], pub shares: [u16; 10], pub prices: [i32; 10], pub rng: u32 }
 
 impl State {
-    pub const fn new(seed: u32) -> Self { Self { cash: 1000, bank: 0, debt: 25000, city: 0, day: 1, cargo: [0;10], shares: [0;10], prices: BASE, rng: if seed == 0 { 1 } else { seed }, capacity: 100 } }
+    pub const fn new(seed: u32) -> Self { Self { cash: 1000, bank: 0, debt: 25000, city: 0, day: 1, cargo: [0;10], shares: [0;10], prices: BASE, rng: if seed == 0 { 1 } else { seed } } }
     fn random(&mut self, n: u32) -> u32 { self.rng ^= self.rng << 13; self.rng ^= self.rng >> 17; self.rng ^= self.rng << 5; self.rng % n }
-    pub fn used(&self) -> u16 { self.cargo.iter().sum() }
+    pub fn used(&self) -> u32 { self.cargo.iter().map(|&q|q as u32).sum() }
     pub fn total_cash(&self) -> i32 { self.cash + self.bank }
-    pub fn buy(&mut self, good: usize, qty: u16) -> bool { if good >= 10 || self.used()+qty > self.capacity || self.cash < self.prices[good]*qty as i32 { return false; } self.cash -= self.prices[good]*qty as i32; self.cargo[good] += qty; true }
-    pub fn sell(&mut self, good: usize, qty: u16) -> bool { if good >= 10 || self.cargo[good] < qty { return false; } self.cargo[good]-=qty; self.cash += self.prices[good]*qty as i32; true }
+    pub fn buy(&mut self, good: usize, qty: u16) -> bool {
+        if good >= 10 || qty == 0 || self.cargo[good] as u32 + qty as u32 > u16::MAX as u32 { return false; }
+        let cost = self.prices[good] as i64 * qty as i64;
+        if cost > self.cash as i64 { return false; }
+        self.cash -= cost as i32; self.cargo[good] += qty; true
+    }
+    pub fn sell(&mut self, good: usize, qty: u16) -> bool {
+        if good >= 10 || qty == 0 || self.cargo[good] < qty { return false; }
+        let cash = self.cash as i64 + self.prices[good] as i64 * qty as i64;
+        if cash > i32::MAX as i64 { return false; }
+        self.cargo[good] -= qty; self.cash = cash as i32; true
+    }
     pub fn bank_deposit(&mut self, amount: i32) -> bool { if amount <= 0 || self.cash < amount { return false; } self.cash-=amount; self.bank+=amount; true }
     pub fn bank_withdraw(&mut self, amount: i32) -> bool { if amount <= 0 || self.bank < amount { return false; } self.bank-=amount; self.cash+=amount; true }
     pub fn borrow(&mut self, amount: i32) -> bool { if amount <= 0 || amount > 5000 { return false; } self.cash+=amount; self.debt+=amount; true }
@@ -50,7 +60,7 @@ pub extern "C" fn core_stock(index:u32, qty:u32, buy:i32)->i32 { unsafe { if qty
 pub extern "C" fn core_travel(city:u32)->i32 { unsafe { let s=state(); if city>=9 || city as u8==s.city{return -2} s.travel(city as u8).map(i32::from).unwrap_or(-1) } }
 
 #[cfg(test)]
-mod tests { use super::*; #[test] fn trade_and_capacity(){let mut s=State::new(42);assert!(s.buy(0,10));assert_eq!(s.used(),10);assert!(s.sell(0,4));assert_eq!(s.cargo[0],6);assert!(!s.buy(0,101));} #[test] fn bank_and_debt(){let mut s=State::new(1);assert!(s.bank_deposit(100));assert!(s.borrow(50));assert!(s.repay(50));assert!(s.bank_withdraw(100));assert_eq!(s.debt,25000);} #[test] fn travel_is_free_and_advances(){let mut s=State::new(99);let cash=s.cash;assert_eq!(s.travel(1),None);assert_eq!(s.cash,cash);assert_eq!(s.day,2);assert_eq!(s.debt,25250);} }
+mod tests { use super::*; #[test] fn trade_and_funds(){let mut s=State::new(42);assert!(s.buy(0,10));assert_eq!(s.used(),10);assert!(s.sell(0,4));assert_eq!(s.cargo[0],6);assert!(!s.buy(0,101));} #[test] fn bank_and_debt(){let mut s=State::new(1);assert!(s.bank_deposit(100));assert!(s.borrow(50));assert!(s.repay(50));assert!(s.bank_withdraw(100));assert_eq!(s.debt,25000);} #[test] fn travel_is_free_and_advances(){let mut s=State::new(99);let cash=s.cash;assert_eq!(s.travel(1),None);assert_eq!(s.cash,cash);assert_eq!(s.day,2);assert_eq!(s.debt,25250);} }
 
 #[no_mangle]
-pub extern "C" fn core_version() -> u32 { 3 }
+pub extern "C" fn core_version() -> u32 { 4 }

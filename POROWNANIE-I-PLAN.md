@@ -40,7 +40,7 @@ Gra ma dwa ekrany: powitanie oraz wspólny ekran tabeli. Towary, akcje i banki z
 | P1 | Wizualny przegląd obu czcionek, PL/EN, powiększenia i rozmiarów okna | Brak obcięć, czytelna instrukcja, ciągła ramka i wyrównane kolumny |
 | P1 | Odporność zapisu | Obsługa braku miejsca/uprawnień localStorage, walidacja uszkodzonych pól, kopia poprzedniej gry przed Nową grą |
 | P1 | Dalsza walidacja silników | Wiele ziaren i wartości granicznych; przepełnienia finansów i ilości, także przy bezpośrednim wywołaniu ABI |
-| P2 | Balans rodzinnej gry | Uzgodnione ceny, ryzyko, odsetki, ładownia i limity kredytu; rozważyć kakao zamiast tytoniu |
+| P2 | Balans rodzinnej gry | Uzgodnione ceny, ryzyko, odsetki i limity kredytu; rozważyć kakao zamiast tytoniu |
 | P2 | Koniec rozgrywki | Jasna wygrana/bankructwo i podsumowanie wyniku w obecnym układzie dwóch ekranów |
 | P2 | Dostępność | Sprawdzenie Tab/fokusu i telefonu na urządzeniu; pole numeryczne i −/+/Maks już wdrożone |
 | P3 | Paczka wydania | Komplet plików i licencji, samouczek, sprawdzenie po rozpakowaniu bez internetu |
@@ -52,3 +52,7 @@ W poprzedniej próbie narzędzie przeglądarki zablokowało dostęp do lokalnej 
 Usunięto ręczny zapis, dodano puste wiersze przed sponsorami i instrukcją kliknięcia. Powitanie ma Kontynuuj/Nowa gra po lewej i czcionkę po prawej. Gra ma jeden pasek z trzema grupami działań. Przy długu tekst przycisków jest szary, żółte pozostają skróty. Wprowadzono natywne pole ilości/kwoty, −/+/Maks i większe cele dotykowe. Przewijanie na małym ekranie zachowuje czytelność tabeli. Testy interakcji nie zastępują sprawdzenia Safari na fizycznym iPadzie.
 
 Powitanie linkuje obu sponsorów, ma wolny wiersz przed instrukcją i krótką stopkę „Offline · JS · Autozapis” lub „Offline · Rust/WASM · Autozapis”. Lista miast rozkłada się na szerokość w dwóch wierszach, z większym odstępem; Esc zostaje w najniższym wierszu działań. Ilość ma własny wolny wiersz przed kompaktowymi przyciskami.
+
+### Mobilne sterowanie jedną ręką
+
+Powitanie i gra mają przypięty nagłówek oraz dolny panel; przewija się środkowa zawartość. Zaznacza się cały wiersz, a transakcje wykonuje przyciskami na dole. Tryb lewej/prawej ręki jest zapamiętywany i odwraca główne działania. Zakładki pokazują sumy towarów, akcji i banków. Sponsorzy są w nagłówku, status silnika tylko na powitaniu. Usunięto limit 100 jednostek ładowni w JS i WASM; techniczna granica zapisu to 65 535 jednostek jednej pozycji. Przegląd na fizycznym iOS, zwłaszcza z klawiaturą ekranową i większym tekstem, pozostaje do wykonania.

@@ -24,7 +24,7 @@ All operations run below the table. Type a quantity/amount, confirm with Enter o
 
 Trade across nine cities, use six separate bank accounts, and trade ten share positions. The first six historical positions retain their saved indexes; PKO BP, ORLEN, HiPromine and Excellence occupy the new four. Share prices are fictional game values. Sources and selection rationale are in [SOURCES.md](SOURCES.md). Older six-position saves are extended without losing holdings.
 
-The game autosaves to browser localStorage. The common table includes quantity, value and total; financial summaries stay in place for every table. Medicines replace weapons and gold replaces narcotics. The 80×25-style viewport has 23 content rows of 78 columns and one continuous CSS border. The small status footer stays inside the bottom right corner.
+The game autosaves to browser localStorage. The common table includes quantity, value and total; financial summaries stay in place for every table. Medicines replace weapons and gold replaces narcotics. The 80×25-style viewport has 23 content rows of 78 columns and one continuous CSS border. The small engine/autosave status appears only on the welcome screen. The former 100-unit cargo limit has been removed; purchases depend on cash, with a technical storage bound of 65,535 units per item.
 
 ## Build the Rust/WASM core
 
@@ -48,7 +48,9 @@ See [POROWNANIE-I-PLAN.md](POROWNANIE-I-PLAN.md) for the comparison with the sup
 
 ## Touch controls
 
-Desktop keeps the DOS table. Phones up to 900px and touch tablets up to 1200px use a dedicated card list, three market tabs and a bottom operation panel. Only the list scrolls; action buttons stay available. Buy/sell and deposit/withdraw are available directly on each card, with touch targets at least 44px tall. The two layouts share the same state and autosave.
+Desktop keeps the DOS table. Phones up to 900px and touch tablets up to 1200px use a dedicated card list, three market tabs and a bottom operation panel. Only the list scrolls; action buttons stay available. Select a compact item row, then use the two-level bottom action dock to buy/sell or deposit/withdraw. Touch targets stay at least 44px tall. Header, market totals and dock stay pinned; only the middle content scrolls, including on welcome. The two layouts share the same state and autosave.
+
+Left/right-handed mode is saved locally and mirrors the primary action rows, confirmation and quantity controls. Welcome places New game left and Continue right by default, font centrally above them and the hand-mode switch above that. Sponsor links remain in the compact game header. Goods, shares and bank tabs contain their respective totals.
 
 Quantity and money entry use a native numeric-keyboard input with minus, plus and Max buttons. Enter or Z (Polish) / C (English) confirms; Esc cancels. Travel uses aligned city choices and excludes the current city. Sponsor rotation does not replace a focused amount input. Desktop font width is measured to fit 78 columns; the welcome background spans full rows.
 
