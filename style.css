@@ -153,3 +153,5 @@ body[data-font='matrix'] pre,body[data-font='matrix'] #mobile{font-family:'DOS P
 }
 
 .mobile-status>span:last-child{text-align:right}
+
+.mobile-bottom>.mobile-dock{border-top:0}

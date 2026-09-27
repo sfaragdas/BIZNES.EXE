@@ -31,7 +31,7 @@ jobs:
       - name: Assemble the public site
         run: |
           mkdir -p _site/target/wasm32-unknown-unknown/release
-          cp index.html game.js style.css pwa.js sw.js manifest.webmanifest favicon.svg NOTICE LICENSE _site/
+          cp matrix-colors.html index.html game.js style.css pwa.js sw.js manifest.webmanifest favicon.svg NOTICE LICENSE _site/
           # Each deployment gets unique asset URLs, bypassing older browser/CDN entries.
           python - <<'PY'
           import os, re
