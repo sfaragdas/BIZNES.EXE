@@ -48,9 +48,11 @@ See [POROWNANIE-I-PLAN.md](POROWNANIE-I-PLAN.md) for the comparison with the sup
 
 ## Touch controls
 
-The single action bar groups table navigation on the left, Menu/Debt/Travel in the middle, and transactions on the right. On narrow screens it scrolls horizontally instead of shrinking touch targets. The DOS table also permits horizontal scrolling on small phones. Touch targets are enlarged on coarse-pointer devices.
+Desktop keeps the DOS table. Phones up to 900px and touch tablets up to 1200px use a dedicated card list, three market tabs and a bottom operation panel. Only the list scrolls; action buttons stay available. Buy/sell and deposit/withdraw are available directly on each card, with touch targets at least 44px tall. The two layouts share the same state and autosave.
 
-Quantity and money entry use a native numeric-keyboard input with minus, plus and Max buttons. Rows, cities and every action are clickable; letter shortcuts are optional. Enter confirms a typed amount and Esc cancels. Sponsor rotation does not replace a focused input, so it cannot interrupt typing. Actual iPad/iOS rendering has not been device-tested.
+Quantity and money entry use a native numeric-keyboard input with minus, plus and Max buttons. Enter or Z (Polish) / C (English) confirms; Esc cancels. Travel uses aligned city choices and excludes the current city. Sponsor rotation does not replace a focused amount input. Desktop font width is measured to fit 78 columns; the welcome background spans full rows.
+
+Node interaction checks cover both JS and WASM, including touch transactions and confirmation shortcuts. Actual Safari/iPad rendering and the on-screen keyboard still require device validation.
 
 ## Public version
 

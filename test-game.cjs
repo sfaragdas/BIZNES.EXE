@@ -6,7 +6,7 @@ const document={body:{dataset:{}},querySelector:el,querySelectorAll:()=>[],addEv
 const useHttp=process.argv.includes('--wasm-http'),useWasm=useHttp||process.argv.includes('--wasm');const context={setInterval:()=>0,document,localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},Date:{now:()=>123456},console,location:{protocol:useWasm?'http:':'file:'},WebAssembly,fetch:useHttp?url=>fetch(new URL(url,'http://127.0.0.1:8765')):async url=>({ok:true,arrayBuffer:async()=>fs.readFileSync('target/wasm32-unknown-unknown/release/biznes_exe_core.wasm')})};
 vm.runInNewContext(fs.readFileSync('game.js','utf8'),context);
 const key=k=>listeners.keydown({key:k,preventDefault(){},ctrlKey:false,metaKey:false,altKey:false});
-function click(id){el('#terminal').handlers.click({target:{closest(selector){if(selector==='[data-frame-action]')return id==='language'?{dataset:{frameAction:id}}:null;if(selector==='[data-ui-action]')return{dataset:{uiAction:id}};return null}}})}
+function click(id,root='#terminal'){el(root).handlers.click({target:{closest(selector){if(selector==='[data-frame-action]')return id==='language'?{dataset:{frameAction:id}}:null;if(selector==='[data-ui-action]')return{dataset:{uiAction:id}};return null}}})}
 const state=()=>JSON.parse(store.get('bx-save'));
 const checkScreen=(text)=>{const e=el('#terminal');assert.ok(e.textContent.includes(text),`screen should contain: ${text}; got ${e.textContent}`);const rows=e.textContent.split('\n');assert.equal(rows.length,23);assert.equal(rows.find(r=>r.length!==78),undefined,rows.map(r=>r.length).join(','))};
 const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
@@ -19,7 +19,7 @@ const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
   key('Enter');checkScreen('Towar:');checkScreen('Towary');
   key('K');assert.ok(!el('#terminal').innerHTML.includes('data-ui-action="debt"'));checkScreen('Jaki towar kupujesz?');key('K');checkScreen('możesz kupić 55 ton');click('amount-max');assert.ok(el('#terminal').innerHTML.includes('value="55"'));click('amount-minus');assert.ok(el('#terminal').innerHTML.includes('value="54"'));click('amount-plus');assert.ok(el('#terminal').innerHTML.includes('value="55"'));
   const field={id:'amount-input',value:'10'};el('#terminal').handlers.input({target:field});
-  listeners.keydown({key:'Enter',target:field,preventDefault(){}});assert.equal(state().cargo[0],10);
+  listeners.keydown({key:'z',target:field,preventDefault(){}});assert.equal(state().cargo[0],10);
   key('S');checkScreen('Jaki towar sprzedajesz?');key('S');checkScreen('Nie posiadasz: Samochody.');
   key('K');checkScreen('Jaki towar kupujesz?');key('Escape');key('S');key('K');pressAmount(3);assert.equal(state().cargo[0],7);
   key('K');key('K');pressAmount(999);checkScreen('Nieprawidłowa ilość');key('B');checkScreen('Stan konta:');
@@ -31,7 +31,7 @@ const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
   key('S');key('E');pressAmount(1);assert.equal(state().shares[9],0);checkScreen('Akcje:');
   key('B');key('D');key('P');checkScreen('Ile pożyczasz?');key('Escape');key('A');
   key('D');key('O');pressAmount(10);assert.equal(state().debt,25990);checkScreen('Akcje:');
-  const before=state().cash;key('W');checkScreen('Akcje:');checkScreen('Tokio');assert.ok(el('#terminal').innerHTML.includes('city-row-inner'));assert.ok(el('#terminal').innerHTML.indexOf('data-ui-action=\"city-0\"')<el('#terminal').innerHTML.indexOf('data-ui-action=\"cancel\"'));key('B');assert.equal(state().city,1);checkScreen('Akcje:');
+  const before=state().cash;key('W');checkScreen('Akcje:');checkScreen('Tokio');assert.ok(el('#terminal').innerHTML.includes('city-row-inner'));assert.ok(el('#terminal').innerHTML.indexOf('data-ui-action=\"city-1\"')<el('#terminal').innerHTML.indexOf('data-ui-action=\"cancel\"'));key('B');assert.equal(state().city,1);checkScreen('Akcje:');
   assert.ok(!el('#terminal').textContent.includes('Wciśnij ENTER'));key('T');checkScreen('Towar:');
   // Travel results and events all remain inline and accept the next action.
   for(let i=0;i<20;i++){key('W');click('city-'+((state().city+1)%9));checkScreen('Towar:');key('D');checkScreen('Pożyczasz');key('Escape')}
@@ -40,6 +40,20 @@ const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
   key('P');key('S');pressAmount(1);checkScreen('Transaction completed.');key('D');checkScreen('Borrow, repay');key('Escape');
   click('language');key('Q');checkScreen('Kontynuuj');const saved=state();key('Enter');assert.deepEqual(state(),saved);
   key('Q');key('N');assert.equal(state().cash,1000);assert.equal(state().shares.length,10);
+  // Touch cards use the same state and input handlers as the terminal.
+  const tap=id=>click(id,'#mobile');
+  assert.equal((el('#mobile').innerHTML.match(/class="mobile-card"/g)||[]).length,10);
+  tap('quick-buy-0');
+  const mobileField={id:'mobile-amount-input',value:'2'};
+  el('#mobile').handlers.input({target:mobileField});tap('submit');assert.equal(state().cargo[0],2);
+  tap('quick-sell-0');tap('amount-max');tap('submit');assert.equal(state().cargo[0],0);
+  tap('bank');tap('quick-deposit-0');el('#mobile').handlers.input({target:{...mobileField,value:'10'}});tap('submit');assert.equal(state().banks[0],10);
+  tap('quick-withdraw-0');tap('amount-max');tap('submit');assert.equal(state().banks[0],0);
+  tap('travel');
+  for(const root of ['#mobile','#terminal']){const html=el(root).innerHTML;assert.ok(!html.includes('data-ui-action="city-0"'));assert.equal((html.match(/data-ui-action="city-/g)||[]).length,8)}
+  tap('city-1');assert.equal(state().city,1);tap('travel');assert.ok(!el('#mobile').innerHTML.includes('data-ui-action="city-1"'));tap('cancel');
+  tap('debt');tap('borrow');el('#mobile').handlers.input({target:{...mobileField,value:'10'}});tap('submit');
+  tap('language');tap('debt');tap('repay');el('#mobile').handlers.input({target:{...mobileField,value:'10'}});listeners.keydown({key:'c',target:mobileField,preventDefault(){}});assert.ok(el('#mobile').textContent.includes('Transaction completed.'));tap('language');
   const css=fs.readFileSync('style.css','utf8');assert.ok(css.includes('PxPlus_IBM_VGA8.ttf'));assert.ok(!css.includes('Courier New'));
   // Load a real previous-format save: the first six positions keep their identity.
   const legacy={...state(),cash:2000,bank:20,banks:[20,0,0,0,0,0],shares:[1,2,3,4,5,6],rng:0xf1234567};
