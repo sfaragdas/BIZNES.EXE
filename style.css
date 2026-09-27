@@ -50,7 +50,7 @@ pre .terminal-action:hover,pre .terminal-action:focus-visible{color:#000}
 
 /* Paint the entire row, including space below the font's glyph box. */
 pre .panel-row{background:linear-gradient(to right,transparent 1ch,var(--dosbar) 1ch,var(--dosbar) calc(100% - 1ch),transparent calc(100% - 1ch))}
-pre .welcomepanel{height:100%;vertical-align:top;background:transparent}
+pre .welcomepanel{font-size:.94em;width:calc(100% - 2ch);height:100%;vertical-align:top;background:transparent}
 pre .city-row-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;align-items:center}
 .city-row-inner .terminal-action{text-align:left}
 #mobile{display:none}
@@ -80,7 +80,7 @@ pre .city-row-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));g
   .mobile-summary small{grid-column:1/-1;color:var(--dim);font-size:.9em}
   .mobile-tabs,.mobile-main-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;flex:none}
   .mobile-tabs{padding:5px 0;border:0}
-  .mobile-bottom{flex:none;background:var(--bg)}
+  .mobile-bottom{flex:none;max-height:calc(100% - 100px);overflow:auto;background:var(--bg)}
   #mobile .mobile-tabs button{display:flex;flex-direction:column;gap:2px;align-items:center;padding:4px 2px;font-size:.85em;color:var(--fg)}
   .mobile-tabs small{font-size:.7em;color:inherit}
   .mobile-tabs b{font-size:.85em;font-weight:normal;overflow-wrap:anywhere;max-width:100%}
@@ -110,7 +110,7 @@ pre .city-row-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));g
   body[data-hand='left'] .mobile-quantity{direction:rtl}
   .mobile-quantity>*{direction:ltr}
   #mobile-amount-input{width:100%;min-width:0;min-height:44px;font:inherit;font-size:18px;text-align:right;background:#111;color:var(--yellow);border:1px solid var(--fg);border-radius:0;padding:6px}
-  .mobile-manifest{background:var(--dosbar);color:#000;padding:16px 12px;border-block:3px dotted #000;margin-bottom:20px}
+  .mobile-manifest{font-size:14px;background:var(--dosbar);color:#000;padding:16px 12px;border-block:3px dotted #000;margin-bottom:20px}
   .mobile-manifest a{display:inline-block;color:#000;text-decoration:underline;margin-right:8px}
   .mobile-manifest p:last-child{margin-top:20px}
   .mobile-hand-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.8em}
