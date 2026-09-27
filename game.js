@@ -30,7 +30,7 @@ if(location.protocol!=='file:'&&typeof WebAssembly!=='undefined'){fetch('target/
 function save(){S.bank=S.banks.reduce((a,b)=>a+b,0);localStorage.setItem('bx-save',JSON.stringify(S));hasExistingSave=true;document.querySelector('#save-status').textContent=t('Saved locally','Zapisano lokalnie')}
 function used(){return S.cargo.reduce((a,b)=>a+b,0)}
 function rand(n){S.rng^=S.rng<<13;S.rng^=S.rng>>>17;S.rng^=S.rng<<5;return(S.rng>>>0)%n}
-function visibleText(s){return s.replace(/\{LANG\}/g,lang==='pl'?'L/EN':'L/PL').replace(/\{SPONSOR\}/g,SPONSORS[sponsorIndex][0]).replace(/\{([A-Z])\}/g,'$1').replace(/\[\[([^|]+)\|([^|]+)\|([^|]+)(?:\|([^\]]+))?\]\]/g,'$3')}
+function visibleText(s){return s.replace(/\{(?:LEFT|MID|RIGHT|END)\}/g,'').replace(/\{AMOUNT\}/g,' '.repeat(10)).replace(/\{LANG\}/g,lang==='pl'?'L/EN':'L/PL').replace(/\{SPONSOR\}/g,SPONSORS[sponsorIndex][0]).replace(/\{([A-Z])\}/g,'$1').replace(/\[\[([^|]+)\|([^|]+)\|([^|]+)(?:\|([^\]]+))?\]\]/g,'$3')}
 function frame(rows){
   const content=rows.slice(0,22);while(content.length<22)content.push('');
   content.push(statusText().padStart(78));
@@ -38,9 +38,9 @@ function frame(rows){
     const width=78+(raw.length-visibleText(raw).length);
     const r=raw.slice(0,width).padEnd(width);
     let html=esc(r);
-    const panel=view==='welcome'&&i>=2&&i<=8;
+    const panel=view==='welcome'&&i>=2&&i<=9;
     if(panel){
-      const edge=i===2||i===8;
+      const edge=i===2||i===9;
       const text=edge?'*'.repeat(76):'* '+r.trim().padEnd(72)+' *';
       html=` <span class="welcomepanel${edge?' panel-edge':''}">${esc(text)}</span> `;
     }
@@ -48,7 +48,8 @@ function frame(rows){
     html=html.replace(/\{LANG\}/g,`<button class="frame-control" data-frame-action="language">L/${lang==='pl'?'EN':'PL'}</button>`).replace(/\{SPONSOR\}/g,`<a class="sponsor-link" href="${SPONSORS[sponsorIndex][1]}" target="_blank" rel="noopener noreferrer">${SPONSORS[sponsorIndex][0]}</a>`).replace(/BIZNES\.EXE/g,'<span class="accent">BIZNES.EXE</span>').replace(/\{([A-Z])\}/g,'<span class="key">$1</span>').replace(/(\$\s*)([\d,]+(?:\.\d{2})?)/g,'$1<span class="accent">$2</span>').replace(/([\d,]+(?:\.\d{2})?)(\s*\$)/g,'<span class="accent">$1</span>$2');
     for(const city of [...C,...CEN])html=html.replace(new RegExp(esc(city),'g'),`<span class="accent">${esc(city)}</span>`);
 
-    const cls=i===22?'footer-status':i===0?'statusline':view==='welcome'&&i===10?'welcome-instructions':view==='welcome'&&i>=12&&i<=16?'welcome-copy':view==='home'&&((notice&&i===20)||(mode&&i>=18&&i<=21))?'promptline':view==='home'&&i===1?'tablehead':view==='home'&&i===17?'section-divider':'';
+    const cls=raw.includes('{LEFT}')?'action-bar':raw.includes('{AMOUNT}')?'amount-row':i===22?'footer-status':i===0?'statusline':view==='welcome'&&i===10?'welcome-instructions':view==='welcome'&&i>=12&&i<=17?'welcome-copy':view==='home'&&((notice&&i===20)||(mode&&i===18))?'promptline':view==='home'&&i===1?'tablehead':view==='home'&&i===17?'section-divider':'';
+    html=html.replace(/\{LEFT\}/g,'<span class="action-group group-left">').replace(/\{MID\}/g,'</span><span class="action-group group-middle">').replace(/\{RIGHT\}/g,'</span><span class="action-group group-right">').replace(/\{END\}/g,'</span>').replace(/\{AMOUNT\}/g,`<input id="amount-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="10" autocomplete="off" enterkeyhint="done" aria-label="${t('Quantity or amount','Ilość lub kwota')}" value="${esc(input)}">`);
     return `<span class="terminal-row ${cls}">${html}</span>`;
   }).join('\n');
 }
@@ -57,21 +58,23 @@ function statusText(){const engine=document.querySelector('#engine-status').text
 function topbar(){const tail='  {SPONSOR}  {LANG}',brand='BIZNES.EXE  ·  '+t('Tiny economic game','Mała gra ekonomiczna');return `${brand.padEnd(78-visibleText(tail).length)}${tail}`}
 function header(){return [topbar(),` ${t('Cash','Gotówka')} $${fmt(S.cash)}  ${t('Bank','Bank')} $${fmt(S.bank)}  ${t('Debt','Dług')} $${fmt(S.debt)}     ${t('Cargo','Ładunek')}: ${used()}/${S.capacity}`,` ${t('Net worth','Majątek')}: $${fmt(S.cash+S.bank-S.debt+S.cargo.reduce((n,q,i)=>n+q*S.prices[i],0))}`, '─'.repeat(78)]}
 function welcome(){
-  const opts=[actionToken('welcome-save','S',t('Save game','Zapisz stan')),actionToken('welcome-continue','K',t('Continue','Kontynuuj')),actionToken('new-game','N',t('New game','Nowa gra')),actionToken('font-toggle','F',`F: ${t('Font','Czcionka')}: ${fontStyle==='retro'?'DOS PL':t('standard','standardowa')}`)];
+  const opts=[actionToken('welcome-continue','K',t('Continue','Kontynuuj')),actionToken('new-game','N',t('New game','Nowa gra')),actionToken('font-toggle','F',`F: ${t('Font','Czcionka')}: ${fontStyle==='retro'?'DOS PL':t('standard','standardowa')}`)];
   return frame([
     topbar(),'','',
     center(t('BIZNES.EXE · A tiny economic game','BIZNES.EXE · Mała gra ekonomiczna')),
     center(t('Lightweight by design. A retro game for a new generation.','Manifest lekkiego oprogramowania w klimacie retro dla młodego pokolenia.')),
     center(t('Inspired by Biznesman (1988), by M. Cwynar / Studio SAMBA.','Inspiracja: Biznesman (1988), M. Cwynar / Studio SAMBA.')),
     center(t('An independent game inspired by the original, not made by its authors.','Niezależna gra inspirowana oryginałem, nie jest dziełem jego autorów.')),
+    '',
     center(t('Project sponsors: MojeDostawy.pl and LCSE.pl.','Sponsorzy projektu: MojeDostawy.pl oraz LCSE.pl.')),
-    '','',center(t('HOW TO PLAY','INSTRUKCJA')),'',
+    '',center(t('HOW TO PLAY','INSTRUKCJA')),'',
     center(t('Buy low, sell high; prices change between cities.','Kupuj tanio, sprzedawaj drożej — ceny różnią się między miastami.')),
     center(t('Travel is free. Random events may help or hurt.','Podróż jest bezpłatna. Zdarzenia mogą pomóc albo zaszkodzić.')),
     center(t('Watch your debt and cargo capacity. Your game saves automatically.','Pilnuj długu i ładowni. Gra zapisuje się automatycznie.')),
     center(t('{K} buy · {S} sell · {W} travel · {A} shares · {D} debt · {B} banks · {Q} menu','{K} kupno · {S} sprzedaż · {W} wyjazd · {A} akcje · {D} długi · {B} banki · {Q} menu')),
+    '',
     center(t('Click a choice or press its highlighted letter.','Kliknij wybór albo naciśnij wyróżnioną literę.')),
-    '-'.repeat(78),center(opts.join('   ')),'-'.repeat(78),'',''
+    '-'.repeat(78),'{LEFT}'+opts.slice(0,2).join('   ')+'{MID}{RIGHT}'+opts[2]+'{END}','-'.repeat(78),''
   ]);
 }
 // Two screens; the active table is independent of the inline operation.
@@ -118,15 +121,15 @@ function inlineControls(){
   if(!mode){
     const tabs=[button('goods','T','Towary','Goods'),button('shares','A','Akcje','Shares'),button('bank','B','Banki','Banks')];
     const ops=table==='banks'?[button('deposit','P','Wpłata','Deposit',1),button('withdraw','O','Odbiór','Withdraw')]:[button('buy','K','Kupno','Buy'),button('sell','S','Sprzedaż','Sell')];
-    ops.push(button('travel','W','Wyjazd','Travel'),button('debt','D','Długi','Debt'),button('quit','Q','Q Menu','Q Menu'));
-    return [' '+tabs.join('   '),' '+ops.join('   '),notice,table==='stocks'?t('Game prices are fictional. Select a highlighted letter or click.','Kursy są fikcyjne. Wybierz wyróżnioną literę albo kliknij.'):t('Choose a highlighted letter or click.','Wybierz wyróżnioną literę albo kliknij.')];
+    const middle=[button('quit','Q','Q Menu','Q Menu'),button('debt','D','Długi','Debt'),button('travel','W','Wyjazd','Travel')];
+    return ['{LEFT}'+tabs.join(' ')+'{MID}'+middle.join(' ')+'{RIGHT}'+ops.join(' ')+'{END}','',notice,table==='stocks'?t('Game prices are fictional. Select a highlighted letter or click.','Kursy są fikcyjne. Wybierz wyróżnioną literę albo kliknij.'):t('Choose a highlighted letter or click.','Wybierz wyróżnioną literę albo kliknij.')];
   }
   if(mode==='travel'){
     const opts=cities().map((c,i)=>actionToken(`city-${i}`,c[0].toUpperCase(),c));
     return [t('Cities you can travel to:','Miasta, do których możesz się wybrać:'),' '+opts.slice(0,5).join('   '),' '+opts.slice(5).join('   '),' '+cancel];
   }
   if(mode==='debt'&&step==='choice')return [t('Borrow, repay, or return?','Pożyczasz, oddajesz, czy wracasz?'),
-    ' '+button('borrow','P','Pożyczasz','Borrow')+'   '+button('repay','O','Oddajesz','Repay')+'   '+cancel,'',t('Loan limit per operation: 5000 $.','Limit pożyczki na operację: 5000 $.')];
+    '',' '+button('borrow','P','Pożyczasz','Borrow')+'   '+button('repay','O','Oddajesz','Repay')+'   '+cancel,t('Loan limit per operation: 5000 $.','Limit pożyczki na operację: 5000 $.')];
   if(step==='row'){
     const question=table==='banks'?t('Which bank?','Który bank?'):table==='stocks'?(mode==='buy'?t('Which shares do you buy?','Jakie akcje kupujesz?'):t('Which shares do you sell?','Jakie akcje sprzedajesz?')):(mode==='buy'?t('Which good do you buy?','Jaki towar kupujesz?'):t('Which good do you sell?','Jaki towar sprzedajesz?'));
     return [' '+question+' < '+t('choose a highlighted letter','wybierz wyróżnioną literę')+' >',' '+cancel,'',''];
@@ -136,10 +139,10 @@ function inlineControls(){
   const genitive=['kawy','herbaty','tytoniu','zboża','ropy naftowej','leków','złota','wideo','drukarek','samochodów'];
   const tradeTitle=t(`How many ${item.label} do you ${mode}?`,table==='goods'?`Ile ${genitive[selected]} ${mode==='buy'?'kupujesz':'sprzedajesz'}?`:`Ile akcji ${item.label} ${mode==='buy'?'kupujesz':'sprzedajesz'}?`);
   const title=mode==='borrow'?t('How much do you borrow?','Ile pożyczasz?'):mode==='repay'?t('How much do you repay?','Ile oddajesz?'):mode==='deposit'?t('How much do you deposit?','Ile wpłacasz?'):mode==='withdraw'?t('How much do you withdraw?','Ile odbierasz?'):tradeTitle;
-  return [' '+title,' < '+hint+' > ? '+input+'_',' '+button('submit','ENTER','ENTER zatwierdź','ENTER confirm')+'   '+cancel,''];
+  return [' '+title,' < '+hint+' >',' '+button('amount-minus','−','−','−')+'  {AMOUNT}  '+button('amount-plus','+','+','+')+'   '+button('amount-max','MAX','Maks','Max'),' '+button('submit','ENTER','ENTER zatwierdź','ENTER confirm')+'   '+cancel];
 }
 function screen(){return view==='welcome'?welcome():home()}
-function render(persist=true){if(persist)save();document.body.dataset.font=fontStyle;T.innerHTML=screen()}
+function render(persist=true){const focused=document.activeElement?.id==='amount-input';if(persist)save();document.body.dataset.font=fontStyle;T.innerHTML=screen();if(focused)document.querySelector('#amount-input')?.focus?.({preventScroll:true})}
 function homeNotice(msg){view='home';step='';mode='';input='';notice=msg;render()}
 function stockPrice(i){return 80+((S.day*17+i*31)%90)}
 function maximum(){
@@ -203,12 +206,15 @@ function select(id){
     if(id==='font-toggle'){fontStyle=fontStyle==='retro'?'current':'retro';localStorage.setItem('bx-font',fontStyle)}
     else if(id==='welcome-continue'){homeNotice('');return}
     else if(id==='new-game'){newGame();return}
-    else if(id==='welcome-save')save();
+
     render();return;
   }
   if(id==='quit'){view='welcome';mode='';step='';notice='';render();return}
   if(id==='cancel'){homeNotice('');return}
   if(id==='submit'){submit();return}
+  if(step==='quantity'&&['amount-minus','amount-plus','amount-max'].includes(id)){
+    input=String(id==='amount-max'?maximum():Math.max(0,Math.min(maximum(),(Number(input)||0)+(id==='amount-plus'?1:-1))));render(false);return;
+  }
   if(id.startsWith('city-')){if(mode==='travel')travelTo(Number(id.slice(5)));return}
   const row=/^(good|stock|bank)-(\d+)$/.exec(id);
   if(row){if(row[1]==={goods:'good',stocks:'stock',banks:'bank'}[table])chooseRow(Number(row[2]));return}
@@ -222,7 +228,7 @@ function select(id){
   render();
 }
 function action(k){
-  if(view==='welcome'){const id={N:'new-game',S:'welcome-save',Z:'welcome-save',K:'welcome-continue',C:'welcome-continue',ENTER:'welcome-continue',F:'font-toggle',L:'language'}[k];if(id)select(id);return}
+  if(view==='welcome'){const id={N:'new-game',K:'welcome-continue',C:'welcome-continue',ENTER:'welcome-continue',F:'font-toggle',L:'language'}[k];if(id)select(id);return}
   if(k==='ESC'){select('cancel');return}
   if(mode){
     if(mode==='travel'){const i=cities().findIndex(c=>c[0].toUpperCase()===k);if(i>=0)travelTo(i);return}
@@ -236,14 +242,23 @@ function action(k){
   const id=common[k]||(table==='banks'?{P:'deposit',O:'withdraw'}:{K:'buy',S:'sell'})[k];
   if(id)select(id);
 }
+T.addEventListener('input',e=>{
+  if(e.target.id!=='amount-input')return;
+  input=e.target.value.replace(/[^0-9]/g,'').slice(0,10);e.target.value=input;
+});
 T.addEventListener('click',e=>{const f=e.target.closest?.('[data-frame-action]');if(f){select('language');return}const a=e.target.closest?.('[data-ui-action]');if(a)select(a.dataset.uiAction)});
 document.addEventListener('keydown',e=>{
   if(e.ctrlKey||e.metaKey||e.altKey)return;
+  if(e.target?.id==='amount-input'){
+    if(e.key==='Enter'){e.preventDefault();submit()}
+    else if(e.key==='Escape'){e.preventDefault();select('cancel')}
+    return;
+  }
   // Let a focused native button handle Enter/Space once through its click event.
   if((e.key==='Enter'||e.key===' ')&&e.target?.closest?.('button,a'))return;
   let k=e.key.toUpperCase();if(k==='ESCAPE')k='ESC';
   if(k==='BACKSPACE'||k==='ENTER'||k==='ESC'||k.length===1){e.preventDefault();action(k)}
 });
 document.querySelector('#engine-status').textContent=location.protocol==='file:'?'JS fallback':'Loading WASM';render();
-if(typeof setInterval==='function')setInterval(()=>{sponsorIndex=(sponsorIndex+1)%SPONSORS.length;render(false)},7000);
+if(typeof setInterval==='function')setInterval(()=>{sponsorIndex=(sponsorIndex+1)%SPONSORS.length;if(document.activeElement?.id!=='amount-input')render(false)},7000);
 })();

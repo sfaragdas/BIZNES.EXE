@@ -24,3 +24,7 @@
 `cargo test` was attempted but cannot link host tests on this machine because the Windows ARM64 Visual C++ linker `link.exe` is absent. This does not affect the successful WASM release build or the full-loop checks against the compiled WASM module. The Rust unit tests remain in `src/lib.rs` for environments with the host linker installed.
 
 The JavaScript fallback is selected automatically under `file://`, where browsers block fetching local WASM files. Serve this directory over localhost to use the compiled Rust core; see `START.md`.
+
+## Touch-input update
+
+JS and WASM interaction checks passed again after removing manual save and introducing the grouped action bar. Checks now cover welcome spacing, absence of the save button, native input events and Enter submission, and −/+/Max adjustment. Input occupies ten columns in the text harness; CSS layout and the actual iOS keyboard remain unverified on a physical device.

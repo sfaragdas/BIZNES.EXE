@@ -22,7 +22,7 @@ Gra ma dwa ekrany: powitanie oraz wspólny ekran tabeli. Towary, akcje i banki z
 | Zdarzenia | M.in. spadek 100000 i utrata żywności | Własne mniejsze zdarzenia pod tabelą. Inna skala nagród i ryzyka |
 | Gospodarka | Ceny zwykle w tysiącach, zmienne wysokie odsetki | Ceny początkowe 9–350, dług 25000, gotówka 1000, odsetki 1% na podróż |
 | Ładownia | Limit niewidoczny na otrzymanych ekranach | Limit 100 jednostek jest własną zasadą tej wersji |
-| Zapis | Niepotwierdzony zrzutami | Autosave, ręczny zapis, Q do powitania, kontynuacja. Migracja sześciu akcji do dziesięciu zachowuje portfel |
+| Zapis | Niepotwierdzony zrzutami | Autosave, Q do powitania, kontynuacja. Migracja sześciu akcji do dziesięciu zachowuje portfel |
 
 ## Sprawdzone w tej zmianie
 
@@ -42,7 +42,11 @@ Gra ma dwa ekrany: powitanie oraz wspólny ekran tabeli. Towary, akcje i banki z
 | P1 | Dalsza walidacja silników | Wiele ziaren i wartości granicznych; przepełnienia finansów i ilości, także przy bezpośrednim wywołaniu ABI |
 | P2 | Balans rodzinnej gry | Uzgodnione ceny, ryzyko, odsetki, ładownia i limity kredytu; rozważyć kakao zamiast tytoniu |
 | P2 | Koniec rozgrywki | Jasna wygrana/bankructwo i podsumowanie wyniku w obecnym układzie dwóch ekranów |
-| P2 | Dostępność | Rzeczywista obsługa Tab/fokusu i telefonu, pole liczby wywołujące klawiaturę ekranową |
+| P2 | Dostępność | Sprawdzenie Tab/fokusu i telefonu na urządzeniu; pole numeryczne i −/+/Maks już wdrożone |
 | P3 | Paczka wydania | Komplet plików i licencji, samouczek, sprawdzenie po rozpakowaniu bez internetu |
 
 W poprzedniej próbie narzędzie przeglądarki zablokowało dostęp do lokalnej karty file://. Nie obchodzono tego ograniczenia. Świeży przegląd wizualny nadal wymaga sprawdzenia w działającej przeglądarce; testy Node nie są jego zamiennikiem. Natywne testy Rust wymagają nieobecnego wcześniej linkera Windows ARM64; testy przebiegu używają faktycznie skompilowanego modułu WASM.
+
+### Najnowsze dopracowanie interfejsu
+
+Usunięto ręczny zapis, dodano puste wiersze przed sponsorami i instrukcją kliknięcia. Powitanie ma Kontynuuj/Nowa gra po lewej i czcionkę po prawej. Gra ma jeden pasek z trzema grupami działań. Przy długu tekst przycisków jest szary, żółte pozostają skróty. Wprowadzono natywne pole ilości/kwoty, −/+/Maks i większe cele dotykowe. Przewijanie na małym ekranie zachowuje czytelność tabeli. Testy interakcji nie zastępują sprawdzenia Safari na fizycznym iPadzie.

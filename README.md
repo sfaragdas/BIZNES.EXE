@@ -20,7 +20,7 @@ Run the deterministic full-loop checks with `node test-game.cjs` for the `file:/
 
 Keyboard and mouse both work. There are two screens: welcome and one common table view. Switch the table with T (goods), A (shares), or B (banks). K buys and S sells goods/shares; P deposits and O withdraws in the bank table. W travels, D opens debt operations below the current table, and Q saves and returns to welcome. L changes the language. English labels show the actual shortcut, adding a letter prefix where needed. Use the highlighted letter in each row (some are inside the name to avoid collisions) or click it.
 
-All operations run below the table. Type a quantity/amount, confirm with Enter or the clickable confirmation, and cancel with Esc. Result messages do not need acknowledgment: the next key selects the next operation. Travel and random events also stay inline; travel costs zero. Action choices are separated by dashed lines and hide during an operation. The welcome screen includes manual Save, Continue, New game, and standard/DOS PL font selection.
+All operations run below the table. Type a quantity/amount, confirm with Enter or the clickable confirmation, and cancel with Esc. Result messages do not need acknowledgment: the next key selects the next operation. Travel and random events also stay inline; travel costs zero. Action choices are separated by dashed lines and hide during an operation. The welcome screen has Continue and New game on the left, with the font selection on the right. Saving is automatic; there is no redundant manual-save action.
 
 Trade across nine cities, use six separate bank accounts, and trade ten share positions. The first six historical positions retain their saved indexes; PKO BP, ORLEN, HiPromine and Excellence occupy the new four. Share prices are fictional game values. Sources and selection rationale are in [SOURCES.md](SOURCES.md). Older six-position saves are extended without losing holdings.
 
@@ -45,3 +45,9 @@ The name and related designations require separate verification before commercia
 ## Comparison and next steps
 
 See [POROWNANIE-I-PLAN.md](POROWNANIE-I-PLAN.md) for the comparison with the supplied DOS screenshots, remaining limitations, and the prioritized improvement plan. Interaction checks do not establish pixel-level visual equivalence. A deterministic sequence also compares the JS and WASM state after 21 trips; this is not exhaustive engine validation.
+
+## Touch controls
+
+The single action bar groups table navigation on the left, Menu/Debt/Travel in the middle, and transactions on the right. On narrow screens it scrolls horizontally instead of shrinking touch targets. The DOS table also permits horizontal scrolling on small phones. Touch targets are enlarged on coarse-pointer devices.
+
+Quantity and money entry use a native numeric-keyboard input with minus, plus and Max buttons. Rows, cities and every action are clickable; letter shortcuts are optional. Enter confirms a typed amount and Esc cancels. Sponsor rotation does not replace a focused input, so it cannot interrupt typing. Actual iPad/iOS rendering has not been device-tested.

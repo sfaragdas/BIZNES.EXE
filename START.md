@@ -6,7 +6,7 @@ uruchom lokalny serwer w tym folderze i otwórz jego adres. Stopka pokaże wybra
 
 ## Sterowanie
 
-- Powitanie: Z/S — zapisz, K/Enter — kontynuuj, N — nowa gra, F — czcionka.
+- Powitanie: K/Enter — kontynuuj, N — nowa gra, F — czcionka.
 - T — towary, A — akcje, B — banki: zmieniają tabelę na tym samym ekranie.
 - K — kupno, S — sprzedaż. W bankach: P — wpłata, O — odbiór.
 - W — wyjazd bez opłaty, D — dług pod aktualną tabelą, Q — zapis i powrót do menu.
@@ -16,6 +16,9 @@ uruchom lokalny serwer w tym folderze i otwórz jego adres. Stopka pokaże wybra
 - Po wyniku operacji od razu wybierasz kolejną czynność — bez dodatkowego Entera.
 - L — polski/angielski. W wersji EN kieruj się wyróżnionymi literami.
 
-Zapis jest lokalny dla przeglądarki. Q zapisuje automatycznie; ręczny zapis pozostaje
-na powitaniu. Nowa gra zastępuje bieżący zapis. Czcionka standardowa korzysta z
+Zapis jest lokalny dla przeglądarki. Q zapisuje automatycznie; ręczny przycisk zapisu został usunięty. Nowa gra zastępuje bieżący zapis. Czcionka standardowa korzysta z
 systemowego kroju monospace; DOS PL zawiera polskie litery w stylu VGA.
+
+Na telefonie/iPadzie dotykaj nazw i przycisków — nie musisz wpisywać liter.
+Pole ilości lub kwoty ma klawiaturę numeryczną oraz −, + i Maks.
+Na wąskim ekranie tabela i pasek przycisków mogą być przewijane poziomo.

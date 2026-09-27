@@ -30,3 +30,38 @@ body[data-font='retro'] pre{font-family:'DOS PL',monospace;font-size:calc(100cqi
 
 .sponsor-link{color:var(--dim);text-decoration:none}
 .sponsor-link:hover,.sponsor-link:focus-visible{color:var(--yellow);text-decoration:underline;outline:1px solid var(--yellow)}
+
+/* One action row with separate navigation, shared actions and transactions. */
+pre .action-bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1ch;white-space:normal;overflow:visible;color:var(--fg);background:var(--bg)}
+.action-group{display:flex;align-items:center;gap:1ch;white-space:nowrap}
+.group-left{justify-content:flex-start}
+.group-middle{justify-content:center}
+.group-right{justify-content:flex-end}
+pre .terminal-action{color:var(--fg);touch-action:manipulation}
+pre .terminal-action:hover,pre .terminal-action:focus-visible{color:#000}
+.amount-row{color:var(--fg)}
+#amount-input{width:10ch;max-width:30%;font:inherit;line-height:1.2;color:var(--yellow);background:#111;border:1px solid var(--fg);border-radius:0;padding:0 .35ch;vertical-align:middle;text-align:right}
+#amount-input:focus{outline:2px solid var(--yellow);outline-offset:1px}
+@media(pointer:coarse){
+  .screen{aspect-ratio:auto;max-width:1180px;max-height:none;overflow:visible}
+  pre{height:auto;padding:16px 1.25%;overflow:visible}
+  .terminal-row{flex:none;min-height:36px;line-height:36px}
+  .terminal-action,.frame-control{display:inline-block;min-height:44px;line-height:44px}
+  .terminal-row:has(.terminal-action){min-height:48px;overflow:visible}
+  .terminal-row:has(#amount-input){min-height:48px}
+  #amount-input{font-size:max(16px,1em);min-height:44px}
+  pre .action-bar{min-height:52px}
+}
+@media(max-width:700px){
+  main{padding:6px;width:100%;min-width:0}
+  .screen{width:100%;max-width:none;max-height:none;aspect-ratio:auto;overflow:auto}
+  pre,body[data-font='retro'] pre{width:max(100%,680px);height:auto;min-height:720px;padding:12px 8px;font-size:14px;overflow:visible}
+  body[data-font='retro'] pre{font-size:16px}
+  .terminal-row{flex:none;min-height:30px;line-height:30px}
+  pre .action-bar{position:sticky;left:0;width:calc(100vw - 30px);display:flex;justify-content:space-between;gap:24px;overflow-x:auto;min-height:52px;padding:4px 6px;border-top:1px dashed var(--dim);border-bottom:1px dashed var(--dim);z-index:2}
+  .action-group{flex:none;gap:16px}
+  .terminal-action,.frame-control{display:inline-block;min-height:44px;line-height:44px}
+  .terminal-row:has(.terminal-action),.terminal-row:has(#amount-input){min-height:48px;overflow:visible}
+  #amount-input{font-size:16px;min-height:44px}
+  pre .footer-status{position:sticky;left:0;width:calc(100vw - 30px);text-align:right}
+}
