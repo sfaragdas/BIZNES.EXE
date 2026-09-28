@@ -1,66 +1,40 @@
-# BIZNES.EXE — porównanie i dalsze poprawki
+# BIZNES.EXE — zgodność z kierunkiem retro i plan
 
-Aktualizacja: 27.09.2026, po ujednoliceniu ekranów. Podstawa: kod oraz zrzuty Biznesmana dostarczone przez użytkownika. Zdjęcia nie ujawniają wszystkich zasad ekonomii ani algorytmów oryginału.
+Aktualizacja: 28.09.2026. Podstawa porównania z oryginałem: zrzuty dostarczone przez użytkownika. Nie ustalają one wszystkich reguł ani algorytmów Biznesmana.
 
-## Aktualny kierunek
+## Co zachowujemy
 
-Gra ma dwa ekrany: powitanie oraz wspólny ekran tabeli. Towary, akcje i banki zmieniają zawartość tabeli; handel, wpłaty, wypłaty, dług i wyjazd odbywają się pod nią. Wyniki i zdarzenia nie wymagają dodatkowego Entera. To świadome uproszczenie względem DOS, zgodne z ostatnią decyzją użytkownika.
+- Czarny ekran, jasnoszary tekst, kolor akcentu, szare nagłówki, tabela i kropkowane wyrównania.
+- Desktop i szeroki tablet: klikalne napisy, wyróżnione litery, operacje pod tabelą, a nie osobne ekrany.
+- Powitanie z własnym tekstem w polu z gwiazdkami i jawną inspiracją: Biznesman (1988), M. Cwynar / SAMBA.
+- Dziesięć towarów, dziewięć miast, handel, akcje, banki i dług.
 
-## Porównanie
+## Świadome różnice
 
-| Obszar | Oryginał na zrzutach | Obecna wersja |
-|---|---|---|
-| Powitanie | Szare pole z gwiazdkami, autorstwo, dłuższa instrukcja | Własny manifest, informacja o inspiracji, sponsorzy i instrukcja. Przyciski oddzielone kreskami |
-| Czcionka | Bitmapowy krój DOS | Przywrócony standardowy monospace; DOS PL to PxPlus IBM VGA8 z polskimi literami. Nie potwierdzono identyczności z czcionką oryginału |
-| Ramka | Stała siatka terminala | Niezależne obramowanie CSS; wewnątrz 23 wiersze po 78 znaków. Stopka w prawym dolnym rogu |
-| Towary | Dziesięć pozycji, w tym broń i narkotyki | Dziesięć pozycji; leki i złoto według wcześniejszej decyzji. Tytoń nadal obecny |
-| Akcje | Sześć historycznych pozycji na osobnym ekranie | Wspólna tabela z kursem, ilością, wartością i sumą. Sześć dawnych pozycji + PKO BP, ORLEN, HiPromine, Excellence; kursy fikcyjne |
-| Banki | Sześć kont i osobny ekran | Sześć kont we wspólnej tabeli; cztery puste wiersze zachowują położenie finansów. Wpłata i odbiór pod tabelą |
-| Dług | Pożyczasz, Oddajesz, czy Wracasz? | Pożyczasz/Oddajesz/Esc pod dowolną tabelą; limit pożyczki 5000 na operację |
-| Handel | Wybór literą, ilość pod tabelą, Enter po komunikacie | Litery lub kliknięcie, ilość i limit pod tabelą, Esc; wynik nie przechwytuje następnego działania |
-| Podróż | Dziewięć miast w trzech kolumnach, bez opłaty | Dziewięć miast w dwóch wierszach pod bieżącą tabelą, koszt zero |
-| Zdarzenia | M.in. spadek 100000 i utrata żywności | Własne mniejsze zdarzenia pod tabelą. Inna skala nagród i ryzyka |
-| Gospodarka | Ceny zwykle w tysiącach, zmienne wysokie odsetki | Ceny początkowe 9–350, dług 25000, gotówka 1000, odsetki 1% na podróż |
-| Ładownia | Limit niewidoczny na otrzymanych ekranach | Limit 100 jednostek jest własną zasadą tej wersji |
-| Zapis | Niepotwierdzony zrzutami | Autosave, Q do powitania, kontynuacja. Migracja sześciu akcji do dziesięciu zachowuje portfel |
+| Obszar | Obecna adaptacja |
+|---|---|
+| Układy | Wspólny stan i instrukcja; tabela desktop/szeroki tablet, lista na wąskim ekranie |
+| Asortyment | Leki i złoto zamiast broni i narkotyków; tytoń wciąż obecny |
+| Akcje | 10 pozycji; fikcyjne kursy, wspólna tabela z towarami i bankami |
+| Banki | 6 rachunków, obecnie takie same zasady |
+| Dług | 1% na podróż, pożyczka do 5000 $ na operację |
+| Wyjazd | Bez opłaty; wybór miasta pod tabelą, bieżące miasto pominięte |
+| Zdarzenia | 35% szansy na zdarzenie; własne skutki, okno i relacja wygasają po 15 s |
+| Wynik transakcji | Sukces wraca do ogólnego widoku rynku, błąd ilości pozostawia formularz |
+| Zakładki | Dostępne także podczas operacji; kierunek transakcji przechodzi między rynkami |
+| Zapis | Automatyczny, lokalny; instalowalna PWA po pierwszym pobraniu |
+| Ładownia | Brak dawnego limitu 100; techniczna granica 65 535 na pozycję |
+| Style | Standard, DOS i Matrix; nie deklarujemy identyczności fontu z oryginałem |
 
-## Sprawdzone w tej zmianie
+## Ujednolicenie desktop/mobile
 
-- JavaScript i skompilowany Rust/WASM: handel wszystkimi dziesięcioma akcjami, wpłaty, wypłaty, pożyczka, spłata, podróże i zdarzenia, PL/EN, anulowanie i zapis.
-- Wynik operacji nie zużywa następnego klawisza. Menu wraca od razu po wyniku.
-- Odczyt starego portfela sześciu akcji i ponowny odczyt nowego portfela dziesięciu.
-- Deterministyczna sekwencja z 21 podróżami daje takie same salda, portfel, ceny i stan generatora w JS/WASM. Ujednolicono wzór podróży, liczbę zdarzeń i przekazywanie ziarna z ustawionym najwyższym bitem.
-- Wszystkie 18 polskich liter występuje w tablicy cmap czcionki DOS PL.
-- Testy treści sprawdzają 23 × 78 znaków. To nie jest test renderowania pikseli.
+Nazwy operacji i instrukcja pochodzą ze wspólnych funkcji. Desktop skraca akapity do jednego wiersza, zachowując ich kolejność i sens. Zakładki pozostają widoczne; „Wybierz akcję:” jest wspólnym promptem. Opis projektu, rozdzielona lista patronów, instalacja, wersja alfa i krótki status offline są na powitaniu. „Pokrycie długu” zastępuje mylące „Szansa na spłatę”: to wyliczony stosunek gotówki i banków do długu, a nie prawdopodobieństwo.
 
-## Pozostały plan
+## Kolejność dalszych prac
 
-| Priorytet | Praca | Kryterium ukończenia |
-|---|---|---|
-| P1 | Wizualny przegląd obu czcionek, PL/EN, powiększenia i rozmiarów okna | Brak obcięć, czytelna instrukcja, ciągła ramka i wyrównane kolumny |
-| P1 | Odporność zapisu | Obsługa braku miejsca/uprawnień localStorage, walidacja uszkodzonych pól, kopia poprzedniej gry przed Nową grą |
-| P1 | Dalsza walidacja silników | Wiele ziaren i wartości granicznych; przepełnienia finansów i ilości, także przy bezpośrednim wywołaniu ABI |
-| P2 | Balans rodzinnej gry | Uzgodnione ceny, ryzyko, odsetki i limity kredytu; rozważyć kakao zamiast tytoniu |
-| P2 | Koniec rozgrywki | Jasna wygrana/bankructwo i podsumowanie wyniku w obecnym układzie dwóch ekranów |
-| P2 | Dostępność | Sprawdzenie Tab/fokusu i telefonu na urządzeniu; pole numeryczne i −/+/Maks już wdrożone |
-| P3 | Paczka wydania | Komplet plików i licencji, samouczek, sprawdzenie po rozpakowaniu bez internetu |
+1. **Pilne techniczne:** walidacja i odporność zapisu, ochrona przed przepełnieniem liczb, realne testy Safari i PWA.
+2. **Decyzje o zasadach:** pomoc graczowi w losowaniu zdarzeń, kredyt, różnice między bankami, koniec rozgrywki i wynik.
+3. **Warunek oferty dla patrona:** jasne oznaczenie płatnej współpracy, zgody na marki, znana grupa odbiorców i uczciwie opisany pomiar efektów.
+4. **Później:** edukacyjny tryb rozgrywki, lokalne wyzwania, eksport zapisu. ETF-y, konta i rynek online są pomysłami, nie wdrożonymi funkcjami.
 
-W poprzedniej próbie narzędzie przeglądarki zablokowało dostęp do lokalnej karty file://. Nie obchodzono tego ograniczenia. Świeży przegląd wizualny nadal wymaga sprawdzenia w działającej przeglądarce; testy Node nie są jego zamiennikiem. Natywne testy Rust wymagają nieobecnego wcześniej linkera Windows ARM64; testy przebiegu używają faktycznie skompilowanego modułu WASM.
-
-### Najnowsze dopracowanie interfejsu
-
-Usunięto ręczny zapis, dodano puste wiersze przed sponsorami i instrukcją kliknięcia. Powitanie ma Kontynuuj/Nowa gra po lewej i czcionkę po prawej. Gra ma jeden pasek z trzema grupami działań. Przy długu tekst przycisków jest szary, żółte pozostają skróty. Wprowadzono natywne pole ilości/kwoty, −/+/Maks i większe cele dotykowe. Przewijanie na małym ekranie zachowuje czytelność tabeli. Testy interakcji nie zastępują sprawdzenia Safari na fizycznym iPadzie.
-
-Powitanie linkuje obu sponsorów, ma wolny wiersz przed instrukcją i krótką stopkę „Offline · JS · Autozapis” lub „Offline · Rust/WASM · Autozapis”. Lista miast rozkłada się na szerokość w dwóch wierszach, z większym odstępem; Esc zostaje w najniższym wierszu działań. Ilość ma własny wolny wiersz przed kompaktowymi przyciskami.
-
-### Mobilne sterowanie jedną ręką
-
-Powitanie i gra mają przypięty nagłówek oraz dolny panel; przewija się środkowa zawartość. Zaznacza się cały wiersz, a transakcje wykonuje przyciskami na dole. Tryb lewej/prawej ręki jest zapamiętywany i odwraca główne działania. Zakładki pokazują sumy towarów, akcji i banków. Sponsorzy są w nagłówku, status silnika tylko na powitaniu. Usunięto limit 100 jednostek ładowni w JS i WASM; techniczna granica zapisu to 65 535 jednostek jednej pozycji. Przegląd na fizycznym iOS, zwłaszcza z klawiaturą ekranową i większym tekstem, pozostaje do wykonania.
-
-### Kolejność działań i klawiatura Safari
-
-Sterowanie mobilne: działanie → pozycja → ilość. Nagłówek pokazuje jednego rotującego sponsora, miasto pod saldami; dług jest wyrównany do prawej. Opis powitania skrócono do klimatu retro MS-DOS i niezależnej adaptacji. Kontener mobilny jest przypięty do wysokości oraz przesunięcia VisualViewport i reaguje na resize/scroll, aby panel ilości podążał za obszarem nad klawiaturą. Potwierdzenie na fizycznym iPhonie pozostaje konieczne.
-
-### PWA i widoczność zdarzeń
-
-Dodano manifest, ikony i wersjonowany service worker z pełnym pakietem offline. Status gotowości pojawia się po aktywacji workera. Na iOS instalacja wymaga menu udostępniania; przycisk pokazuje instrukcję. Czcionka pozostaje po stronie aktywnej ręki, instalacja po przeciwnej. Sponsor ma 14 px, miasto znajduje się pod standardowym napisem BIZNES.EXE. Losowość podróży zwiększono z 25% do 35%; zdarzenia mają popup i trwały raport ostatniej podróży. Instalację i ponowne otwieranie w trybie samolotowym należy jeszcze potwierdzić na urządzeniu.
+Ograniczenie dowodów: testy Node sprawdzają przebieg i treść siatki 23×78, nie czytelność na fizycznym urządzeniu. Oryginalne zrzuty są odniesieniem wizualnym, nie specyfikacją algorytmów. Historyczne szczegóły buildów pozostają w BUILD-STATUS.md; bieżący opis funkcji jest w README.md.

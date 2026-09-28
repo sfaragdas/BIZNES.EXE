@@ -14,14 +14,14 @@ const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
   if(useWasm){for(let i=0;i<40&&el('#engine-status').textContent!=='Rust/WASM';i++)await new Promise(r=>setTimeout(r,25));assert.equal(el('#engine-status').textContent,'Rust/WASM')}
   checkScreen('Patroni projektu');checkScreen('Styl');checkScreen('-'.repeat(78));assert.ok(el('#terminal').innerHTML.includes('href=\"https://mojedostawy.pl\"'));assert.ok(el('#terminal').innerHTML.includes('href=\"https://lcse.pl\"'));checkScreen(`Offline · ${useWasm?'Rust/WASM':'JS'}`);
   assert.ok(!el('#terminal').innerHTML.includes('welcome-save'));
-  const welcomeRows=el('#terminal').textContent.split('\n');assert.equal(welcomeRows[7].trim(),'*                                                                          *'.trim());assert.equal(welcomeRows[17].trim(),'');
+  const welcomeRows=el('#terminal').textContent.split('\n');assert.equal(welcomeRows[7].trim(),'*                                                                          *'.trim());assert.equal(welcomeRows[11].trim(),'');
   click('font-toggle');assert.equal(document.body.dataset.font,'retro');click('font-toggle');assert.equal(document.body.dataset.font,'matrix');click('font-toggle');assert.equal(document.body.dataset.font,'current');
   key('Enter');checkScreen('Towar:');checkScreen('Towary');
-  key('K');assert.ok(!el('#terminal').innerHTML.includes('data-ui-action="debt"'));checkScreen('Jaki towar kupujesz?');key('K');checkScreen('możesz kupić 55 ton');click('amount-max');assert.ok(el('#terminal').innerHTML.includes('value="55"'));click('amount-minus');assert.ok(el('#terminal').innerHTML.includes('value="54"'));click('amount-plus');assert.ok(el('#terminal').innerHTML.includes('value="55"'));
+  key('K');assert.ok(!el('#terminal').innerHTML.includes('data-ui-action="debt"'));checkScreen('Kupno: Zaznacz pozycję na liście.');key('K');checkScreen('możesz kupić 55 ton');click('amount-max');assert.ok(el('#terminal').innerHTML.includes('value="55"'));click('amount-minus');assert.ok(el('#terminal').innerHTML.includes('value="54"'));click('amount-plus');assert.ok(el('#terminal').innerHTML.includes('value="55"'));
   const field={id:'amount-input',value:'10'};el('#terminal').handlers.input({target:field});
   listeners.keydown({key:'z',target:field,preventDefault(){}});assert.equal(state().cargo[0],10);key('Escape');
-  key('S');checkScreen('Jaki towar sprzedajesz?');key('S');checkScreen('Nie posiadasz: Samochody.');key('Escape');
-  key('K');checkScreen('Jaki towar kupujesz?');key('Escape');key('S');key('K');pressAmount(3);assert.equal(state().cargo[0],7);key('Escape');
+  key('S');checkScreen('Sprzedaż: Zaznacz pozycję na liście.');key('S');checkScreen('Nie posiadasz: Samochody.');key('Escape');
+  key('K');checkScreen('Kupno: Zaznacz pozycję na liście.');key('Escape');key('S');key('K');pressAmount(3);assert.equal(state().cargo[0],7);key('Escape');
   key('K');key('K');pressAmount(999);checkScreen('Nieprawidłowa ilość');key('Escape');key('B');checkScreen('Stan konta:');
   key('P');key('S');pressAmount(100);assert.equal(state().banks[0],100);checkScreen('Stan konta:');key('Escape');
   key('O');key('S');pressAmount(40);assert.equal(state().banks[0],60);key('Escape');
@@ -36,8 +36,8 @@ const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
   // Travel results and events all remain inline and accept the next action.
   for(let i=0;i<20;i++){key('W');click('city-'+((state().city+1)%9));checkScreen('Towar:');key('D');checkScreen('Pożyczasz');key('Escape')}
   if(process.argv.includes('--snapshot'))console.log('SNAPSHOT '+JSON.stringify(state()));
-  click('language');checkScreen('Goods:');key('K');checkScreen('Which good do you buy?');key('Escape');key('A');checkScreen('Shares:');key('B');checkScreen('Balance:');
-  key('P');key('S');pressAmount(1);checkScreen('Transaction completed.');key('Escape');key('D');checkScreen('Borrow, repay');key('Escape');
+  click('language');checkScreen('Goods:');key('K');checkScreen('Buy: Select an item from the list.');key('Escape');key('A');checkScreen('Shares:');key('B');checkScreen('Balance:');
+  key('P');key('S');pressAmount(1);checkScreen('Transaction completed.');key('Escape');key('D');checkScreen('Choose an action:');key('Escape');
   click('language');key('Q');checkScreen('Kontynuuj');const saved=state();key('Enter');assert.deepEqual(state(),saved);
   key('Q');key('N');assert.equal(state().cash,1000);assert.equal(state().shares.length,10);
   // Touch cards use the same state and input handlers as the terminal.

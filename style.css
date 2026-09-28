@@ -59,7 +59,7 @@ pre .welcomepanel{font-size:.94em;width:calc(100% - 2ch);height:100%;vertical-al
 pre .city-row-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;align-items:center}
 .city-row-inner .terminal-action{text-align:left}
 #mobile{display:none}
-@media(max-width:900px),(pointer:coarse) and (max-width:1200px){
+@media(max-width:900px){
   body{height:100dvh;min-height:0;overflow:hidden}
   main{width:100%;min-width:0;padding:0}
   .screen{display:none}
@@ -144,7 +144,7 @@ body[data-hand='left'] #journey-dialog button{margin-left:0;margin-right:auto}
 /* Styles are palette + type choices; no animation or extra font download. */
 body[data-font='matrix']{--yellow:#008f39}
 body[data-font='matrix'] pre,body[data-font='matrix'] #mobile{font-family:'DOS PL',monospace;font-synthesis:none}
-@media(max-width:900px),(pointer:coarse) and (max-width:1200px){
+@media(max-width:900px){
   body[data-font='matrix'] #mobile{font-size:15px}
   .mobile-columns{flex:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;font-size:10px;color:var(--dim);padding:3px 6px;border-bottom:1px dashed var(--dim);margin-right:0}
   .mobile-columns>span:nth-child(2){text-align:center}
@@ -162,3 +162,13 @@ body[data-font='matrix'] pre,body[data-font='matrix'] #mobile{font-family:'DOS P
 .mobile-bottom>.mobile-dock{border-top:0}
 
 .transaction-label{color:var(--yellow)}
+
+/* Desktop and landscape tablets retain text controls and the terminal table. */
+.screen{position:relative}
+pre .market-navigation{border-top:1px dashed var(--dim);color:var(--fg)}
+pre .footer-status{justify-content:space-between}
+#desktop-install-help{position:absolute;left:1.25%;right:1.25%;bottom:calc(100% * 3 / 23);max-height:35%;overflow:auto;background:var(--bg);border-block:1px dashed var(--dim);padding:10px;font:14px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;z-index:4}
+@media (pointer:coarse) and (min-width:901px){
+  main{padding:4px}
+  .screen{max-width:100%;max-height:none;aspect-ratio:78/54}
+}

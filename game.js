@@ -53,9 +53,9 @@ function frame(rows){
     const width=78+(raw.length-visibleText(raw).length);
     const r=raw.slice(0,width).padEnd(width);
     let html=esc(r);
-    const panel=view==='welcome'&&i>=2&&i<=9;
+    const panel=view==='welcome'&&i>=2&&i<=10;
     if(panel){
-      const edge=i===2||i===9;
+      const edge=i===2||i===10;
       const trimmed=r.trim(),text=edge?'*'.repeat(76):'* '+trimmed+' '.repeat(Math.max(0,72-visibleText(trimmed).length))+' *';
       html=` <span class="welcomepanel${edge?' panel-edge':''}">${esc(text)}</span> `;
     }
@@ -63,8 +63,9 @@ function frame(rows){
     html=html.replace(/\{LANG\}/g,`<button class="frame-control" data-frame-action="language">L/${lang==='pl'?'EN':'PL'}</button>`).replace(/\{SPONSOR\}/g,`<a class="sponsor-link" href="${SPONSORS[sponsorIndex][1]}" target="_blank" rel="noopener noreferrer">${SPONSORS[sponsorIndex][0]}</a>`).replace(/BIZNES\.EXE/g,'<span class="accent">BIZNES.EXE</span>').replace(/\{([A-Z])\}/g,'<span class="key">$1</span>').replace(/(\$\s*)([\d,]+(?:\.\d{2})?)/g,'$1<span class="accent">$2</span>').replace(/([\d,]+(?:\.\d{2})?)(\s*\$)/g,'<span class="accent">$1</span>$2');
     if(view==='home'&&i===16){const city=cities()[S.city];html=html.replace(esc(city),`<span class="accent">${esc(city)}</span>`)}
 
-    const cls=panel?'panel-row':raw.includes('{CITYROW}')?'city-row':raw.includes('{LEFT}')?'action-bar':raw.includes('{AMOUNT}')?'amount-row':i===22?'footer-status':i===0?'statusline':view==='welcome'&&i===11?'welcome-instructions':view==='welcome'&&i>=13&&i<=17?'welcome-copy':view==='home'&&((notice&&i===20)||(mode&&i===18))?'promptline':view==='home'&&i===1?'tablehead':view==='home'&&i===17?'section-divider':'';
+    const cls=panel?'panel-row':raw.includes('{CITYROW}')?'city-row':raw.includes('{LEFT}')?'action-bar':raw.includes('{AMOUNT}')?'amount-row':i===22?'footer-status':i===0?'statusline':view==='welcome'&&i===12?'welcome-instructions':view==='welcome'&&i>=13&&i<=17?'welcome-copy':view==='home'&&((notice&&i===20)||(mode&&i===18))?'promptline':view==='home'&&i===1?'tablehead':view==='home'&&i===17?'market-navigation':'';
     html=html.replace(/\{LEFT\}/g,'<span class="action-group group-left">').replace(/\{MID\}/g,'</span><span class="action-group group-middle">').replace(/\{RIGHT\}/g,'</span><span class="action-group group-right">').replace(/\{END\}/g,'</span>').replace(/\{CITYROW\}/g,'<span class="city-row-inner">').replace(/\{CITYEND\}/g,'</span>').replace(/\{SPONSOR_LINKS\}/g,[...SPONSORS].reverse().map(([name,url])=>`<a class="sponsor-link" href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`).join('    ')).replace(/\{AMOUNT\}/g,`<input id="amount-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="10" autocomplete="off" enterkeyhint="done" aria-label="${t('Quantity or amount','Ilość lub kwota')}" value="${esc(input)}">`);
+    if(view==='welcome'&&i===22)html=`<span>${RELEASE.padEnd(78-statusText().length)}</span><span>${esc(statusText())}</span>`;
     return `<span class="terminal-row ${cls}">${html}</span>`;
   }).join('\n');
 }
@@ -73,27 +74,32 @@ function pwaMessage(){return typeof window!=='undefined'?window.BiznesPWA?.messa
 function statusText(){const engine=document.querySelector('#engine-status').textContent==='Rust/WASM'?'Rust/WASM':'JS';const offline=typeof window!=='undefined'&&window.BiznesPWA?window.BiznesPWA.status(lang):'Offline';return `${offline} · ${engine}`}
 
 function topbar(){const tail='  {SPONSOR}  {LANG}',brand='BIZNES.EXE  ·  '+t('Tiny economic game','Mała gra ekonomiczna');return `${brand.padEnd(78-visibleText(tail).length)}${tail}`}
+const instructions=()=>[
+  [t('Buy goods and shares cheaply, then sell them for more. Share prices are fictional.','Kupuj towary i akcje tanio, a sprzedawaj drożej. Kursy akcji są fikcyjne.'),t('Buy goods and shares low; sell high. Share prices are fictional.','Kupuj towary i akcje tanio, sprzedawaj drożej. Kursy akcji są fikcyjne.')],
+  [t('Travel is free: each trip changes market prices, increases your debt by 1% and may bring a reward or setback.','Podróż jest bezpłatna: każdy wyjazd zmienia ceny, zwiększa dług o 1% i może przynieść korzyść lub wpadkę.'),t('Free trips: new prices, 1% more debt, possible rewards or setbacks.','Wyjazd: bez opłat, nowe ceny, dług +1%, możliwe korzyści lub wpadki.')],
+  [t('Use Banks to deposit or withdraw cash, and Debt to borrow or repay it.','W Bankach wpłacaj i odbieraj gotówkę, a w Długu pożyczaj lub spłacaj pieniądze.'),t('Banks: deposit/withdraw. Debt: borrow/repay.','Banki: wpłać/odbierz gotówkę. Dług: pożycz/spłać pieniądze.')],
+  [t('Choose an action, then an item. Enter the amount or use +, − and Max, then confirm. Correct errors in the same form; a successful transaction or Cancel returns to the main view.','Wybierz działanie, potem pozycję. Wpisz ilość lub użyj +, − i Maks, następnie zatwierdź. Błąd poprawisz w tym samym formularzu; udana transakcja lub Anuluj wraca do widoku głównego.'),t('Action → item → amount. Enter confirms; Esc cancels. Correct errors in place.','Działanie → pozycja → ilość. Enter zatwierdza, Esc anuluje. Błąd poprawisz.')],
+  [t('Progress saves automatically. Menu returns to the welcome screen; Continue resumes your game.','Postęp zapisuje się automatycznie. Menu otwiera ekran powitalny, a Kontynuuj wznawia grę.'),t('Progress saves automatically. Menu → welcome; Continue → resume.','Postęp zapisuje się sam. Menu → powitanie; Kontynuuj → wznowienie.')]
+];
 function welcome(){
-  const opts=[actionToken('welcome-continue','K',t('Continue','Kontynuuj')),actionToken('new-game','N',t('New game','Nowa gra')),actionToken('font-toggle','F',`F: ${t('Style','Styl')}: ${styleName()}`)];
+  const start=[button('new-game','N','Nowa gra','New game'),button('welcome-continue',lang==='pl'?'K':'C','Kontynuuj','Continue')];
+  const settings=[button('install-app','I','Zainstaluj','Install'),button('font-toggle','F','F: Styl: '+styleName(),'F: Style: '+styleName())];
   return frame([
     topbar(),'','',
-    center(t('BIZNES.EXE · A tiny economic game','BIZNES.EXE · Mała gra ekonomiczna')),
+    center(t('BIZNES.EXE · Small game. Big business.','BIZNES.EXE · Mała gra. Wielki biznes.')),
     center(t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.')),
     center(t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:')),
-    center(t('Biznesman (1988), M. Cwynar / SAMBA.','Biznesman (1988), M. Cwynar / SAMBA.')),
-    '',
-    center(t('Project patrons: {SPONSOR_LINKS}','Patroni projektu: {SPONSOR_LINKS}')),
-    '','',center(t('HOW TO PLAY','INSTRUKCJA')),
-    center(t('Buy goods and shares low; sell high. Share prices are fictional.','Kupuj towary i akcje tanio, sprzedawaj drożej. Kursy akcji są fikcyjne.')),
-    center(t('Free trips change prices, add 1% debt and may bring rewards or setbacks.','Wyjazd: bez opłat, nowe ceny, dług +1%, możliwe korzyści lub wpadki.')),
-    center(t('Banks: deposit/withdraw. Debt: borrow/repay. Progress saves automatically.','Banki: wpłać/odbierz. Dług: pożycz/spłać. Postęp zapisuje się sam.')),
-    center(t('Choose an action and item; enter an amount. Enter confirms, Esc cancels.','Wybierz działanie i pozycję, wpisz ilość. Enter zatwierdza, Esc anuluje.')),
-    center(t('{K} buy · {S} sell · {W} travel · {A} shares · {D} debt · {B} banks · {Q} menu','{K} kupno · {S} sprzedaż · {W} wyjazd · {A} akcje · {D} długi · {B} banki · {Q} menu')),
-    '',
+    center('Biznesman (1988), M. Cwynar / SAMBA.'),'',
+    center(t('Project patrons:','Patroni projektu:')),center('{SPONSOR_LINKS}'),
+    '','',center(t('How to play','Jak grać')),
+    ...instructions().map(([,compact])=>center(compact)),
     center(t('Click a choice or press its highlighted letter.','Kliknij wybór albo naciśnij wyróżnioną literę.')),
-    '-'.repeat(78),'{LEFT}'+opts.slice(0,2).join('   ')+'{MID}{RIGHT}'+opts[2]+'{END}','-'.repeat(78)
+    '-'.repeat(78),'{LEFT}'+start.join('   ')+'{MID}{RIGHT}'+settings.join('   ')+'{END}','-'.repeat(78)
   ]);
 }
+const operationLabel=()=>({buy:t('Buy','Kupno'),sell:t('Sell','Sprzedaż'),deposit:t('Deposit','Wpłata'),withdraw:t('Withdraw','Odbiór'),borrow:t('Borrow','Pożyczka'),repay:t('Repay','Spłata')}[mode]||'');
+const chooseAction=()=>t('Choose an action:','Wybierz akcję:');
+function marketTabs(){return [button('goods','T','Towary','Goods'),button('shares','A','Akcje','Shares'),button('bank','B','Banki','Banks')].join('   ')}
 // Two screens; the active table is independent of the inline operation.
 const GOODS_HOT=()=>lang==='pl'?[0,0,0,0,0,0,2,0,0,0]:[0,0,2,0,0,0,2,0,0,1];
 const STOCK_LABELS=()=>lang==='pl'?["Hilton (Nowy Jork)","International (Paryż)","MacDonald's","Philips","JVC","Toyota",...STOCKS.slice(6)]:["Hilton (New York)","International (Paris)","McDonald's","Philips","JVC","Toyota",...STOCKSEN.slice(6)];
@@ -128,28 +134,26 @@ function home(){
   return frame([topbar(),headings.map((h,i)=>(h+':').padEnd([30,14,16,18][i])).join(''),...rows,
     '─'.repeat(59)+' '+leader(t('TOTAL:','RAZEM:'),money(total),18),
     pair(t('Debt balance','Stan twojego długu'),money(S.debt),t('Debt growth per trip','Procent wzrostu długu'),'1 %'),
-    pair(t('Account balance','Stan twojego konta'),money(S.cash),t('Chance of repayment','Szansa na spłatę'),`${coverage} %`),
+    pair(t('Account balance','Stan twojego konta'),money(S.cash),t('Debt coverage','Pokrycie długu'),`${coverage} %`),
     pair(t('Held in banks','W bankach posiadasz'),money(S.bank),'','─'.repeat(39)),
     pair(t('Held in shares','W akcjach posiadasz'),money(shareValue),t('Currently in','Przebywasz w'),cities()[S.city]),
-    '-'.repeat(78),...controls]);
+    marketTabs(),...controls]);
 }
 function inlineControls(){
   const cancel=button('cancel','ESC','ESC anuluj','ESC cancel');
   if(!mode){
-    const tabs=[button('goods','T','Towary','Goods'),button('shares','A','Akcje','Shares'),button('bank','B','Banki','Banks')];
-    const ops=table==='banks'?[button('deposit','P','Wpłata','Deposit',1),button('withdraw','O','Odbiór','Withdraw')]:[button('buy','K','Kupno','Buy'),button('sell','S','Sprzedaż','Sell')];
-    const middle=[button('debt','D','Długi','Debt'),button('quit','Q','Q Menu','Q Menu'),button('travel','W','Wyjazd','Travel')];
-    return ['{LEFT}'+tabs.join(' ')+'{MID}'+middle.join(' ')+'{RIGHT}'+ops.join(' ')+'{END}','',notice,table==='stocks'?t('Game prices are fictional. Select a highlighted letter or click.','Kursy są fikcyjne. Wybierz wyróżnioną literę albo kliknij.'):t('Choose a highlighted letter or click.','Wybierz wyróżnioną literę albo kliknij.')];
+    const ops=table==='banks'?[button('deposit','P','Wpłać','Deposit',1),button('withdraw','O','Odbierz','Withdraw')]:[button('buy','K','Kup','Buy'),button('sell','S','Sprzedaj','Sell')];
+    const middle=[button('debt','D','Dług','Debt'),button('quit','Q','Q Menu','Q Menu'),button('travel','W','Wyjazd','Travel')];
+    return [chooseAction(),'{LEFT}'+middle.join('   ')+'{MID}{RIGHT}'+ops.join('   ')+'{END}',notice,''];
   }
   if(mode==='travel'){
     const opts=cities().map((c,i)=>i===S.city?null:actionToken(`city-${i}`,c[0].toUpperCase(),c)).filter(Boolean);
-    return [t('Cities you can travel to:','Miasta, do których możesz się wybrać:'),'{CITYROW}'+opts.slice(0,4).join('   ')+'{CITYEND}','{CITYROW}'+opts.slice(4).join('   ')+'{CITYEND}',' '+cancel];
+    return [t('Where to?','Dokąd jedziemy?'),'{CITYROW}'+opts.slice(0,4).join('   ')+'{CITYEND}','{CITYROW}'+opts.slice(4).join('   ')+'{CITYEND}',' '+cancel];
   }
-  if(mode==='debt'&&step==='choice')return [t('Borrow, repay, or return?','Pożyczasz, oddajesz, czy wracasz?'),
+  if(mode==='debt'&&step==='choice')return [chooseAction(),
     ' '+button('borrow','P','Pożyczasz','Borrow')+'   '+button('repay','O','Oddajesz','Repay'),t('Loan limit per operation: 5000 $.','Limit pożyczki na operację: 5000 $.'),' '+cancel];
   if(step==='row'){
-    const question=table==='banks'?t('Which bank?','Który bank?'):table==='stocks'?(mode==='buy'?t('Which shares do you buy?','Jakie akcje kupujesz?'):t('Which shares do you sell?','Jakie akcje sprzedajesz?')):(mode==='buy'?t('Which good do you buy?','Jaki towar kupujesz?'):t('Which good do you sell?','Jaki towar sprzedajesz?'));
-    return [' '+question+' < '+t('choose a highlighted letter','wybierz wyróżnioną literę')+' >','',notice,' '+cancel];
+    return [' '+operationLabel()+': '+t('Select an item from the list.','Zaznacz pozycję na liście.'),'',notice,' '+cancel];
   }
   const max=maximum(),isMoney=['deposit','withdraw','borrow','repay'].includes(mode),item=entries()[selected]||{label:'',unit:''};
   const hint=isMoney?`${t('available','dostępne')}: ${money(max)}`:mode==='buy'?t(`you can buy ${max} ${item.unit}`,`możesz kupić ${max} ${item.unit}`):t(`you own ${max} ${item.unit}`,`posiadasz ${max} ${item.unit}`);
@@ -165,7 +169,7 @@ function mobileView(){
   const links=[...SPONSORS].reverse().map(([name,url])=>`<a href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`).join('    ');
   const [sponsorName,sponsorUrl]=SPONSORS[sponsorIndex];
   const head=`<header class="mobile-head"><div class="mobile-brand"><strong>BIZNES.EXE</strong>${view==='home'?`<span class="mobile-city">${esc(cities()[S.city])}</span>`:''}</div><nav class="mobile-sponsors" aria-label="${t('Patrons','Patroni')}"><a href="${sponsorUrl}" target="_blank" rel="noopener noreferrer">${sponsorName}</a></nav>${mobileButton('language',lang==='pl'?'EN':'PL',`aria-label="${t('Switch language','Zmień język')}"`)}</header>`;
-  if(view==='welcome')return head+`<section class="mobile-list mobile-welcome"><div class="mobile-manifest"><h1>${t('Small game. Big business.','Mała gra. Wielki biznes.')}</h1><p>${t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.')}</p><p>${t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:')}<br>Biznesman (1988), M. Cwynar / SAMBA.</p><p>${t('Project patrons','Patroni projektu')}:<br>${links}</p></div><h2>${t('How to play','Jak grać')}</h2><p>${t('Buy goods and shares cheaply, then sell them for more. Share prices are fictional.','Kupuj towary i akcje tanio, a sprzedawaj drożej. Kursy akcji są fikcyjne.')}</p><p>${t('Travel is free: each trip changes market prices, increases your debt by 1% and may bring a reward or setback.','Podróż jest bezpłatna: każdy wyjazd zmienia ceny, zwiększa dług o 1% i może przynieść korzyść lub wpadkę.')}</p><p>${t('Use Banks to deposit or withdraw cash, and Debt to borrow or repay it.','W Bankach wpłacaj i odbieraj gotówkę, a w Długu pożyczaj lub spłacaj pieniądze.')}</p><p>${t('Choose an action, then an item. Enter the amount or use +, − and Max, then confirm. Correct errors in the same form; a successful transaction or Cancel returns to the main view.','Wybierz działanie, potem pozycję. Wpisz ilość lub użyj +, − i Maks, następnie zatwierdź. Błąd poprawisz w tym samym formularzu; udana transakcja lub Anuluj wraca do widoku głównego.')}</p><p>${t('Progress saves automatically. Menu returns to the welcome screen; Continue resumes your game.','Postęp zapisuje się automatycznie. Menu otwiera ekran powitalny, a Kontynuuj wznawia grę.')}</p></section>${pwaMessage()?`<p class="install-help" role="status">${esc(pwaMessage())}</p>`:''}<small class="mobile-status"><span>${RELEASE}</span><span>${esc(statusText())}</span></small><section class="mobile-dock mobile-welcome-dock"><div class="mobile-hand-row">${mobileButton('hand-toggle',handedness==='right'?t('Left-handed','Leworęczny'):t('Right-handed','Praworęczny'))}<span>${handedness==='right'?t('Right-handed ✓','Praworęczny ✓'):t('Left-handed ✓','Leworęczny ✓')}</span></div><div class="mobile-font-row">${mobileButton('install-app',t('Install app','Zainstaluj'))}${mobileButton('font-toggle',t('Style: ','Styl: ')+styleName())}</div><div class="mobile-primary-row">${mobileButton('new-game',t('New game','Nowa gra'))}${mobileButton('welcome-continue',t('Continue','Kontynuuj'),'class="mobile-confirm"')}</div></section>`;
+  if(view==='welcome')return head+`<section class="mobile-list mobile-welcome"><div class="mobile-manifest"><h1>${t('Small game. Big business.','Mała gra. Wielki biznes.')}</h1><p>${t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.')}</p><p>${t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:')}<br>Biznesman (1988), M. Cwynar / SAMBA.</p><p>${t('Project patrons','Patroni projektu')}:<br>${links}</p></div><h2>${t('How to play','Jak grać')}</h2>${instructions().map(([text])=>`<p>${text}</p>`).join('')}</section>${pwaMessage()?`<p class="install-help" role="status">${esc(pwaMessage())}</p>`:''}<small class="mobile-status"><span>${RELEASE}</span><span>${esc(statusText())}</span></small><section class="mobile-dock mobile-welcome-dock"><div class="mobile-hand-row">${mobileButton('hand-toggle',handedness==='right'?t('Left-handed','Leworęczny'):t('Right-handed','Praworęczny'))}<span>${handedness==='right'?t('Right-handed ✓','Praworęczny ✓'):t('Left-handed ✓','Leworęczny ✓')}</span></div><div class="mobile-font-row">${mobileButton('install-app',t('Install app','Zainstaluj'))}${mobileButton('font-toggle',t('Style: ','Styl: ')+styleName())}</div><div class="mobile-primary-row">${mobileButton('new-game',t('New game','Nowa gra'))}${mobileButton('welcome-continue',t('Continue','Kontynuuj'),'class="mobile-confirm"')}</div></section>`;
   const bank=table==='banks',totals={goods:S.cargo.reduce((n,q,i)=>n+q*S.prices[i],0),shares:S.shares.reduce((n,q,i)=>n+q*stockPrice(i),0),bank:S.bank};
   const tabs=(handedness==='left'?[['goods',t('Goods','Towary')],['shares',t('Shares','Akcje')],['bank',t('Banks','Banki')]]:[['bank',t('Banks','Banki')],['shares',t('Shares','Akcje')],['goods',t('Goods','Towary')]]).map(([id,label])=>`<button type="button" data-ui-action="${id}" aria-pressed="${({goods:'goods',shares:'stocks',bank:'banks'}[id]===table&&mode!=='travel')}"><span>${label}</span><b>${money(totals[id])}</b></button>`).join('');
   const cards=entries().map((e,i)=>{
@@ -177,11 +181,11 @@ function mobileView(){
 }
 function mobileOperation(){
   const cancel=mobileCancel(),bank=table==='banks';
-  const label={buy:t('Buy','Kupno'),sell:t('Sell','Sprzedaż'),deposit:t('Deposit','Wpłata'),withdraw:t('Withdraw','Odbiór'),borrow:t('Borrow','Pożyczka'),repay:t('Repay','Spłata')}[mode];
+  const label=operationLabel();
   const message=notice?`<p class="mobile-notice has-message" role="status">${esc(notice)}</p>`:'';
-  if(!mode)return {content:null,footer:`<p class="mobile-notice ${notice&&notice!==S.lastJourney?.[lang]?'has-message':''}" role="status">${esc((S.lastJourney?.[lang]===notice?'':notice)||t('Choose an action:','Wybierz akcję:'))}</p><nav class="mobile-main-actions">${mobileButton('debt',t('Debt','Dług'))}${mobileButton('quit','Menu')}${mobileButton('travel',t('Travel','Wyjazd'))}</nav><div class="mobile-primary-row">${mobileButton('mobile-sell',bank?t('Withdraw','Odbierz'):t('Sell','Sprzedaj'))}${mobileButton('mobile-buy',bank?t('Deposit','Wpłać'):t('Buy','Kup'),'class="mobile-confirm"')}</div>`};
+  if(!mode)return {content:null,footer:`<p class="mobile-notice ${notice&&notice!==S.lastJourney?.[lang]?'has-message':''}" role="status">${esc((S.lastJourney?.[lang]===notice?'':notice)||chooseAction())}</p><nav class="mobile-main-actions">${mobileButton('debt',t('Debt','Dług'))}${mobileButton('quit','Menu')}${mobileButton('travel',t('Travel','Wyjazd'))}</nav><div class="mobile-primary-row">${mobileButton('mobile-sell',bank?t('Withdraw','Odbierz'):t('Sell','Sprzedaj'))}${mobileButton('mobile-buy',bank?t('Deposit','Wpłać'):t('Buy','Kup'),'class="mobile-confirm"')}</div>`};
   if(mode==='travel')return {content:'',footer:`<h2>${t('Where to?','Dokąd jedziemy?')}</h2><div class="mobile-cities">${cities().map((c,i)=>i===S.city?'':mobileButton(`city-${i}`,c)).join('')}</div><div class="mobile-operation-footer">${cancel}</div>`};
-  if(mode==='debt')return {content:`<h2>${t('Manage debt','Obsługa długu')}</h2><p>${t('Current debt','Obecny dług')}: ${money(S.debt)}</p><p>${t('Loan limit per operation: 5000 $.','Limit pożyczki na operację: 5000 $.')}</p>`,footer:`<p>${t('Choose an action:','Wybierz akcję:')}</p><div class="mobile-primary-row">${mobileButton('borrow',t('Borrow','Pożyczasz'))}${mobileButton('repay',t('Repay','Oddajesz'),'class="mobile-confirm"')}</div><div class="mobile-operation-footer">${cancel}</div>`};
+  if(mode==='debt')return {content:`<h2>${t('Manage debt','Obsługa długu')}</h2><p>${t('Current debt','Obecny dług')}: ${money(S.debt)}</p><p>${t('Loan limit per operation: 5000 $.','Limit pożyczki na operację: 5000 $.')}</p>`,footer:`<p>${chooseAction()}</p><div class="mobile-primary-row">${mobileButton('borrow',t('Borrow','Pożyczasz'))}${mobileButton('repay',t('Repay','Oddajesz'),'class="mobile-confirm"')}</div><div class="mobile-operation-footer">${cancel}</div>`};
   if(step==='row')return {content:null,footer:`${message}<p><span class="transaction-label">${label}:</span> ${t('Select an item from the list.','Zaznacz pozycję na liście.')}</p><div class="mobile-operation-footer">${cancel}</div>`};
 
   return {content:`<h2 class="transaction-label">${label}</h2>${['borrow','repay'].includes(mode)?'':`<p>${esc(entries()[selected].label)}</p>`}<p>${t('Maximum available','Maksymalnie dostępne')}: ${maximum()}</p>`,footer:`${message}<label for="mobile-amount-input">${t('Quantity / amount','Ilość / kwota')}</label><div class="mobile-quantity">${mobileButton('amount-minus','−',`aria-label="${t('Decrease','Zmniejsz')}"`)}<input id="mobile-amount-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="10" autocomplete="off" enterkeyhint="done" value="${esc(input)}">${mobileButton('amount-plus','+',`aria-label="${t('Increase','Zwiększ')}"`)}${mobileButton('amount-max',t('Max','Maks'))}</div><div class="mobile-operation-footer">${cancel}${mobileButton('submit',t('Confirm','Zatwierdź'),'class="mobile-confirm"')}</div>`};
@@ -223,6 +227,8 @@ function render(persist=true){
   if(persist)save();
   document.body.dataset.font=fontStyle;document.body.dataset.hand=handedness;
   T.innerHTML=screen();updateMobile(mobileView());fitTerminal();renderJourneyPopup();
+  const help=document.querySelector('#desktop-install-help');
+  if(help){help.textContent=view==='welcome'?pwaMessage():'';help.hidden=!help.textContent}
   if(focused&&document.activeElement?.id!==id)document.querySelector('#'+id)?.focus?.({preventScroll:true});
 }
 let noticeSerial=0;
@@ -358,7 +364,7 @@ function select(id){
   render();
 }
 function action(k){
-  if(view==='welcome'){const id={N:'new-game',K:'welcome-continue',C:'welcome-continue',ENTER:'welcome-continue',F:'font-toggle',L:'language'}[k];if(id)select(id);return}
+  if(view==='welcome'){const id={N:'new-game',K:'welcome-continue',C:'welcome-continue',ENTER:'welcome-continue',F:'font-toggle',I:'install-app',L:'language'}[k];if(id)select(id);return}
   if(k==='ESC'){select('cancel');return}
   if(mode){
     if(mode==='travel'){const i=cities().findIndex((c,i)=>i!==S.city&&c[0].toUpperCase()===k);if(i>=0)travelTo(i);return}
