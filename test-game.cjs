@@ -22,10 +22,10 @@ const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
   listeners.keydown({key:'z',target:field,preventDefault(){}});assert.equal(state().cargo[0],10);key('Escape');
   key('S');checkScreen('Sprzedaż: Zaznacz pozycję na liście.');key('S');checkScreen('Nie posiadasz: Samochody.');key('Escape');
   key('K');checkScreen('Kupno: Zaznacz pozycję na liście.');key('Escape');key('S');key('K');pressAmount(3);assert.equal(state().cargo[0],7);key('Escape');
-  key('K');key('K');pressAmount(999);checkScreen('Nieprawidłowa ilość');key('Escape');key('B');checkScreen('Stan konta:');
-  key('P');key('S');pressAmount(100);assert.equal(state().banks[0],100);checkScreen('Stan konta:');key('Escape');
+  key('K');key('K');pressAmount(999);checkScreen('Nieprawidłowa ilość');key('Escape');key('B');checkScreen('Saldo:');
+  key('P');key('S');pressAmount(100);assert.equal(state().banks[0],100);checkScreen('Saldo:');key('Escape');
   key('O');key('S');pressAmount(40);assert.equal(state().banks[0],60);key('Escape');
-  key('D');checkScreen('Stan konta:');checkScreen('Pożyczasz');key('P');pressAmount(1000);assert.equal(state().debt,26000);checkScreen('Stan konta:');
+  key('D');checkScreen('Saldo:');checkScreen('Pożyczasz');key('P');pressAmount(1000);assert.equal(state().debt,26000);checkScreen('Saldo:');
   key('A');checkScreen('Akcje:');checkScreen('Excellence (NC)');assert.equal(state().shares.length,10);
   for(let i=0;i<10;i++){click('buy');click('stock-'+i);pressAmount(1);assert.equal(state().shares[i],1);key('Escape')}
   key('S');key('E');pressAmount(1);assert.equal(state().shares[9],0);checkScreen('Akcje:');key('Escape');

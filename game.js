@@ -121,7 +121,7 @@ function home(){
   const leader=(label,value,width)=>label.padEnd(Math.max(label.length,width-String(value).length),'.')+value;
   const pair=(l,lv,r,rv)=>leader(l,lv,38)+' '+leader(r,rv,39);
   const list=entries(),bank=table==='banks';
-  const headings=bank?[t('Bank','Bank'),t('Deposit up to','Możesz wpłacić'),t('Withdraw up to','Możesz odebrać'),t('Balance','Stan konta')]:[table==='stocks'?t('Shares','Akcje'):t('Goods','Towar'),t('Price','Cena'),t('Owned quantity','Posiadana ilość'),t('Current value','Aktualna wartość')];
+  const headings=bank?[t('Bank','Bank'),t('Deposit up to','Możesz wpłacić'),t('Withdraw up to','Możesz odebrać'),t('Balance','Saldo')]:[table==='stocks'?t('Shares','Akcje'):t('Goods','Towar'),t('Price','Cena'),t('Owned','Masz'),t('Value','Wartość')];
   const rows=list.map(e=>{
     const name=actionToken(e.id,e.label[e.hot].toUpperCase(),e.label.padEnd(30,'.'),e.hot);
     return name+(bank?money(S.cash):money(e.price)).padStart(14)+(bank?money(e.balance):`${e.qty} ${e.unit}`).padStart(16)+money(bank?e.balance:e.qty*e.price).padStart(18);
