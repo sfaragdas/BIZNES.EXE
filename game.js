@@ -70,7 +70,7 @@ function frame(rows){
 }
 const center=s=>{const length=visibleText(s).length,left=Math.max(0,Math.floor((78-length)/2));return ' '.repeat(left)+s+' '.repeat(Math.max(0,78-length-left))};
 function pwaMessage(){return typeof window!=='undefined'?window.BiznesPWA?.message(lang)||'':''}
-function statusText(){const engine=document.querySelector('#engine-status').textContent==='Rust/WASM'?'Rust/WASM':'JS';const offline=typeof window!=='undefined'&&window.BiznesPWA?window.BiznesPWA.status(lang):'Offline';return `${offline} · ${engine} · ${t('Autosave','Autozapis')}`}
+function statusText(){const engine=document.querySelector('#engine-status').textContent==='Rust/WASM'?'Rust/WASM':'JS';const offline=typeof window!=='undefined'&&window.BiznesPWA?window.BiznesPWA.status(lang):'Offline';return `${offline} · ${engine}`}
 
 function topbar(){const tail='  {SPONSOR}  {LANG}',brand='BIZNES.EXE  ·  '+t('Tiny economic game','Mała gra ekonomiczna');return `${brand.padEnd(78-visibleText(tail).length)}${tail}`}
 function welcome(){
@@ -205,7 +205,8 @@ function updateMobile(html){
     for(let i=0;i<next.childNodes.length;i++){
       const fresh=next.childNodes[i],old=parent.childNodes[i];
       if(!old){parent.appendChild(fresh.cloneNode(true));continue}
-      if(old.nodeType!==fresh.nodeType||old.nodeName!==fresh.nodeName||old.nodeType===1&&old.id!==fresh.id){old.replaceWith(fresh.cloneNode(true));continue}
+      // A different action is a new control; never carry focus to an unrelated button.
+      if(old.nodeType!==fresh.nodeType||old.nodeName!==fresh.nodeName||old.nodeType===1&&(old.id!==fresh.id||old.getAttribute('data-ui-action')!==fresh.getAttribute('data-ui-action'))){old.replaceWith(fresh.cloneNode(true));continue}
       if(old.nodeType===3){if(old.nodeValue!==fresh.nodeValue)old.nodeValue=fresh.nodeValue;continue}
       if(old.nodeType!==1)continue;
       for(const attr of [...old.attributes])if(!fresh.hasAttribute(attr.name))old.removeAttribute(attr.name);
