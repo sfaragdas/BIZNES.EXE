@@ -44,6 +44,7 @@ jobs:
           worker.write_text(worker.read_text(encoding='utf-8').replace('20260927-pwa', os.environ['GITHUB_SHA']), encoding='utf-8')
           PY
           cp -r assets _site/
+          cp -r classic _site/
           cp target/wasm32-unknown-unknown/release/biznes_exe_core.wasm _site/target/wasm32-unknown-unknown/release/
       - uses: actions/upload-pages-artifact@v3
         with:
