@@ -22,17 +22,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
-      - name: Build the game core
+      - name: Test
         run: |
-          rustup target add wasm32-unknown-unknown
-          cargo build --locked --release --target wasm32-unknown-unknown
           node test-game.cjs
-          node test-game.cjs --wasm
           node test-classic.cjs
       - name: Assemble the public site
         run: |
-          mkdir -p _site/target/wasm32-unknown-unknown/release
-          cp matrix-colors.html index.html game.js style.css pwa.js sw.js manifest.webmanifest favicon.svg NOTICE LICENSE _site/
+          mkdir -p _site
+          cp index.html game.js style.css pwa.js sw.js manifest.webmanifest favicon.svg NOTICE LICENSE _site/
           cp -r classic _site/
           # Each deployment gets unique asset URLs, bypassing older browser/CDN entries.
           python - <<'PY'
@@ -52,7 +49,6 @@ jobs:
           classic_worker.write_text(classic_worker.read_text(encoding='utf-8').replace('classic-20260929', os.environ['GITHUB_SHA']), encoding='utf-8')
           PY
           cp -r assets _site/
-          cp target/wasm32-unknown-unknown/release/biznes_exe_core.wasm _site/target/wasm32-unknown-unknown/release/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

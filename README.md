@@ -2,7 +2,9 @@
 
 **Lekka gra ekonomiczna w klimacie retro MS-DOS.** Kupuj tanio, sprzedawaj drożej, podróżuj i pilnuj długu.
 
-[**Zagraj w przeglądarce**](https://sfaragdas.github.io/BIZNES.EXE/)
+[**Zagraj w przeglądarce**](https://sfaragdas.github.io/BIZNES.EXE/) · [**Wersja Classic**](https://sfaragdas.github.io/BIZNES.EXE/classic/)
+
+Nowa wersja **BIZNES.EXE 2.0** jest w przygotowaniu. Dotychczasowa gra pozostaje dostępna jako Classic.
 
 ALFA · PL / EN · Standard / DOS / Matrix · komputer / tablet / telefon · PWA offline
 
@@ -51,31 +53,24 @@ To **alfa**, nie symulator prawdziwych inwestycji. Jest 10 towarów, 10 akcji, 6
 
 Znane tematy do dopracowania: odporność lokalnego zapisu, granice dużych liczb, balans zdarzeń i pożyczek oraz sprawdzenie Safari/klawiatury/PWA na fizycznych urządzeniach. Techniczny limit jednej pozycji wynosi 65 535 jednostek; dawnego limitu 100 jednostek ładowni już nie ma.
 
-- [Porównanie z oryginałem i plan](POROWNANIE-I-PLAN.md)
-- [Przegląd kodu z 28.09.2026](REVIEW-2026-09-28.md)
-- [Źródła nazw akcji](SOURCES.md)
-
 ## Uruchomienie i rozwój
 
-Frontend: HTML/CSS/JavaScript, bez frameworka i zewnętrznych bibliotek uruchomieniowych. Rdzeń Rust/WASM ma pełny odpowiednik JavaScript.
-
-Otwarcie `index.html` jako pliku uruchamia JS fallback. Dla WASM:
+Czysty HTML/CSS/JavaScript, bez frameworka, kroku budowania i zewnętrznych bibliotek uruchomieniowych. Grę można otworzyć bezpośrednio z `index.html` albo przez lokalny serwer:
 
 ```sh
-cargo build --locked --release --target wasm32-unknown-unknown
-python -m http.server 8000
+python3 -m http.server 8000
 ```
 
-Otwórz `http://localhost:8000`. Moduł powstaje w `target/wasm32-unknown-unknown/release/biznes_exe_core.wasm`.
+Otwórz `http://localhost:8000` (Classic: `http://localhost:8000/classic/`).
 
 Kontrole przebiegu (Node, symulowany DOM):
 
 ```sh
 node test-game.cjs
-node test-game.cjs --wasm
+node test-classic.cjs
 ```
 
-Testy obejmują transakcje, przełączanie rynków, komunikaty, zdarzenia, języki, style, zapis oraz siatkę terminala. Nie potwierdzają wyglądu ani zachowania klawiatury na fizycznym iPhonie. Workflow GitHub Pages buduje WASM, uruchamia oba warianty testów i publikuje pliki gry po pushu do `main`. Każde wdrożenie wersjonuje pliki i pamięć PWA.
+Testy obejmują transakcje, przełączanie rynków, komunikaty, zdarzenia, języki, style, zapis oraz siatkę terminala. Nie potwierdzają wyglądu ani zachowania klawiatury na fizycznym iPhonie. Workflow GitHub Pages uruchamia testy i publikuje grę oraz wersję Classic po pushu do `main`. Każde wdrożenie wersjonuje pliki i pamięć PWA.
 
 ## Licencje
 

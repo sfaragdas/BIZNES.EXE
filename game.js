@@ -27,7 +27,7 @@ let sponsorIndex=0,fontStyle=localStorage.getItem('bx-style')||localStorage.getI
 if(!STYLES.some(style=>style.id===fontStyle))fontStyle='current';
 const styleName=()=>STYLES.find(style=>style.id===fontStyle).name;
 const RELEASE='ALFA · 2026.09.28';
-let lang=localStorage.getItem('bx-lang')||'pl',view='welcome',notice='',selected=0,CORE=null,input='',step='',mode='',table='goods';
+let lang=localStorage.getItem('bx-lang')||'pl',view='welcome',notice='',selected=0,input='',step='',mode='',table='goods';
 const t=(en,pl)=>lang==='pl'?pl:en, goods=()=>lang==='pl'?GOODS:GEN, cities=()=>lang==='pl'?C:CEN, banks=()=>lang==='pl'?BANKS:BANKSEN;
 const fresh=()=>({schema:2,cash:1000,bank:0,debt:25000,city:0,day:1,cargo:Array(10).fill(0),shares:Array(10).fill(0),banks:Array(6).fill(0),prices:[...BASE],rng:(Date.now()>>>0)||42,alive:true,seed:Date.now()>>>0});
 let S;try{S=JSON.parse(localStorage.getItem('bx-save'))||fresh()}catch{S=fresh()}
@@ -39,9 +39,6 @@ if(S.bank!==S.banks.reduce((a,b)=>a+b,0)){S.banks[0]+=S.bank-S.banks.reduce((a,b
 let migratedCargo=false;if(legacySave){let recovered=0;for(let i=5;i<10;i++){recovered+=S.cargo[i]*S.prices[i];S.cargo[i]=0}for(let i=0;i<Math.min(3,S.shares.length);i++)recovered+=S.shares[i]*(80+((S.day*17+i*31)%90));if(recovered>0){S.cash+=recovered;migratedCargo=true}S.shares.fill(0);S.city=[2,2,5,0,4,6,3,8][Math.min(7,S.city)]||0;S.schema=2;if(migratedCargo)notice=t('Older goods and shares were converted to cash.','Stare towary i akcje zamieniono na gotówkę.')}
 const money=n=>`${Number(n).toFixed(2)} $`, esc=s=>String(s).replace(/[&<>"]+/g,c=>c.split('').map(ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])).join(''));
 const actionToken=(id,key,label,hot=0)=>`[[${id}|${key}|${label}|${hot}]]`;
-function coreHydrate(){for(const [f,v] of [[0,S.cash],[1,S.bank],[2,S.debt],[3,S.city],[4,S.day],[9,S.rng|0]])CORE.core_set(f,0,v);S.prices.forEach((v,i)=>CORE.core_set(6,i,v));S.cargo.forEach((v,i)=>CORE.core_set(7,i,v));S.shares.forEach((v,i)=>CORE.core_set(8,i,v))}
-function coreSync(){S.cash=CORE.core_get(0,0);S.bank=CORE.core_get(1,0);S.debt=CORE.core_get(2,0);S.city=CORE.core_get(3,0);S.day=CORE.core_get(4,0);S.rng=CORE.core_get(9,0)>>>0;S.prices=S.prices.map((_,i)=>CORE.core_get(6,i));S.cargo=S.cargo.map((_,i)=>CORE.core_get(7,i));S.shares=S.shares.map((_,i)=>CORE.core_get(8,i));}
-if(location.protocol!=='file:'&&typeof WebAssembly!=='undefined'){fetch('target/wasm32-unknown-unknown/release/biznes_exe_core.wasm?v=6').then(r=>{if(!r.ok)throw Error('WASM missing');return r.arrayBuffer()}).then(b=>WebAssembly.instantiate(b,{})).then(({instance})=>{if(instance.exports.core_version?.()!==6)throw Error('Outdated core');CORE=instance.exports;CORE.core_init(S.rng);coreHydrate();document.querySelector('#engine-status').textContent='Rust/WASM';render()}).catch(()=>{document.querySelector('#engine-status').textContent='JS fallback'})}
 function save(){S.bank=S.banks.reduce((a,b)=>a+b,0);localStorage.setItem('bx-save',JSON.stringify(S));document.querySelector('#save-status').textContent=t('Saved locally','Zapisano lokalnie')}
 function used(){return S.cargo.reduce((a,b)=>a+b,0)}
 function rand(n){S.rng^=S.rng<<13;S.rng^=S.rng>>>17;S.rng^=S.rng<<5;return(S.rng>>>0)%n}
@@ -71,7 +68,7 @@ function frame(rows){
 }
 const center=s=>{const length=visibleText(s).length,left=Math.max(0,Math.floor((78-length)/2));return ' '.repeat(left)+s+' '.repeat(Math.max(0,78-length-left))};
 function pwaMessage(){return typeof window!=='undefined'?window.BiznesPWA?.message(lang)||'':''}
-function statusText(){const engine=document.querySelector('#engine-status').textContent==='Rust/WASM'?'Rust/WASM':'JS';const offline=typeof window!=='undefined'&&window.BiznesPWA?window.BiznesPWA.status(lang):'Offline';return `${offline} · ${engine}`}
+function statusText(){return typeof window!=='undefined'&&window.BiznesPWA?window.BiznesPWA.status(lang):'Offline'}
 
 function topbar(){const tail='  {SPONSOR}  {LANG}',brand='BIZNES.EXE  ·  '+t('Tiny economic game','Mała gra ekonomiczna');return `${brand.padEnd(78-visibleText(tail).length)}${tail}`}
 const instructions=()=>[
@@ -282,12 +279,10 @@ function submit(){
   let ok=true;
   if(mode==='buy'||mode==='sell'){
     const buying=mode==='buy',e=entries()[selected];
-    if(CORE){ok=table==='goods'?CORE[buying?'core_buy':'core_sell'](selected,n)===1:CORE.core_stock(selected,n,buying?1:0)===1;if(ok)coreSync()}
-    else{S.cash+=n*e.price*(buying?-1:1);(table==='goods'?S.cargo:S.shares)[selected]+=n*(buying?1:-1)}
+    S.cash+=n*e.price*(buying?-1:1);(table==='goods'?S.cargo:S.shares)[selected]+=n*(buying?1:-1);
   }else{
     const op={deposit:0,withdraw:1,repay:2,borrow:3}[mode];
-    if(CORE){ok=CORE.core_bank(op,n)===1;if(ok)coreSync()}
-    else{S.cash+=n*([1,3].includes(op)?1:-1);if(op<2)S.bank+=n*(op===0?1:-1);else S.debt+=n*(op===3?1:-1)}
+    S.cash+=n*([1,3].includes(op)?1:-1);if(op<2)S.bank+=n*(op===0?1:-1);else S.debt+=n*(op===3?1:-1);
     if(ok&&op<2)S.banks[selected]+=n*(op===0?1:-1);
   }
   if(!ok)return showNotice(t('Operation failed.','Operacja nie powiodła się.'));
@@ -309,7 +304,6 @@ function trigger(id){
     case 6:S.day++;detail=t('+1 day','+1 dzień');kind='bad';break;
     case 11:S.prices[g]=Math.max(1,Math.floor(S.prices[g]*.65));detail=`${goods()[g]}: ${money(S.prices[g])}`;break;
   }
-  if(CORE)coreHydrate();
   S.lastJourney={pl:EVENTS[id][1]+' '+detail,en:EVENTS[id][2]+' '+detail,kind,expiresAt:Date.now()+15000};
   eventPopup=true;homeNotice(S.lastJourney[lang]);expireJourneyAfterDelay();
 }
@@ -317,13 +311,12 @@ function travelTo(city){
   if(city<0||city>=C.length)return;
   if(city===S.city)return homeNotice(t('You are already here.','Już tu jesteś.'));
   let result=-1;
-  if(CORE){result=CORE.core_travel(city);coreSync()}
-  else{const fee=0;S.cash-=fee;S.city=city;updateMarkets();if(rand(100)<35)result=rand(EVENTS.length)}
+  const fee=0;S.cash-=fee;S.city=city;updateMarkets();if(rand(100)<35)result=rand(EVENTS.length);
   S.lastJourney=null;
   if(result>=0)return trigger(result);
   homeNotice(t('Trip complete. Prices changed.','Podróż zakończona. Ceny uległy zmianie.'));
 }
-function newGame(){S=fresh();if(CORE){CORE.core_init(S.rng);coreHydrate()}table='goods';homeNotice(t('New game started.','Rozpoczęto nową grę.'))}
+function newGame(){S=fresh();table='goods';homeNotice(t('New game started.','Rozpoczęto nową grę.'))}
 function select(id){
   if(eventPopup){eventPopup=false;D?.close?.();if(id==='close-event'){render(false);return}}
   if(id==='install-app'){if(typeof window!=='undefined')window.BiznesPWA?.install();return}
@@ -418,6 +411,6 @@ if(typeof window!=='undefined'&&window.visualViewport){
 if(typeof ResizeObserver!=='undefined')new ResizeObserver(fitTerminal).observe(T);
 if(document.fonts){document.fonts.ready.then(fitTerminal);document.fonts.addEventListener?.('loadingdone',fitTerminal)}
 expireJourneyAfterDelay();
-document.querySelector('#engine-status').textContent=location.protocol==='file:'?'JS fallback':'Loading WASM';render();
+render();
 if(typeof setInterval==='function')setInterval(()=>{sponsorIndex=(sponsorIndex+1)%SPONSORS.length;if(!eventPopup&&!['amount-input','mobile-amount-input'].includes(document.activeElement?.id))render(false)},7000);
 })();

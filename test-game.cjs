@@ -3,7 +3,7 @@ const fs=require('node:fs');const vm=require('node:vm');const assert=require('no
 const elements={},listeners={},store=new Map(),timers=[];
 function el(id){if(!elements[id]){const e={textContent:'',dataset:{},handlers:{},addEventListener(n,f){this.handlers[n]=f}};Object.defineProperty(e,'innerHTML',{get(){return e.html},set(v){e.html=v;e.textContent=v.replace(/<input[^>]*>/g,' '.repeat(10)).replace(/<[^>]*>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'")}});elements[id]=e}return elements[id]}
 const document={body:{dataset:{}},querySelector:el,querySelectorAll:()=>[],addEventListener:(n,f)=>listeners[n]=f};
-const useHttp=process.argv.includes('--wasm-http'),useWasm=useHttp||process.argv.includes('--wasm');const context={setTimeout:(fn,delay)=>timers.push({fn,delay}),setInterval:()=>0,document,localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},Date:{now:()=>123456},console,location:{protocol:useWasm?'http:':'file:'},WebAssembly,fetch:useHttp?url=>fetch(new URL(url,'http://127.0.0.1:8765')):async url=>({ok:true,arrayBuffer:async()=>fs.readFileSync('target/wasm32-unknown-unknown/release/biznes_exe_core.wasm')})};
+const context={setTimeout:(fn,delay)=>timers.push({fn,delay}),setInterval:()=>0,document,localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},Date:{now:()=>123456},console,location:{protocol:'file:'}};
 vm.runInNewContext(fs.readFileSync('game.js','utf8'),context);
 const key=k=>listeners.keydown({key:k,preventDefault(){},ctrlKey:false,metaKey:false,altKey:false});
 function click(id,root='#terminal'){el(root).handlers.click({target:{closest(selector){if(selector==='[data-frame-action]')return id==='language'?{dataset:{frameAction:id}}:null;if(selector==='[data-ui-action]')return{dataset:{uiAction:id}};return null}}})}
@@ -11,8 +11,7 @@ const state=()=>JSON.parse(store.get('bx-save'));
 const checkScreen=(text)=>{const e=el('#terminal');assert.ok(e.textContent.includes(text),`screen should contain: ${text}; got ${e.textContent}`);const rows=e.textContent.split('\n');assert.equal(rows.length,23);assert.equal(rows.find(r=>r.length!==78),undefined,rows.map(r=>r.length).join(','))};
 const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
 (async()=>{
-  if(useWasm){for(let i=0;i<40&&el('#engine-status').textContent!=='Rust/WASM';i++)await new Promise(r=>setTimeout(r,25));assert.equal(el('#engine-status').textContent,'Rust/WASM')}
-  checkScreen('Patroni projektu');checkScreen('Styl');checkScreen('-'.repeat(78));assert.ok(el('#terminal').innerHTML.includes('href=\"https://mojedostawy.pl\"'));assert.ok(el('#terminal').innerHTML.includes('href=\"https://lcse.pl\"'));checkScreen(`Offline · ${useWasm?'Rust/WASM':'JS'}`);
+  checkScreen('Patroni projektu');checkScreen('Styl');checkScreen('-'.repeat(78));assert.ok(el('#terminal').innerHTML.includes('href=\"https://mojedostawy.pl\"'));assert.ok(el('#terminal').innerHTML.includes('href=\"https://lcse.pl\"'));checkScreen('Offline');assert.ok(!el('#terminal').textContent.includes('WASM'));
   assert.ok(!el('#terminal').innerHTML.includes('welcome-save'));
   const welcomeRows=el('#terminal').textContent.split('\n');assert.equal(welcomeRows[7].trim(),'*                                                                          *'.trim());assert.equal(welcomeRows[11].trim(),'');
   click('font-toggle');assert.equal(document.body.dataset.font,'retro');click('font-toggle');assert.equal(document.body.dataset.font,'matrix');click('font-toggle');assert.equal(document.body.dataset.font,'current');
@@ -96,12 +95,11 @@ const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
   store.set('bx-save',JSON.stringify(legacy));
   async function reload(){
     vm.runInNewContext(fs.readFileSync('game.js','utf8'),context);
-    if(useWasm){for(let i=0;i<40&&el('#engine-status').textContent!=='Rust/WASM';i++)await new Promise(r=>setTimeout(r,25));assert.equal(el('#engine-status').textContent,'Rust/WASM')}
   }
   await reload();key('Enter');key('A');
   assert.deepEqual(state().shares,[1,2,3,4,5,6,0,0,0,0]);
   key('K');key('E');pressAmount(1);assert.equal(state().shares[9],1);key('Escape');
   key('Q');const savedTen=state();await reload();key('Enter');assert.deepEqual(state(),savedTen);
   key('A');key('S');key('E');pressAmount(1);assert.equal(state().shares[9],0);
-  console.log(`PASS (${useWasm?'Rust/WASM':'JS'}): two screens, 10 stocks, all inline operations, notices, travel/events, PL/EN, fonts, save and 23x78 rows.`);
+  console.log(`PASS: two screens, 10 stocks, all inline operations, notices, travel/events, PL/EN, fonts, save and 23x78 rows.`);
 })().catch(e=>{console.error(e);process.exitCode=1});
