@@ -26,7 +26,7 @@ function writeLocal(key,value){try{localStorage.setItem(key,value);return true}c
 function storageMessage(){return invalidSave?t(backupSaved?'Damaged save backed up. Choose New game to start again.':'Damaged save preserved; backup failed. Autosave disabled.','Zapis uszkodzony. '+(backupSaved?'Kopia zachowana. Wybierz Nowa gra.':'Brak kopii. Autozapis wyłączony.')):saveBlocked||storageFailed?t('Autosave unavailable. Progress is only in memory.','Autozapis nie działa. Postęp jest tylko w pamięci.'):''}
 const integer=(n,max=MAX_NUMBER,min=0)=>Number.isSafeInteger(n)&&n>=min&&n<=max;
 function validSave(s){
-  if(s?.debtRate!==undefined&&!integer(s.debtRate,35,5))return false;
+  if(s?.debtRate!==undefined&&!integer(s.debtRate,35,1))return false;
   if(s?.borrowedThisStay!==undefined&&typeof s.borrowedThisStay!=='boolean')return false;
   if(!s||typeof s!=='object'||Array.isArray(s)||![undefined,2].includes(s.schema))return false;
   if(!['cash','bank','debt'].every(k=>integer(s[k]))||!integer(s.city,s.schema?8:7)||!integer(s.day,MAX_NUMBER,1)||!integer(s.rng,4294967295,-2147483648)||!integer(s.seed,4294967295)||typeof s.alive!=='boolean')return false;
@@ -62,10 +62,10 @@ const styleName=()=>STYLES.find(style=>style.id===fontStyle).name;
 const RELEASE='2026.09.29';
 let lang=(readLocal('bx-classic-lang')==='en'?'en':'pl'),view='welcome',notice='',selected=0,input='',step='',mode='',table='goods';
 const t=(en,pl)=>lang==='pl'?pl:en, goods=()=>lang==='pl'?GOODS:GEN, cities=()=>lang==='pl'?C:CEN, banks=()=>lang==='pl'?BANKS:BANKSEN;
-const fresh=()=>({schema:2,debtRate:5+(Date.now()>>>0)%31,borrowedThisStay:false,cash:1000,bank:0,debt:25000,city:0,day:1,cargo:Array(10).fill(0),shares:Array(6).fill(0),banks:Array(6).fill(0),prices:[...BASE],rng:(Date.now()>>>0)||42,alive:true,seed:Date.now()>>>0});
+const fresh=()=>({schema:2,debtRate:5+(Date.now()>>>0)%6,borrowedThisStay:false,cash:1000,bank:0,debt:10000,city:0,day:1,cargo:Array(10).fill(0),shares:Array(6).fill(0),banks:Array(6).fill(0),prices:[...BASE],rng:(Date.now()>>>0)||42,alive:true,seed:Date.now()>>>0});
 let S=loadSave();
 S.borrowedThisStay??=false;
-S.debtRate??=5+(S.rng>>>0)%31;
+S.debtRate=Math.min(30,S.debtRate??(5+(S.rng>>>0)%6));
 delete S.capacity;
 const legacySave=!S.schema;
 if(!Array.isArray(S.shares))S.shares=Array(6).fill(0);while(S.shares.length<6)S.shares.push(0);
@@ -123,7 +123,7 @@ const instructions=()=>[
   [t('Buy low, sell high. Goods and shares have changing, fictional prices.','Kupuj tanio i sprzedawaj drożej. Ceny towarów i akcji są zmienne i fikcyjne.')],
   [t('Travel for free. You may gain or lose goods or cash along the way.','Podróżuj bez opłat. Po drodze możesz zyskać lub stracić towar i pieniądze.')],
   [t('Deposit cash in banks. Borrow and repay through Debt.','Wpłacaj i odbieraj pieniądze w bankach. W Długu pożyczaj i spłacaj.')],
-  [t('Watch your debt: each trip adds 5–35%. The displayed rate applies next.','Pilnuj długu: wyjazd dolicza 5–35%. Widoczna stawka dotyczy kolejnej podróży.')],
+  [t('Watch your debt: each trip adds 1–30%. The displayed rate applies next.','Pilnuj długu: wyjazd dolicza 1–30%. Widoczna stawka dotyczy kolejnej podróży.')],
   [t('Choose an action, item and amount. Enter confirms, Esc cancels. Autosave.','Wybierz działanie, pozycję i ilość. Enter zatwierdza, Esc anuluje. Autozapis.')]
 ].map(([text])=>[text,text]);
 
@@ -348,8 +348,14 @@ function differentPrice(price,previous,i){
   price=Math.max(low,Math.min(high,price));
   return price===previous?(price<high?price+1:price-1):price;
 }
+// Small steps instead of independent rate jumps. Higher rates usually ease.
+function nextDebtRate(){
+  if(rand(5)===0)return S.debtRate;
+  const down=S.debtRate>=15?rand(100)<85:rand(2)===0;
+  return Math.max(1,Math.min(30,S.debtRate+(down?-1:1)*(1+rand(3))));
+}
 function updateMarkets(){
-  S.borrowedThisStay=false;S.day++;S.debt+=Math.floor(S.debt*S.debtRate/100);S.debtRate=5+rand(31);
+  S.borrowedThisStay=false;S.day++;S.debt+=Math.floor(S.debt*S.debtRate/100);S.debtRate=nextDebtRate();
   S.prices=S.prices.map((previous,i)=>{
     const anchor=BASE[i]*(75+(S.city*17+i*11)%51)/100;
     const shock=(rand(2*VOLATILITY[i]+1)-VOLATILITY[i])/100;
