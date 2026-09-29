@@ -165,7 +165,7 @@ body[data-font='matrix'] pre,body[data-font='matrix'] #mobile{font-family:'DOS P
 
 /* Desktop and landscape tablets retain text controls and the terminal table. */
 .screen{position:relative}
-pre .market-navigation{border-top:1px dashed var(--dim);color:var(--fg)}
+pre .market-navigation{border-top:1px dashed var(--dim);color:var(--fg);text-align:center;white-space:normal}
 pre .footer-status{justify-content:space-between}
 #desktop-install-help{position:absolute;left:1.25%;right:1.25%;bottom:calc(100% * 3 / 23);max-height:35%;overflow:auto;background:var(--bg);border-block:1px dashed var(--dim);padding:10px;font:14px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;z-index:4}
 @media (pointer:coarse) and (min-width:901px){

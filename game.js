@@ -142,9 +142,9 @@ function home(){
 function inlineControls(){
   const cancel=button('cancel','ESC','ESC anuluj','ESC cancel');
   if(!mode){
-    const ops=table==='banks'?[button('deposit','P','Wpłać','Deposit',1),button('withdraw','O','Odbierz','Withdraw')]:[button('buy','K','Kup','Buy'),button('sell','S','Sprzedaj','Sell')];
-    const middle=[button('debt','D','Dług','Debt'),button('quit','Q','Q Menu','Q Menu'),button('travel','W','Wyjazd','Travel')];
-    return [chooseAction(),'{LEFT}'+middle.join('   ')+'{MID}{RIGHT}'+ops.join('   ')+'{END}',notice,''];
+    const ops=table==='banks'?[button('deposit','P','Wpłać','Deposit',1),button('withdraw','O','Odbierz','Withdraw')]:[button('buy','K','Kupno','Buy'),button('sell','S','Sprzedaż','Sell')];
+    const actions=[...ops,button('travel','W','Wyjazd','Travel'),button('debt','D','Dług','Debt')];
+    return [chooseAction(),'{LEFT}{MID}'+actions.join('   ')+'{RIGHT}{END}',notice,button('quit','Q','Q - Wyjście','Q - Exit')];
   }
   if(mode==='travel'){
     const opts=cities().map((c,i)=>i===S.city?null:actionToken(`city-${i}`,c[0].toUpperCase(),c)).filter(Boolean);
