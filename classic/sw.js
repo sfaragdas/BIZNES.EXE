@@ -1,6 +1,6 @@
 'use strict';
 // Replaced with the commit hash by the publication workflow.
-const BUILD='classic-v1';
+const BUILD='classic-20260929';
 const CACHE='biznes-classic-'+BUILD;
 const ASSETS=['./index.html','./game.js?v='+BUILD,'./style.css?v='+BUILD,'./pwa.js?v='+BUILD,'./manifest.webmanifest','./favicon.svg','./assets/icon-192.png','./assets/icon-512.png','./assets/PxPlus_IBM_VGA8.ttf'];
 self.addEventListener('install',event=>event.waitUntil((async()=>{
