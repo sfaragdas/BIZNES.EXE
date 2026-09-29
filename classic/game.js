@@ -77,7 +77,7 @@ const RELEASE='2026.09.29';
 let lang=(readLocal('bx-classic-lang')==='en'?'en':'pl'),view='welcome',notice='',selected=0,input='',step='',mode='',table='goods';
 const t=(en,pl)=>lang==='pl'?pl:en, goods=()=>lang==='pl'?GOODS:GEN, cities=()=>lang==='pl'?C:CEN, banks=()=>lang==='pl'?BANKS:BANKSEN;
 const fresh=()=>{
-  const state={schema:2,debtRate:5+(Date.now()>>>0)%6,borrowedThisStay:false,cash:1000,bank:0,debt:10000,city:0,day:1,cargo:Array(10).fill(0),shares:Array(6).fill(0),banks:Array(6).fill(0),rng:(Date.now()>>>0)||42,alive:true,seed:Date.now()>>>0};
+  const state={schema:2,debtRate:5+(Date.now()>>>0)%6,borrowedThisStay:false,cash:1000,bank:0,debt:15000,city:0,day:1,cargo:Array(10).fill(0),shares:Array(6).fill(0),banks:Array(6).fill(0),rng:(Date.now()>>>0)||42,alive:true,seed:Date.now()>>>0};
   state.prices=GOODS_RANGES.map(range=>randomPrice(state,range));
   state.stockPrices=SHARE_RANGES.map(range=>randomPrice(state,range));
   return state;
@@ -290,6 +290,7 @@ function updateMobile(html){
   patch(M,template.content);
 }
 function render(persist=true){
+  if(view!=='welcome'&&typeof window!=='undefined')window.BiznesPWA?.clearMessage();
   const id=document.activeElement?.id,focused=['amount-input','mobile-amount-input'].includes(id);
   if(persist)save();
   const warning=document.querySelector('#storage-warning');if(warning){warning.textContent=storageMessage();warning.hidden=!warning.textContent}
