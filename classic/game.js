@@ -4,7 +4,20 @@ const CEN=['Amsterdam','Bangkok','Gdynia','Hong Kong','London','Munich','New Yor
 const GOODS=['Kawa','Herbata','Tytoń','Zboże','Ropa naftowa','Leki','Broń','Wideo','Drukarki','Samochody'];
 const GEN=['Coffee','Tea','Tobacco','Grain','Oil','Medicine','Weapons','Video','Printers','Cars'];
 const UNITS=['ton','ton','ton','ton','ton','szt.','szt.','szt.','szt.','szt.'];
-const BASE=[18,14,22,9,31,75,110,160,350,240];
+// Stable asset indices keep existing inventories intact; display order is separate.
+const GOODS_RANGES=[[6,36],[4,26],[7,66],[3,27],[10,93],[26,89],[38,128],[56,166],[85,244],[500,1450]];
+const SHARE_RANGES=[[100,250],[80,200],[60,150],[40,100],[20,50],[120,300]];
+const rangeOrder=(ranges)=>(a,b)=>ranges[a.index][0]-ranges[b.index][0];
+function randomInt(state,n){state.rng^=state.rng<<13;state.rng^=state.rng>>>17;state.rng^=state.rng<<5;return(state.rng>>>0)%n}
+function randomPrice(state,[low,high],previous){
+  // One third of trips can explore the entire band; otherwise a local move.
+  let from=low,to=high;
+  if(previous!==undefined&&randomInt(state,3)!==0){const step=Math.ceil((high-low)/4);from=Math.max(low,previous-step);to=Math.min(high,previous+step)}
+  const skip=previous!==undefined&&previous>=from&&previous<=to;
+  let price=from+randomInt(state,to-from+1-(skip?1:0));
+  if(skip&&price>=previous)price++;
+  return price;
+}
 const BANKS=['Szwajcarski','Francuski','Angielski','Polski','USA','Kanadyjski'];
 const BANKSEN=['Swiss','French','English','Polish','US','Canadian'];
 const EVENTS=[
@@ -26,6 +39,7 @@ function writeLocal(key,value){try{localStorage.setItem(key,value);return true}c
 function storageMessage(){return invalidSave?t(backupSaved?'Damaged save backed up. Choose New game to start again.':'Damaged save preserved; backup failed. Autosave disabled.','Zapis uszkodzony. '+(backupSaved?'Kopia zachowana. Wybierz Nowa gra.':'Brak kopii. Autozapis wyłączony.')):saveBlocked||storageFailed?t('Autosave unavailable. Progress is only in memory.','Autozapis nie działa. Postęp jest tylko w pamięci.'):''}
 const integer=(n,max=MAX_NUMBER,min=0)=>Number.isSafeInteger(n)&&n>=min&&n<=max;
 function validSave(s){
+  if(s?.stockPrices!==undefined&&(!Array.isArray(s.stockPrices)||s.stockPrices.length!==6||!s.stockPrices.every(n=>integer(n,MAX_NUMBER,1))))return false;
   if(s?.debtRate!==undefined&&!integer(s.debtRate,35,1))return false;
   if(s?.borrowedThisStay!==undefined&&typeof s.borrowedThisStay!=='boolean')return false;
   if(!s||typeof s!=='object'||Array.isArray(s)||![undefined,2].includes(s.schema))return false;
@@ -62,7 +76,12 @@ const styleName=()=>STYLES.find(style=>style.id===fontStyle).name;
 const RELEASE='2026.09.29';
 let lang=(readLocal('bx-classic-lang')==='en'?'en':'pl'),view='welcome',notice='',selected=0,input='',step='',mode='',table='goods';
 const t=(en,pl)=>lang==='pl'?pl:en, goods=()=>lang==='pl'?GOODS:GEN, cities=()=>lang==='pl'?C:CEN, banks=()=>lang==='pl'?BANKS:BANKSEN;
-const fresh=()=>({schema:2,debtRate:5+(Date.now()>>>0)%6,borrowedThisStay:false,cash:1000,bank:0,debt:10000,city:0,day:1,cargo:Array(10).fill(0),shares:Array(6).fill(0),banks:Array(6).fill(0),prices:[...BASE],rng:(Date.now()>>>0)||42,alive:true,seed:Date.now()>>>0});
+const fresh=()=>{
+  const state={schema:2,debtRate:5+(Date.now()>>>0)%6,borrowedThisStay:false,cash:1000,bank:0,debt:10000,city:0,day:1,cargo:Array(10).fill(0),shares:Array(6).fill(0),banks:Array(6).fill(0),rng:(Date.now()>>>0)||42,alive:true,seed:Date.now()>>>0};
+  state.prices=GOODS_RANGES.map(range=>randomPrice(state,range));
+  state.stockPrices=SHARE_RANGES.map(range=>randomPrice(state,range));
+  return state;
+};
 let S=loadSave();
 S.borrowedThisStay??=false;
 S.debtRate=Math.min(30,S.debtRate??(5+(S.rng>>>0)%6));
@@ -80,6 +99,8 @@ if(S.shares.length>6){
   else{preserveInvalid(readLocal('bx-classic-save'));S=fresh()}
 }
 if(!validSave(S)){preserveInvalid(readLocal('bx-classic-save'));S=fresh()}
+S.prices=S.prices.map((price,i)=>price<GOODS_RANGES[i][0]||price>GOODS_RANGES[i][1]?randomPrice(S,GOODS_RANGES[i]):price);
+S.stockPrices=SHARE_RANGES.map((range,i)=>{const price=S.stockPrices?.[i];return price>=range[0]&&price<=range[1]?price:randomPrice(S,range)});
 const money=n=>`${Number(n).toFixed(2)} $`, esc=s=>String(s).replace(/[&<>"]+/g,c=>c.split('').map(ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])).join(''));
 const actionToken=(id,key,label,hot=0)=>`[[${id}|${key}|${label}|${hot}]]`;
 function save(){
@@ -89,7 +110,7 @@ function save(){
 }
 
 function used(){return S.cargo.reduce((a,b)=>a+b,0)}
-function rand(n){S.rng^=S.rng<<13;S.rng^=S.rng>>>17;S.rng^=S.rng<<5;return(S.rng>>>0)%n}
+function rand(n){return randomInt(S,n)}
 function visibleText(s){return s.replace(/\{(?:LEFT|MID|RIGHT|END|CITYROW|CITYEND)\}/g,'').replace(/\{AMOUNT\}/g,' '.repeat(10)).replace(/\{SPONSOR_LINKS\}/g,'LCSE.pl    MojeDostawy.pl').replace(/\{LANG\}/g,lang==='pl'?'L/EN':'L/PL').replace(/\{SPONSOR\}/g,SPONSORS[sponsorIndex][0]).replace(/\{([A-Z])\}/g,'$1').replace(/\[\[([^|]+)\|([^|]+)\|([^|]+)(?:\|([^\]]+))?\]\]/g,'$3')}
 function frame(rows){
   const content=rows.slice(0,22);while(content.length<22)content.push('');
@@ -151,9 +172,9 @@ const GOODS_HOT=()=>lang==='pl'?[0,0,0,0,0,0,0,0,0,0]:[0,0,2,0,0,0,0,0,0,1];
 const STOCK_LABELS=()=>lang==='pl'?["Hilton (Nowy Jork)","International (Paryż)","MacDonald's","Philips","JVC","Toyota"]:["Hilton (New York)","International (Paris)","McDonald's","Philips","JVC","Toyota"];
 const STOCK_HOT=[0,0,0,0,0,0];
 function entries(){
-  if(table==='stocks')return STOCK_LABELS().map((label,i)=>({label,hot:STOCK_HOT[i],id:`stock-${i}`,price:stockPrice(i),qty:S.shares[i],unit:t('pcs.','szt.')}));
+  if(table==='stocks')return STOCK_LABELS().map((label,i)=>({index:i,label,hot:STOCK_HOT[i],id:`stock-${i}`,price:stockPrice(i),qty:S.shares[i],unit:t('pcs.','szt.')})).sort(rangeOrder(SHARE_RANGES));
   if(table==='banks')return banks().map((name,i)=>({label:`Bank ${name}`,hot:5,id:`bank-${i}`,balance:S.banks[i]}));
-  return goods().map((label,i)=>({label,hot:GOODS_HOT()[i],id:`good-${i}`,price:S.prices[i],qty:S.cargo[i],unit:lang==='pl'?UNITS[i]:(UNITS[i]==='ton'?'tons':UNITS[i]==='szt.'?'pcs.':'kg')}));
+  return goods().map((label,i)=>({index:i,label,hot:GOODS_HOT()[i],id:`good-${i}`,price:S.prices[i],qty:S.cargo[i],unit:lang==='pl'?UNITS[i]:(UNITS[i]==='ton'?'tons':UNITS[i]==='szt.'?'pcs.':'kg')})).sort(rangeOrder(GOODS_RANGES));
 }
 function button(id,key,pl,en,hot=0){
   let label=t(en,pl);
@@ -204,7 +225,7 @@ function inlineControls(){
   const max=maximum(),isMoney=['deposit','withdraw','borrow','repay'].includes(mode),item=entries()[selected]||{label:'',unit:''};
   const hint=mode==='borrow'?loanHint():isMoney?`${t('available','dostępne')}: ${money(max)}`:mode==='buy'?t(`you can buy ${max} ${item.unit}`,`możesz kupić ${max} ${item.unit}`):t(`you own ${max} ${item.unit}`,`posiadasz ${max} ${item.unit}`);
   const genitive=['kawy','herbaty','tytoniu','zboża','ropy naftowej','leków','broni','wideo','drukarek','samochodów'];
-  const tradeTitle=t(`How many ${item.label} do you ${mode}?`,table==='goods'?`Ile ${genitive[selected]} ${mode==='buy'?'kupujesz':'sprzedajesz'}?`:`Ile akcji ${item.label} ${mode==='buy'?'kupujesz':'sprzedajesz'}?`);
+  const tradeTitle=t(`How many ${item.label} do you ${mode}?`,table==='goods'?`Ile ${genitive[item.index]} ${mode==='buy'?'kupujesz':'sprzedajesz'}?`:`Ile akcji ${item.label} ${mode==='buy'?'kupujesz':'sprzedajesz'}?`);
   const title=mode==='borrow'?t('How much do you borrow?','Ile pożyczasz?'):mode==='repay'?t('How much do you repay?','Ile oddajesz?'):mode==='deposit'?t('How much do you deposit?','Ile wpłacasz?'):mode==='withdraw'?t('How much do you withdraw?','Ile odbierasz?'):tradeTitle;
   return [' '+title,' < '+hint+' >',notice,'{LEFT}'+cancel+'{MID}'+button('amount-minus','−','−','−')+' {AMOUNT} '+button('amount-plus','+','+','+')+' '+button('amount-max','MAX','Maks','Max')+'{RIGHT}'+button('submit',lang==='pl'?'Z':'C','Zatwierdź','Confirm')+'{END}'];
 }
@@ -307,7 +328,7 @@ function showNotice(msg){
   const serial=++noticeSerial;
   if(msg&&typeof setTimeout==='function')setTimeout(()=>{if(serial===noticeSerial&&notice===msg){notice='';render(false)}},7000);
 }
-function stockPrice(i){return 80+((S.day*17+i*31)%90)}
+function stockPrice(i){return S.stockPrices?.[i]??(80+((S.day*17+i*31)%90))}
 const loanHint=()=>S.borrowedThisStay?t('Already borrowed. Travel to borrow again.','Już pożyczono. Kolejna pożyczka po wyjeździe.'):t('Up to 1000 $, once per stay.','Do 1000 $, raz na pobyt.');
 function maximum(){
   if(mode==='borrow')return S.borrowedThisStay?0:Math.min(1000,2147483647-S.cash,2147483647-S.debt);
@@ -330,7 +351,7 @@ function submit(){
   let ok=true;
   if(mode==='buy'||mode==='sell'){
     const buying=mode==='buy',e=entries()[selected];
-    {S.cash+=n*e.price*(buying?-1:1);(table==='goods'?S.cargo:S.shares)[selected]+=n*(buying?1:-1)}
+    {S.cash+=n*e.price*(buying?-1:1);(table==='goods'?S.cargo:S.shares)[e.index]+=n*(buying?1:-1)}
   }else{
     const op={deposit:0,withdraw:1,repay:2,borrow:3}[mode];
     {S.cash+=n*([1,3].includes(op)?1:-1);if(op<2)S.bank+=n*(op===0?1:-1);else S.debt+=n*(op===3?1:-1)}
@@ -340,15 +361,11 @@ function submit(){
   if(!ok)return showNotice(t('Operation failed.','Operacja nie powiodła się.'));
   homeNotice(t('Transaction completed.','Transakcja zakończona.'));
 }
-// Prices retain momentum, drift toward the destination market, and receive
-// commodity-specific shocks. Bounds prevent runaway inflation or collapse.
-const VOLATILITY=[9,10,13,8,20,12,16,18,15,14];
 function differentPrice(price,previous,i){
-  const low=Math.max(1,Math.floor(BASE[i]*.35)),high=BASE[i]*3;
+  const [low,high]=GOODS_RANGES[i];
   price=Math.max(low,Math.min(high,price));
   return price===previous?(price<high?price+1:price-1):price;
 }
-// Small steps instead of independent rate jumps. Higher rates usually ease.
 function nextDebtRate(){
   if(rand(5)===0)return S.debtRate;
   const down=S.debtRate>=15?rand(100)<85:rand(2)===0;
@@ -356,14 +373,8 @@ function nextDebtRate(){
 }
 function updateMarkets(){
   S.borrowedThisStay=false;S.day++;S.debt+=Math.floor(S.debt*S.debtRate/100);S.debtRate=nextDebtRate();
-  S.prices=S.prices.map((previous,i)=>{
-    const anchor=BASE[i]*(75+(S.city*17+i*11)%51)/100;
-    const shock=(rand(2*VOLATILITY[i]+1)-VOLATILITY[i])/100;
-    // Occasional local shortage/surplus; no persistent extra state.
-    const imbalance=rand(10)===0?(rand(2)?1:-1)*BASE[i]*.25:0;
-    const next=Math.round(previous+.22*(anchor-previous)+previous*shock+imbalance);
-    return differentPrice(next,previous,i);
-  });
+  S.prices=S.prices.map((previous,i)=>randomPrice(S,GOODS_RANGES[i],previous));
+  S.stockPrices=S.stockPrices.map((previous,i)=>randomPrice(S,SHARE_RANGES[i],previous));
 }
 
 function journeyText(report=S.lastJourney,language=lang){
@@ -425,7 +436,9 @@ function select(id){
     table={goods:'goods',shares:'stocks',bank:'banks'}[id];
     mode=buying?(table==='banks'?'deposit':'buy'):selling?(table==='banks'?'withdraw':'sell'):'';
     step=mode?'row':'';input='';notice='';selected=0;
-    render();return;
+    render();
+    for(const selector of ['.mobile-list','.mobile-bottom']){const pane=M?.querySelector?.(selector);if(pane){pane.scrollTop=0;pane.scrollLeft=0}}
+    return;
   }
   const pick=/^pick-(\d+)$/.exec(id);
   if(pick&&step==='row'&&Number(pick[1])<entries().length){notice='';chooseRow(Number(pick[1]));return}
@@ -438,7 +451,7 @@ function select(id){
   }
   if(id.startsWith('city-')){if(mode==='travel')travelTo(Number(id.slice(5)));return}
   const row=/^(good|stock|bank)-(\d+)$/.exec(id);
-  if(row){if(row[1]==={goods:'good',stocks:'stock',banks:'bank'}[table])chooseRow(Number(row[2]));return}
+  if(row){if(row[1]==={goods:'good',stocks:'stock',banks:'bank'}[table])chooseRow(entries().findIndex(e=>e.id===id));return}
   if(mode==='debt'&&step==='choice'&&['repay','borrow'].includes(id)){if(id==='borrow'&&S.borrowedThisStay)return showNotice(loanHint());mode=id;step='quantity';input='';render();return}
   if(mode)return;
   notice='';input='';

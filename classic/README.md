@@ -27,3 +27,31 @@ Niezależna adaptacja inspirowana Biznesmanem (1988), M. Cwynar / SAMBA. Nie zaw
 Kod: Apache-2.0 — zobacz LICENSE. Czcionka PxPlus IBM VGA8: CC BY-SA 4.0 — zobacz NOTICE oraz assets/PxPlus-LICENSE.txt. Nazwy firm w grze nie oznaczają współpracy ani poparcia tych firm.
 
 Patroni projektu: [LCSE.pl](https://lcse.pl) · [MojeDostawy.pl](https://mojedostawy.pl).
+
+## Przedziały cen ($)
+
+Nowa gra losuje ceny. Towary i akcje są ustawione według dolnej granicy ceny, a nie według chwilowego kursu.
+
+| Towar | Zakres |
+|---|---:|
+| Zboże | 3–27 |
+| Herbata | 4–26 |
+| Kawa | 6–36 |
+| Tytoń | 7–66 |
+| Ropa | 10–93 |
+| Leki | 26–89 |
+| Broń | 38–128 |
+| Wideo | 56–166 |
+| Drukarki | 85–244 |
+| Samochody | 500–1450 |
+
+| Akcje | Zakres |
+|---|---:|
+| JVC | 20–50 |
+| Philips | 40–100 |
+| MacDonald's | 60–150 |
+| International | 80–200 |
+| Hilton | 100–250 |
+| Toyota | 120–300 |
+
+Każdy przejazd zmienia każdą cenę. W 1/3 losowań wybór obejmuje cały przedział, w pozostałych najbliższe 25% szerokości przedziału w każdą stronę. Poprzednia cena jest wykluczona. Wyprzedaż również respektuje granice. Ceny akcji są zapisywane i nie zależą już od stałego cyklu dnia. Są to fikcyjne ceny na potrzeby gry.

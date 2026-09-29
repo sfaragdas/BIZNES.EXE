@@ -28,6 +28,7 @@ jobs:
           cargo build --locked --release --target wasm32-unknown-unknown
           node test-game.cjs
           node test-game.cjs --wasm
+          node test-classic.cjs
       - name: Assemble the public site
         run: |
           mkdir -p _site/target/wasm32-unknown-unknown/release
