@@ -48,7 +48,7 @@ This public folder is for general project materials and reusable skill content. 
 
 ## Planned structure
 
-- `skill/` — reusable instructions for writing help and practice.
+- [`skill/SKILL.md`](skill/SKILL.md) — reusable bot instructions for writing help, vocabulary practice, and review.
 - `curriculum/` — short, practical lessons and exercises.
 - `wordlists/` — reusable vocabulary lists with source and license notes.
 - `docs/` — design notes, examples, and teaching decisions.
