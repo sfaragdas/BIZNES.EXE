@@ -73,7 +73,7 @@ const STYLES=[{id:'current',name:'Standard'},{id:'retro',name:'DOS'},{id:'matrix
 let sponsorIndex=0,fontStyle=readLocal('bx-classic-style')||readLocal('bx-classic-font')||'current';
 if(!STYLES.some(style=>style.id===fontStyle))fontStyle='current';
 const styleName=()=>STYLES.find(style=>style.id===fontStyle).name;
-const RELEASE='2026.09.29';
+const RELEASE='2026.09.29 Classic';
 let lang=(readLocal('bx-classic-lang')==='en'?'en':'pl'),view='welcome',notice='',selected=0,input='',step='',mode='',table='goods';
 const t=(en,pl)=>lang==='pl'?pl:en, goods=()=>lang==='pl'?GOODS:GEN, cities=()=>lang==='pl'?C:CEN, banks=()=>lang==='pl'?BANKS:BANKSEN;
 const fresh=()=>{

@@ -2,9 +2,11 @@
 
 **Lekka gra ekonomiczna w klimacie retro MS-DOS.** Kupuj tanio, sprzedawaj drożej, podróżuj i pilnuj długu.
 
-[**Zagraj w przeglądarce**](https://sfaragdas.github.io/BIZNES.EXE/) · [**Wersja Classic**](https://sfaragdas.github.io/BIZNES.EXE/classic/)
+▶ [**Zagraj w najnowsze wydanie**](https://sfaragdas.github.io/BIZNES.EXE/): aktualna wersja, rozwijana na bieżąco.
 
-Nowa wersja **BIZNES.EXE 2.0** jest w przygotowaniu. Dotychczasowa gra pozostaje dostępna jako Classic.
+▶ [**Zagraj w Classic**](https://sfaragdas.github.io/BIZNES.EXE/classic/): wersja najbliższa oryginałowi z 1988 roku, zachowana bez zmian.
+
+Trwają prace nad **BIZNES.EXE 2.0** z trybami dla dzieci, młodzieży, dorosłych i zaawansowanych.
 
 ALFA · PL / EN · Standard / DOS / Matrix · komputer / tablet / telefon · PWA offline
 
