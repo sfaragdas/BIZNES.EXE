@@ -27,6 +27,21 @@ Simple English Wikipedia is a reference for clarity and direct sentence structur
 
 See [word lists, sources, and license notes](wordlists/README.md).
 
+## Practice method
+
+The learning design follows a practical version of a balanced language course: useful English input, meaningful speaking and writing, brief focused learning, and repeated practice with familiar language. This reflects Paul Nation's Four Strands approach and research on second-language vocabulary learning.
+
+- **Start from real communication.** Use the learner's own messages, drafts, questions, and speaking topics to find useful gaps.
+- **Teach phrases as well as words.** Include common word partners, sentence patterns, and a natural example. Knowing a translation alone is not enough to use a word confidently.
+- **Keep each lesson small.** Focus on a few useful items at a time. Do not turn every correction into a long lesson.
+- **Recall, do not only reread.** Ask the learner to retrieve the English phrase from a Polish cue, complete a sentence, or say it in their own words. Give a clear correction and another try.
+- **Review after gaps.** Bring useful items back in later conversations and writing, with longer gaps as they become easier to recall.
+- **Read and listen for meaning.** Use short, relevant English texts and spoken examples. Repeated encounters help, but incidental exposure alone is not enough for reliable active use.
+- **Use it in output.** Have the learner write or say a real sentence, then reuse the phrase in a message, presentation, or post when it fits.
+- **Build fluency with familiar material.** Sometimes repeat a short speaking or writing task using already learned language, without adding new words.
+
+This is practical coaching through examples and recall, not a test or certificate course. The system should notice the difference between a word the learner recognizes and one they can use without help.
+
 ## Privacy boundary
 
 This public folder is for general project materials and reusable skill content. Personal vocabulary progress, notes, and preferences belong in private storage.
