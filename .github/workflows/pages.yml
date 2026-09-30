@@ -21,6 +21,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/configure-pages@v5
       - name: Test
         run: |
@@ -49,6 +51,16 @@ jobs:
           classic_worker.write_text(classic_worker.read_text(encoding='utf-8').replace('classic-20260929', os.environ['GITHUB_SHA']), encoding='utf-8')
           PY
           cp -r assets _site/
+      - name: Add the v2 preview
+        run: |
+          # Preview of the BIZNES.EXE 2.0 work branch at /v2/ (rebuilt on each main deploy or manual run).
+          if git fetch origin v2:refs/remotes/origin/v2; then
+            mkdir -p _site/v2
+            git archive origin/v2 index.html privacy.html game.js style.css pwa.js sw.js manifest.webmanifest favicon.svg NOTICE LICENSE assets data | tar -x -C _site/v2
+            V2=$(git rev-parse origin/v2)
+            sed -i "s/bx2-1/$V2/g" _site/v2/sw.js
+            sed -i -E "s/(style\.css|game\.js|pwa\.js|data\/game-data\.js)\?v=[^\"[:space:]]+/\1?v=$V2/g" _site/v2/index.html
+          fi
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
