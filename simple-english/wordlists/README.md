@@ -10,7 +10,9 @@ This file contains the 2,809-word New General Service List (NGSL 1.2), with an a
 - Stage 2: ranks 851–1,500 — expansion
 - Stage 3: ranks 1,501–2,809 — wider core
 
-The rank comes from the source list. The stage bands are a project-specific learning aid, not official CEFR levels. Frequency rank alone does not determine how easy a word is to learn. The future course should teach words in small themed lessons and check prior knowledge before introducing them.
+The rank comes from the source list. The stage bands are a project-specific learning aid, not official CEFR levels or certificates. The learner does not need to master one entire band before using a useful word from a later band. The bands help organize material; lessons should focus on practical gaps, common phrases, and words needed for real messages, conversations, and publication.
+
+The NGSL is frequency-ranked. Frequency rank alone does not determine how easy a word is to learn or whether a learner already knows it. Check prior knowledge and practise in context.
 
 ### Source and attribution
 
