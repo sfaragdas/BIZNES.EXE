@@ -58,7 +58,7 @@ jobs:
             mkdir -p _site/v2
             git archive origin/v2 index.html privacy.html game.js style.css pwa.js sw.js manifest.webmanifest favicon.svg NOTICE LICENSE assets data | tar -x -C _site/v2
             V2=$(git rev-parse origin/v2)
-            sed -i "s/bx2-1/$V2/g" _site/v2/sw.js
+            sed -i -E "s/BUILD='[^']*'/BUILD='$V2'/" _site/v2/sw.js
             sed -i -E "s/(style\.css|game\.js|pwa\.js|data\/game-data\.js)\?v=[^\"[:space:]]+/\1?v=$V2/g" _site/v2/index.html
           fi
       - uses: actions/upload-pages-artifact@v3
