@@ -2,37 +2,28 @@
 
 ## Cel i granice
 
-Lekka, darmowa gra offline: kup tanio, sprzedaj drożej. Jeden silnik JavaScript, dane oddzielone od reguł, PL/EN, retro DOS, PWA. Docelowy budżet pobrania: setki KB; mierzyć po każdej zmianie. Bez kont, serwera, zależności runtime, przymusu powrotu i presji czasu. Wersja Classic pozostaje osobna.
+Lekka, darmowa gra offline o kupowaniu i sprzedawaniu towarów. Jeden silnik JavaScript, dane oddzielone od reguł, PL/EN i PWA. Bez kont, serwera, telemetrii, presji czasu, serii dni, powiadomień push i rankingów z obcymi. Classic pozostaje osobno.
 
-## Tryby i asortyment
+## Tryb dziecko
 
-| Tryb | Towary dostępne na końcu poziomu | Nowa trudność | Status |
-| --- | --- | --- | --- |
-| Dziecko | jabłka, chleb, książki, kredki, piłki, rowery | ceny i ograniczona gotówka; 7 dni, cel 1300 monet | Etap 1: grywalny |
-| Nastolatek | powyższe + plecaki, lampki | prosta pożyczka | wkrótce |
-| Dorosły | powyższe + ekspresy, komputery | podatki | wkrótce |
-| Zaawansowany | powyższe + panele słoneczne, aparaty | akcje fikcyjnych firm, psucie się towaru | wkrótce |
+Runda trwa **14 dni**. Gracz zaczyna z **1000 monet**, 3 towarami i 2 miastami. Cel wynosi **4000 monet majątku**. Majątek = gotówka + bieżąca wartość posiadanych towarów. Dłuższa runda daje więcej podróży i okazji do handlu niż poprzednie 7 dni; cel na poziomie 400% kapitału startowego łączy wygraną z odkryciem całej zawartości. To propozycja do kalibracji w testach gry, nie gwarancja, że każdy gracz osiągnie próg.
 
-Wspólny rdzeń liczy sześć towarów. Towary pojawiają się w trakcie rundy; przyszłe trudności także powinny wchodzić stopniowo. Różnice trybów i definicje towarów, miast, zdarzeń oraz sponsorów znajdują się w pliku danych. Ceny i zdarzenia są fikcyjne. Brak tytoniu, alkoholu, broni i loterii.
+| Majątek | Nowe towary | Nowe miasta |
+| --- | --- | --- |
+| 1000 (start) | jabłka, chleb, książki | Kraków, Toruń |
+| 1500 (150%) | kredki | Gdańsk, Zakopane |
+| 2000 (200%) | piłki, rowery | Wrocław |
+| 3000 (300%) | latawce, puzzle | Poznań, Warszawa |
+| 4000 (400%) | hulajnogi | Malbork |
 
-## Rywalizacja i etyka
+Odblokowania są trwałe w obrębie zapisu rundy. Ceny zmieniają się przy podróży; strzałki porównują bieżącą cenę z poprzednim dniem. Handel nie tworzy długu. Fakty o miastach są krótkie i dwujęzyczne.
 
-Lokalny rekord i odznaki za umiejętności. „Rynek dnia” może być kiedyś deterministycznym, lokalnie obliczanym układem cen, bez nagrody za codzienne wejście. Bez serii dni, push, rankingu obcych, loot boxów, odliczania i ukrytych zachęt do zakupów.
+## Interfejs i dostępność
 
-Sponsorów wybiera redakcja: zdrowe i etyczne marki, bez produktów wysokocukrowych. W trybie dziecko wyłącznie statyczny podpis/logo bez linku i wezwania do kupna. W przyszłych trybach dla dorosłych link wymaga osobnej oceny. Sponsor to jawne dane lokalne, bez skryptów, pikseli i zdalnych obrazów. Kryteria EU Pledge i każde nowe partnerstwo wymagają przeglądu przed publikacją.
+Morska bryza jest domyślna. Retro DOS jest opcją w ustawieniach, a wysoki kontrast działa osobno. Wszystkie przyciski i pola mają co najmniej 44 px wysokości. Link do prywatności znajduje się w menu/startowym ekranie. Partnerzy są tekstem bez linków i bez zewnętrznych skryptów. Zmiana języka i motywu nie resetuje rundy. Animacji przyciągających uwagę nie ma; pasek partnerów zmienia podpis co 15 s, a przy `prefers-reduced-motion` pozostaje stały.
 
-## Prywatność i dostępność
+Sprawdzenie kontrastu palety: biały na #0E6E6E 6,04:1, biały na #C2501F 4,71:1, tekst #1F2A30 na #FFF9EE 13,99:1, turkus na #E7F4F2 5,36:1. Zielona strzałka #2E7D4F ma białe tło, aby osiągnąć wymagany kontrast. Ręczne testy z czytnikiem ekranu i na urządzeniach są nadal potrzebne.
 
-Zapis i statystyki pozostają w localStorage pod `bx2-save` i `bx2-record`; bez identyfikatorów, telemetrii i wysyłki. Interfejs silnika może w przyszłości podawać **zbiorcze liczniki**, lecz transport nie istnieje. Wybór trybu nie pyta o datę urodzenia. Strona prywatności wyjaśnia zapis, cache i sposoby usuwania. Obsługa klawiatury, dotyku, czytelne etykiety, widoczny fokus, motyw wysokiego kontrastu; kontrast i czytniki ekranu sprawdzić ręcznie na urządzeniach.
+## Prywatność i technika
 
-## Sklepy i UE — do weryfikacji przed dystrybucją
-
-- Google Play: deklaracja odbiorców, klasyfikacja treści, polityka rodzin, prywatność i sposób oznaczania sponsorowania. [Oficjalne zasady Google Play](https://support.google.com/googleplay/android-developer/answer/9893335?hl=en-GB).
-- Apple App Store: klasyfikacja wieku, Kids Category, zasady reklam i prywatności; zgodność opakowania PWA jako aplikacji natywnej. [App Review Guidelines](https://developer.apple.com/app-store/review/guidelines/).
-- UE: GDPR/RODO, ochrona małoletnich, potencjalne zastosowanie DSA, dostępność oraz standard EU Pledge dla marek. Zakres obowiązków zależy od rzeczywistej dystrybucji i finansowania; wymaga analizy prawnej i ponownego sprawdzenia aktualnych tekstów. [Wytyczne EDPB](https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-052020-consent-under-regulation-2016679_en).
-
-Nie zakładamy, że sam brak SDK reklamowego rozstrzyga ocenę logo sponsora. Przed zgłoszeniem do sklepów potrzebny jest przegląd praktyk marketingowych i formularzy sklepowych.
-
-## Architektura
-
-`data/game-data.js`: konfiguracja trybów, towarów, miast, zdarzeń, sponsorów. `game.js`: wspólny silnik, zapis, renderowanie i sterowanie. `index.html`/`style.css`: dostępny interfejs; `sw.js`: osobny cache 2.0. Dane są ładowane lokalnym skryptem, więc gra działa także przez `file://`. Nowy tryb lub sponsor opisuje się w danych. Mechanika nowego rodzaju wymaga implementacji w silniku i testów.
+Zapis pod `bx2-save`, rekord pod `bx2-record`; ustawienia pod prefiksem `bx2-`. Brak identyfikatorów, kont i transmisji danych gracza. `data/game-data.js` zawiera tryby, towary, miasta, wydarzenia i partnerów. `game.js` obsługuje reguły i interfejs. `sw.js` utrzymuje osobny cache 2.0.

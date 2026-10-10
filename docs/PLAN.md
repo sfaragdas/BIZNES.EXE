@@ -1,20 +1,21 @@
 # Plan BIZNES.EXE 2.0
 
-## Etap 1 — fundament i tryb dziecko
+## Etap 1.1 — wygląd i UX trybu dziecko
 
-- Dane oddzielone od silnika, ekran trybów, gra dziecko od startu do podsumowania.
-- Handel, podróże, odblokowania, zapis/wznowienie, lokalny rekord, PL/EN, sponsor bez linku.
-- Prywatność, wysoki kontrast, klawiatura i dotyk, PWA offline z osobnym cache.
-- `node test-game.cjs` i `node test-classic.cjs` przechodzą. Classic bez zmian.
+- Domyślna paleta Morska bryza, opcjonalny Retro DOS i niezależny wysoki kontrast.
+- Menu z wyborem poziomu przy nowej grze, ustawieniami, zasadami, partnerami i prywatnością.
+- Handel na kartach, czytelny postęp, zmiany cen, fakty o miastach i partnerzy bez linków.
+- Progresja finansowa: 3 → 9 towarów, 2 → 8 miast; progi 1500, 2000, 3000, 4000 monet.
+- 14 dni, cel 4000 monet. Balans do sprawdzenia z dziećmi i opiekunami.
+- Testy silnika, progresji, języka, braku linków i regresji Classic.
 
 ## Etap 2 — pozostałe tryby
 
-- Nastolatek: pożyczka; dorosły: podatki; zaawansowany: akcje i psucie towaru.
-- Każdy tryb ma własny cel, opis zasad, balans, odblokowania i test zakończenia.
-- Przegląd treści, sponsorów oraz zachowania przy zmianie trybu.
+- Nastolatek: pożyczka; dorosły: podatki; zaawansowany: akcje.
+- Każdy tryb wymaga własnego celu, zasad, bilansu i testu zakończenia.
 
-## Etap 3 — dopracowanie i publikacja
+## Etap 3 — badania i publikacja
 
-- Badanie użyteczności z dziećmi/opiekunami, test WCAG AA i czytników ekranu, telefonów/tabletów oraz PWA offline.
-- Pomiar rozmiaru, wydajności i odporności zapisu; rozstrzygnięcie „rynku dnia” i odznak.
-- Aktualny przegląd wymogów UE, Google Play i App Store, klasyfikacji wieku i partnerstw; dopiero potem opakowanie sklepowe.
+- Badania użyteczności, ręczne testy czytników ekranu, telefonów i PWA offline.
+- Kalibracja ekonomii po obserwacji pełnych rund; kontrola dostępności wizualnej.
+- Ponowna ocena aktualnych zasad sklepów, prywatności i partnerstw przed publikacją.

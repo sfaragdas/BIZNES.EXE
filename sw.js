@@ -1,6 +1,6 @@
 'use strict';
 // Publication workflow replaces this build identifier with the commit hash.
-const BUILD='bx2-1';
+const BUILD='bx2-2';
 const CACHE='biznes-2-offline-'+BUILD;
 const ASSETS=['./index.html','./privacy.html','./game.js?v='+BUILD,'./data/game-data.js?v='+BUILD,'./style.css?v='+BUILD,'./pwa.js?v='+BUILD,'./manifest.webmanifest','./favicon.svg','./assets/icon-192.png','./assets/icon-512.png','./assets/PxPlus_IBM_VGA8.ttf'];
 self.addEventListener('install',event=>event.waitUntil((async()=>{const cache=await caches.open(CACHE);await cache.addAll(ASSETS.map(path=>new Request(new URL(path,self.registration.scope),{cache:'reload'})));await self.skipWaiting()})()));

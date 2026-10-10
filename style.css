@@ -1,1 +1,143 @@
-@font-face{font-family:dos;src:url('assets/PxPlus_IBM_VGA8.ttf') format('truetype');font-display:swap}*{box-sizing:border-box}body{margin:0;background:#080c12;color:#e6f2df;font:19px dos,monospace;min-height:100vh}header,footer{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.5rem;border-bottom:2px solid #568f4d}footer{border-bottom:0;border-top:2px solid #568f4d}nav,.actions{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}main{max-width:1050px;margin:auto;padding:1.5rem}.panel{border:2px solid #568f4d;padding:1.3rem;background:#101a1d}h1{font-size:1.6rem;color:#adff84}h2{font-size:1.25rem}p{line-height:1.45}button,select,input{font:inherit;border:2px solid #a4df8c;border-radius:0;background:#172b24;color:#fff;padding:.5rem;min-height:44px}button{cursor:pointer}button:hover,button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #ffdd67;outline-offset:2px}button:disabled{opacity:.6;cursor:not-allowed}a{color:#c5e9ff}.mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:1rem}.mode-card{border:1px solid #6a9567;padding:1rem}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:650px}th,td{padding:.6rem;border-bottom:1px solid #698761;text-align:left}td input{width:5.2rem}.status{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}.notice{min-height:2rem;color:#ffdf82}.actions{margin-top:1.3rem}.hint{font-size:.9rem}.sponsor-mark{display:inline-block;border:1px solid currentColor;padding:.15rem .4rem;margin-left:.3rem}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.high-contrast{background:#000;color:#fff}.high-contrast .panel{background:#000;border-color:#fff}.high-contrast h1,.high-contrast .notice{color:#ff0}.high-contrast button,.high-contrast select,.high-contrast input{background:#000;color:#fff;border-color:#fff}.high-contrast a{color:#0ff}@media(max-width:650px){body{font-size:16px}header,footer{padding:.8rem;align-items:flex-start;flex-direction:column}main{padding:.7rem}.panel{padding:.8rem}}
+@font-face {
+  font-family: dos;
+  src: url('assets/PxPlus_IBM_VGA8.ttf') format('truetype');
+  font-display: swap;
+}
+
+:root {
+  --background: #FFF9EE;
+  --surface: #E7F4F2;
+  --text: #1F2A30;
+  --accent: #0E6E6E;
+  --accent-text: #FFFFFF;
+  --buy: #C2501F;
+  --rise: #2E7D4F;
+  --fall: #B4412F;
+  --focus: #A74412;
+  font-family: system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 64px;
+  padding: .5rem 1rem;
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.topbar button {
+  border-color: var(--accent-text);
+  color: var(--accent-text);
+  background: transparent;
+}
+
+.partner-strip {
+  min-height: 32px;
+  padding: .25rem 1rem;
+  border-bottom: 1px solid var(--accent);
+  background: var(--surface);
+  font-size: .875rem;
+  text-align: center;
+}
+
+main { max-width: 1080px; margin: auto; padding: 1rem; }
+footer { max-width: 1080px; margin: auto; padding: .5rem 1rem; font-size: .875rem; }
+.panel, .mode-card, .trade-card { border-radius: 12px; background: var(--surface); }
+.panel { padding: 1rem; }
+.mode-card, .trade-card { border: 1px solid var(--accent); padding: 1rem; }
+.mode-grid, .goods-grid { display: grid; gap: 1rem; }
+.goods-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+h1 { margin-top: 0; font-size: 1.5rem; }
+h2 { font-size: 1.2rem; }
+
+button, select, input, .menu-link {
+  min-height: 44px;
+  border: 2px solid var(--accent);
+  border-radius: 10px;
+  padding: .5rem .75rem;
+  font: inherit;
+}
+
+button, .menu-link {
+  cursor: pointer;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+button:hover, .menu-link:hover { filter: brightness(.9); }
+button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+select, input { background: var(--background); color: var(--text); }
+a { color: var(--accent); }
+.menu-list, .settings-list { display: grid; gap: .75rem; max-width: 460px; }
+.menu-link { display: flex; align-items: center; text-decoration: none; }
+.small { font-size: .875rem; }
+.settings-list { margin-bottom: 1.5rem; }
+.settings-list input[type=checkbox] { width: 44px; }
+.trade-card { display: grid; gap: .75rem; }
+.trade-card small { display: block; }
+.price { margin-left: .75rem; font-weight: 700; }
+.rise { color: var(--rise); }
+.fall { color: var(--fall); }
+.rise, .fall { background: #FFFFFF; border-radius: 3px; padding: 0 .15rem; }
+.topbar a { color: var(--accent-text); }
+.trade-controls { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
+.trade-controls input { width: 5rem; }
+.buy { background: var(--buy); border-color: var(--buy); }
+.secondary { background: transparent; color: var(--accent); }
+.travel { display: grid; gap: .5rem; margin-top: 1.5rem; }
+.travel-button { width: 100%; }
+progress { display: block; width: 100%; height: 1.25rem; accent-color: var(--accent); }
+.notice { min-height: 1.5rem; font-weight: 600; }
+
+.high-contrast {
+  --background: #000000;
+  --surface: #111111;
+  --text: #FFFFFF;
+  --accent: #FFFF00;
+  --accent-text: #000000;
+  --buy: #FFFF00;
+  --rise: #80FF80;
+  --fall: #FF9090;
+  --focus: #00FFFF;
+}
+
+.high-contrast .topbar button { border-color: #000; color: #000; }
+.high-contrast .buy { color: #000; }
+.high-contrast .rise, .high-contrast .fall { background: #000; }
+.retro:not(.high-contrast) {
+  --background: #080C12;
+  --surface: #101A1D;
+  --text: #E6F2DF;
+  --accent: #A4DF8C;
+  --accent-text: #080C12;
+  --buy: #C2501F;
+  --rise: #80CC9A;
+  --fall: #FF8E80;
+  --focus: #FFDD67;
+  font-family: dos, monospace;
+}
+
+@media (min-width: 640px) {
+  main { padding: 1.5rem; }
+  .panel { padding: 1.5rem; }
+  .mode-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
