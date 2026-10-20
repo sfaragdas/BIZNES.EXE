@@ -57,9 +57,12 @@ jobs:
           if git fetch origin v2:refs/remotes/origin/v2; then
             mkdir -p _site/v2
             git archive origin/v2 index.html privacy.html game.js style.css pwa.js sw.js manifest.webmanifest favicon.svg NOTICE LICENSE assets data | tar -x -C _site/v2
+            git show origin/v2:test-game.cjs > "$RUNNER_TEMP/test-v2.cjs"
+            git show origin/v2:test-pwa.cjs > "$RUNNER_TEMP/test-v2-pwa.cjs"
+            (cd _site/v2 && node "$RUNNER_TEMP/test-v2.cjs" && node "$RUNNER_TEMP/test-v2-pwa.cjs")
             V2=$(git rev-parse origin/v2)
             sed -i -E "s/BUILD='[^']*'/BUILD='$V2'/" _site/v2/sw.js
-            sed -i -E "s/(style\.css|game\.js|pwa\.js|data\/game-data\.js)\?v=[^\"[:space:]]+/\1?v=$V2/g" _site/v2/index.html
+            sed -i -E "s/(style\.css|game\.js|pwa\.js|data\/game-data\.js)\?v=[^\"[:space:]]+/\1?v=$V2/g" _site/v2/index.html _site/v2/privacy.html
           fi
       - uses: actions/upload-pages-artifact@v3
         with:
