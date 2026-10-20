@@ -141,13 +141,19 @@ function statusText(){const engine='JS';const offline=typeof window!=='undefined
 
 function topbar(){const tail='  {SPONSOR}  {LANG}',brand='BIZNES.EXE  ·  '+t('Tiny economic game','Mała gra ekonomiczna');return `${brand.padEnd(78-visibleText(tail).length)}${tail}`}
 const instructions=()=>[
-  [t('Buy low, sell high. Goods and shares have changing, fictional prices.','Kupuj tanio i sprzedawaj drożej. Ceny towarów i akcji są zmienne i fikcyjne.')],
-  [t('Travel for free. You may gain or lose goods or cash along the way.','Podróżuj bez opłat. Po drodze możesz zyskać lub stracić towar i pieniądze.')],
-  [t('Deposit cash in banks. Borrow and repay through Debt.','Wpłacaj i odbieraj pieniądze w bankach. W Długu pożyczaj i spłacaj.')],
-  [t('Watch your debt: each trip adds 1–30%. The displayed rate applies next.','Pilnuj długu: wyjazd dolicza 1–30%. Widoczna stawka dotyczy kolejnej podróży.')],
-  [t('Choose an action, item and amount. Enter confirms, Esc cancels. Autosave.','Wybierz działanie, pozycję i ilość. Enter zatwierdza, Esc anuluje. Autozapis.')]
-].map(([text])=>[text,text]);
-
+  [t('Buy low, sell high. Goods and shares have changing, fictional prices.','Kupuj tanio i sprzedawaj drożej. Ceny towarów i akcji są zmienne i fikcyjne.'),
+   t('Buy low, sell high. Prices change and are fictional.','Kupuj tanio, sprzedawaj drożej. Ceny są zmienne i fikcyjne.')],
+  [t('There is no travel fare. Each trip changes prices and may bring a gain or loss.','Podróżuj bez opłat za przejazd. Podróż zmienia ceny i może przynieść zysk lub stratę.'),
+   t('No travel fare. Trips change prices and may bring gains or losses.','Przejazd bez opłat. Podróż zmienia ceny; możliwy zysk lub strata.')],
+  [t('Each trip adds 1–30% interest to your debt. The displayed rate applies to the next trip.','Każda podróż nalicza odsetki od długu: 1–30%. Widoczna stawka dotyczy następnego wyjazdu.'),
+   t('Debt +1–30% per trip. The displayed rate applies to the next trip.','Dług +1–30% za podróż. Widoczna stawka dotyczy następnego wyjazdu.')],
+  [t('Banks hold your cash without interest. A bank deposit does not repay your debt.','W bankach przechowujesz pieniądze bez oprocentowania. Wpłata do banku nie spłaca długu.'),
+   t('Banks: no interest. Depositing cash does not repay debt.','Banki: bez oprocentowania. Wpłata do banku nie spłaca długu.')],
+  [t('Use Debt to borrow or repay. Borrow up to 2000 $ once per stay in a city. Travel to borrow again.','W Długu pożyczasz i spłacasz pieniądze. Do 2000 $ raz na pobyt w mieście. Kolejna pożyczka po podróży.'),
+   t('Debt: borrow/repay. Borrow up to 2000 $ once per city stay.','Dług: pożyczaj i spłacaj. Pożyczka do 2000 $ raz na pobyt w mieście.')],
+  [t('Choose an action, item and amount. Enter confirms; Esc cancels. Progress saves automatically in this browser.','Wybierz działanie, pozycję i ilość. Enter zatwierdza, Esc anuluje. Postęp zapisuje się automatycznie w tej przeglądarce.'),
+   t('Choose action/item/amount. Enter: confirm. Esc: cancel. Browser autosave.','Działanie, pozycja, ilość. Enter: OK. Esc: anuluj. Autozapis w przeglądarce.')]
+];
 function welcome(){
   const start=[button('new-game','N','Nowa gra','New game'),button('welcome-continue',lang==='pl'?'K':'C','Kontynuuj','Continue')];
   const settings=[button('install-app','I','Zainstaluj','Install'),button('font-toggle','F','F: Styl: '+styleName(),'F: Style: '+styleName())];
@@ -160,7 +166,6 @@ function welcome(){
     center(t('Project patrons:','Patroni projektu:')),center('{SPONSOR_LINKS}'),
     '','',center(t('How to play','Jak grać')),
     ...instructions().map(([,compact])=>center(compact)),
-    center(t('Click a choice or press its highlighted letter.','Kliknij wybór albo naciśnij wyróżnioną literę.')),
     '-'.repeat(78),'{LEFT}'+start.join('   ')+'{MID}{RIGHT}'+settings.join('   ')+'{END}','-'.repeat(78)
   ]);
 }
@@ -211,7 +216,7 @@ function inlineControls(){
   if(!mode){
     const ops=table==='banks'?[button('deposit','P','Wpłać','Deposit',1),button('withdraw','O','Odbierz','Withdraw')]:[button('buy','K','Kupno','Buy'),button('sell','S','Sprzedaż','Sell')];
     const actions=[...ops,button('travel','W','Wyjazd','Travel'),button('debt','D','Dług','Debt')];
-    return [chooseAction(),'{LEFT}{MID}'+actions.join('   ')+'{RIGHT}{END}',notice,button('quit','Q','Q - Wyjście','Q - Exit')];
+    return [table==='banks'?t('Banks: no interest. Deposits do not repay debt.','Banki: bez oprocentowania. Wpłata nie spłaca długu.'):chooseAction(),'{LEFT}{MID}'+actions.join('   ')+'{RIGHT}{END}',notice,button('quit','Q','Q - Wyjście','Q - Exit')];
   }
   if(mode==='travel'){
     const opts=cities().map((c,i)=>i===S.city?null:actionToken(`city-${i}`,c[0].toUpperCase(),c)).filter(Boolean);
@@ -250,7 +255,7 @@ function mobileOperation(){
   const cancel=mobileCancel(),bank=table==='banks';
   const label=operationLabel();
   const message=notice?`<p class="mobile-notice has-message" role="status">${esc(notice)}</p>`:'';
-  if(!mode)return {content:null,footer:`<p class="mobile-notice ${notice&&notice!==journeyText()?'has-message':''}" role="status">${esc((journeyText()===notice?'':notice)||chooseAction())}</p><nav class="mobile-main-actions">${mobileButton('debt',t('Debt','Dług'))}${mobileButton('quit','Menu')}${mobileButton('travel',t('Travel','Wyjazd'))}</nav><div class="mobile-primary-row">${mobileButton('mobile-sell',bank?t('Withdraw','Odbierz'):t('Sell','Sprzedaj'))}${mobileButton('mobile-buy',bank?t('Deposit','Wpłać'):t('Buy','Kup'),'class="mobile-confirm"')}</div>`};
+  if(!mode)return {content:null,footer:`<p class="mobile-notice ${notice&&notice!==journeyText()?'has-message':''}" role="status">${esc((journeyText()===notice?'':notice)||(bank?t('Banks: no interest. Deposits do not repay debt.','Banki: bez oprocentowania. Wpłata nie spłaca długu.'):chooseAction()))}</p><nav class="mobile-main-actions">${mobileButton('debt',t('Debt','Dług'))}${mobileButton('quit','Menu')}${mobileButton('travel',t('Travel','Wyjazd'))}</nav><div class="mobile-primary-row">${mobileButton('mobile-sell',bank?t('Withdraw','Odbierz'):t('Sell','Sprzedaj'))}${mobileButton('mobile-buy',bank?t('Deposit','Wpłać'):t('Buy','Kup'),'class="mobile-confirm"')}</div>`};
   if(mode==='travel')return {content:'',footer:`<h2>${t('Where to?','Dokąd jedziemy?')}</h2><div class="mobile-cities">${cities().map((c,i)=>i===S.city?'':mobileButton(`city-${i}`,c)).join('')}</div><div class="mobile-operation-footer">${cancel}</div>`};
   if(mode==='debt')return {content:`<h2>${t('Manage debt','Obsługa długu')}</h2><p>${t('Current debt','Obecny dług')}: ${money(S.debt)}</p><p>${t('Debt growth on the next trip','Wzrost długu przy następnym wyjeździe')}: ${S.debtRate}%</p><p>${loanHint()}</p>`,footer:`<p>${chooseAction()}</p><div class="mobile-primary-row">${mobileButton('borrow',t('Borrow','Pożyczasz'))}${mobileButton('repay',t('Repay','Oddajesz'),'class="mobile-confirm"')}</div><div class="mobile-operation-footer">${cancel}</div>`};
   if(step==='row')return {content:null,footer:`${message}<p><span class="transaction-label">${label}:</span> ${t('Select an item from the list.','Zaznacz pozycję na liście.')}</p><div class="mobile-operation-footer">${cancel}</div>`};
@@ -330,7 +335,7 @@ function showNotice(msg){
   if(msg&&typeof setTimeout==='function')setTimeout(()=>{if(serial===noticeSerial&&notice===msg){notice='';render(false)}},7000);
 }
 function stockPrice(i){return S.stockPrices?.[i]??(80+((S.day*17+i*31)%90))}
-const loanHint=()=>S.borrowedThisStay?t('Already borrowed. Travel to borrow again.','Już pożyczono. Kolejna pożyczka po wyjeździe.'):t('Up to 2000 $, once per stay.','Do 2000 $, raz na pobyt.');
+const loanHint=()=>S.borrowedThisStay?t('Loan used. Travel to borrow again.','Pożyczka wykorzystana. Kolejna po podróży.'):t('Up to 2000 $ once per city stay.','Do 2000 $ raz na pobyt w mieście.');
 function maximum(){
   if(mode==='borrow')return S.borrowedThisStay?0:Math.min(2000,2147483647-S.cash,2147483647-S.debt);
   if(mode==='repay')return Math.min(S.cash,S.debt);
