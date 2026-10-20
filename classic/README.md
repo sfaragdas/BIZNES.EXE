@@ -1,5 +1,7 @@
 # BIZNES.EXE Classic
 
+FINAL · 2026.10.20
+
 Lekka gra handlowa w klimacie MS-DOS. Polska i angielska wersja językowa, obsługa klawiatury i dotyku, style Standard, DOS i Matrix.
 
 [Uruchom grę](https://sfaragdas.github.io/BIZNES.EXE/classic/)
@@ -8,8 +10,8 @@ Lekka gra handlowa w klimacie MS-DOS. Polska i angielska wersja językowa, obsł
 
 - Kupuj taniej i sprzedawaj drożej. Masz do wyboru 10 towarów i 6 akcji; ceny są fikcyjne.
 - Podróżuj między 9 miastami. Przejazd zmienia ceny i może przynieść korzyść lub stratę.
-- Pilnuj długu: podróż dolicza widoczne 1–30%. Stawka zmienia się najwyżej o 3 punkty procentowe, czasem pozostaje bez zmian. Przy stawkach od 15% dominuje kierunek spadkowy, więc wyższe wartości są rzadsze. Nowa gra zaczyna się z długiem 15 000 $.
-- W bankach wpłacaj i odbieraj gotówkę. Pożyczka do 1000 $ jest dostępna raz na pobyt; kolejny przejazd odblokowuje następną.
+- Pilnuj długu: podróż dolicza widoczne 1–30%. Stawka zmienia się najwyżej o 3 punkty procentowe, czasem pozostaje bez zmian. Przy stawkach od 15% dominuje kierunek spadkowy, więc wyższe wartości są rzadsze. Nowa gra zaczyna się z długiem 25 000 $.
+- W bankach wpłacaj i odbieraj gotówkę. Pożyczka do 2000 $ jest dostępna raz na pobyt; kolejny przejazd odblokowuje następną.
 - Wybierz działanie, pozycję oraz ilość. Enter zatwierdza, Esc anuluje. Postęp zapisuje się automatycznie.
 
 ## Uruchomienie i offline

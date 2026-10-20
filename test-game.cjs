@@ -103,3 +103,32 @@ const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
   key('A');key('S');key('E');pressAmount(1);assert.equal(state().shares[9],0);
   console.log(`PASS: two screens, 10 stocks, all inline operations, notices, travel/events, PL/EN, fonts, save and 23x78 rows.`);
 })().catch(e=>{console.error(e);process.exitCode=1});
+
+// Economy regression checks for Beta and Classic.
+for(const path of ['game.js','classic/game.js']){
+  const memory=new Map(),stub=()=>({textContent:'',dataset:{},addEventListener(){}});
+  const ctx={console,Date:{now:()=>123456},setTimeout:()=>0,setInterval:()=>0,
+    document:{querySelector:stub,querySelectorAll:()=>[],addEventListener(){},body:{dataset:{}}},
+    localStorage:{getItem:k=>memory.get(k)??null,setItem:(k,v)=>memory.set(k,v)}};
+  const source=fs.readFileSync(path,'utf8').replace(/\}\)\(\);\s*$/, 'globalThis.economy={fresh,maximum,updateMarkets,get:()=>S,borrow:()=>{mode="borrow";return maximum()},base:typeof BASE==="undefined"?[]:BASE};})();');
+  vm.runInNewContext(source,ctx);
+  const e=ctx.economy,s=e.get();
+  assert.equal(e.fresh().debt,25000);
+  assert.equal(e.borrow(),2000);
+  s.debt=0;
+  const rates=new Set(),prices=new Set();
+  for(let trip=0;trip<1000;trip++){
+    s.city=trip%9;const rate=s.debtRate;e.updateMarkets();
+    assert.ok(s.debtRate>=1&&s.debtRate<=30);
+    assert.ok(Math.abs(s.debtRate-rate)<=3);
+    rates.add(s.debtRate);prices.add(s.prices.join(','));
+    assert.ok(s.prices.every(n=>Number.isInteger(n)&&n>0));
+    assert.ok(s.stockPrices.every(n=>Number.isInteger(n)&&n>0));
+    if(path==='game.js')s.prices.forEach((n,i)=>assert.ok(n>=Math.round(e.base[i]*.4)&&n<=Math.round(e.base[i]*1.8)));
+  }
+  assert.ok(rates.size>1);assert.ok(prices.size>1);
+  s.debt=25000;const rate=s.debtRate;e.updateMarkets();
+  assert.equal(s.debt,25000+Math.floor(25000*rate/100));
+  if(path==='classic/game.js'){s.borrowedThisStay=true;assert.equal(e.borrow(),0);e.updateMarkets();assert.equal(e.borrow(),2000);}
+}
+console.log('PASS economy: initial debt, loan limits, 1000 trips per version, variable rates, bounded prices and interest.');

@@ -26,17 +26,19 @@ const STYLES=[{id:'current',name:'Standard'},{id:'retro',name:'DOS'},{id:'matrix
 let sponsorIndex=0,fontStyle=localStorage.getItem('bx-style')||localStorage.getItem('bx-font')||'current';
 if(!STYLES.some(style=>style.id===fontStyle))fontStyle='current';
 const styleName=()=>STYLES.find(style=>style.id===fontStyle).name;
-const RELEASE='ALFA · 2026.09.28';
+const RELEASE='BETA · 2026.10.20';
 let lang=localStorage.getItem('bx-lang')||'pl',view='welcome',notice='',selected=0,input='',step='',mode='',table='goods';
 const t=(en,pl)=>lang==='pl'?pl:en, goods=()=>lang==='pl'?GOODS:GEN, cities=()=>lang==='pl'?C:CEN, banks=()=>lang==='pl'?BANKS:BANKSEN;
-const fresh=()=>({schema:2,cash:1000,bank:0,debt:25000,city:0,day:1,cargo:Array(10).fill(0),shares:Array(10).fill(0),banks:Array(6).fill(0),prices:[...BASE],rng:(Date.now()>>>0)||42,alive:true,seed:Date.now()>>>0});
+const fresh=()=>({schema:2,debtRate:5+(Date.now()>>>0)%6,cash:1000,bank:0,debt:25000,city:0,day:1,cargo:Array(10).fill(0),shares:Array(10).fill(0),banks:Array(6).fill(0),prices:[...BASE],stockPrices:Array.from({length:10},(_,i)=>80+((17+i*31)%90)),rng:(Date.now()>>>0)||42,alive:true,seed:Date.now()>>>0});
 let S;try{S=JSON.parse(localStorage.getItem('bx-save'))||fresh()}catch{S=fresh()}
 delete S.capacity;
+if(!Number.isInteger(S.debtRate)||S.debtRate<1||S.debtRate>30)S.debtRate=5+(S.rng>>>0)%6;
 const legacySave=!S.schema;
 if(!Array.isArray(S.shares))S.shares=Array(10).fill(0);while(S.shares.length<10)S.shares.push(0);
 if(!Array.isArray(S.banks)){S.banks=Array(6).fill(0);S.banks[0]=S.bank||0}while(S.banks.length<6)S.banks.push(0);
 if(S.bank!==S.banks.reduce((a,b)=>a+b,0)){S.banks[0]+=S.bank-S.banks.reduce((a,b)=>a+b,0)}
 let migratedCargo=false;if(legacySave){let recovered=0;for(let i=5;i<10;i++){recovered+=S.cargo[i]*S.prices[i];S.cargo[i]=0}for(let i=0;i<Math.min(3,S.shares.length);i++)recovered+=S.shares[i]*(80+((S.day*17+i*31)%90));if(recovered>0){S.cash+=recovered;migratedCargo=true}S.shares.fill(0);S.city=[2,2,5,0,4,6,3,8][Math.min(7,S.city)]||0;S.schema=2;if(migratedCargo)notice=t('Older goods and shares were converted to cash.','Stare towary i akcje zamieniono na gotówkę.')}
+if(!Array.isArray(S.stockPrices)||S.stockPrices.length!==10)S.stockPrices=Array.from({length:10},(_,i)=>80+((S.day*17+i*31)%90));
 const money=n=>`${Number(n).toFixed(2)} $`, esc=s=>String(s).replace(/[&<>"]+/g,c=>c.split('').map(ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])).join(''));
 const actionToken=(id,key,label,hot=0)=>`[[${id}|${key}|${label}|${hot}]]`;
 function save(){S.bank=S.banks.reduce((a,b)=>a+b,0);localStorage.setItem('bx-save',JSON.stringify(S));document.querySelector('#save-status').textContent=t('Saved locally','Zapisano lokalnie')}
@@ -73,7 +75,7 @@ function statusText(){return typeof window!=='undefined'&&window.BiznesPWA?windo
 function topbar(){const tail='  {SPONSOR}  {LANG}',brand='BIZNES.EXE  ·  '+t('Tiny economic game','Mała gra ekonomiczna');return `${brand.padEnd(78-visibleText(tail).length)}${tail}`}
 const instructions=()=>[
   [t('Buy goods and shares cheaply, then sell them for more. Share prices are fictional.','Kupuj towary i akcje tanio, a sprzedawaj drożej. Kursy akcji są fikcyjne.'),t('Buy goods and shares low; sell high. Share prices are fictional.','Kupuj towary i akcje tanio, sprzedawaj drożej. Kursy akcji są fikcyjne.')],
-  [t('Travel is free: each trip changes market prices, increases your debt by 1% and may bring a reward or setback.','Podróż jest bezpłatna: każdy wyjazd zmienia ceny, zwiększa dług o 1% i może przynieść korzyść lub wpadkę.'),t('Free trips: new prices, 1% more debt, possible rewards or setbacks.','Wyjazd: bez opłat, nowe ceny, dług +1%, możliwe korzyści lub wpadki.')],
+  [t('Travel is free: each trip changes market prices, increases your debt at a variable rate (1–30%) and may bring a reward or setback.','Podróż jest bezpłatna: każdy wyjazd zmienia ceny, zwiększa dług o zmienne 1–30% i może przynieść korzyść lub wpadkę.'),t('Free trips: new prices, debt +1–30%, possible rewards or setbacks.','Wyjazd: bez opłat, nowe ceny, dług +1–30%, możliwe korzyści lub wpadki.')],
   [t('Use Banks to deposit or withdraw cash, and Debt to borrow or repay it.','W Bankach wpłacaj i odbieraj gotówkę, a w Długu pożyczaj lub spłacaj pieniądze.'),t('Banks: deposit/withdraw. Debt: borrow/repay.','Banki: wpłać/odbierz gotówkę. Dług: pożycz/spłać pieniądze.')],
   [t('Choose an action, then an item. Enter the amount or use +, − and Max, then confirm. Correct errors in the same form; a successful transaction or Cancel returns to the main view.','Wybierz działanie, potem pozycję. Wpisz ilość lub użyj +, − i Maks, następnie zatwierdź. Błąd poprawisz w tym samym formularzu; udana transakcja lub Anuluj wraca do widoku głównego.'),t('Action → item → amount. Enter confirms; Esc cancels. Correct errors in place.','Działanie → pozycja → ilość. Enter zatwierdza, Esc anuluje. Błąd poprawisz.')],
   [t('Progress saves automatically. Menu returns to the welcome screen; Continue resumes your game.','Postęp zapisuje się automatycznie. Menu otwiera ekran powitalny, a Kontynuuj wznawia grę.'),t('Progress saves automatically. Menu → welcome; Continue → resume.','Postęp zapisuje się sam. Menu → powitanie; Kontynuuj → wznowienie.')]
@@ -130,7 +132,7 @@ function home(){
   const controls=inlineControls();
   return frame([topbar(),headings.map((h,i)=>(h+':').padEnd([30,14,16,18][i])).join(''),...rows,
     '─'.repeat(59)+' '+leader(t('TOTAL:','RAZEM:'),money(total),18),
-    pair(t('Debt balance','Stan twojego długu'),money(S.debt),t('Debt growth per trip','Procent wzrostu długu'),'1 %'),
+    pair(t('Debt balance','Stan twojego długu'),money(S.debt),t('Debt growth per trip','Procent wzrostu długu'),`${S.debtRate} %`),
     pair(t('Account balance','Stan twojego konta'),money(S.cash),t('Debt coverage','Pokrycie długu'),`${coverage} %`),
     pair(t('Held in banks','W bankach posiadasz'),money(S.bank),'','─'.repeat(39)),
     pair(t('Held in shares','W akcjach posiadasz'),money(shareValue),t('Currently in','Przebywasz w'),cities()[S.city]),
@@ -148,7 +150,7 @@ function inlineControls(){
     return [t('Where to?','Dokąd jedziemy?'),'{CITYROW}'+opts.slice(0,4).join('   ')+'{CITYEND}','{CITYROW}'+opts.slice(4).join('   ')+'{CITYEND}',' '+cancel];
   }
   if(mode==='debt'&&step==='choice')return [chooseAction(),
-    ' '+button('borrow','P','Pożyczasz','Borrow')+'   '+button('repay','O','Oddajesz','Repay'),t('Loan limit per operation: 5000 $.','Limit pożyczki na operację: 5000 $.'),' '+cancel];
+    ' '+button('borrow','P','Pożyczasz','Borrow')+'   '+button('repay','O','Oddajesz','Repay'),t('Loan limit per operation: 2000 $.','Limit pożyczki na operację: 2000 $.'),' '+cancel];
   if(step==='row'){
     return [' '+operationLabel()+': '+t('Select an item from the list.','Zaznacz pozycję na liście.'),'',notice,' '+cancel];
   }
@@ -182,7 +184,7 @@ function mobileOperation(){
   const message=notice?`<p class="mobile-notice has-message" role="status">${esc(notice)}</p>`:'';
   if(!mode)return {content:null,footer:`<p class="mobile-notice ${notice&&notice!==S.lastJourney?.[lang]?'has-message':''}" role="status">${esc((S.lastJourney?.[lang]===notice?'':notice)||chooseAction())}</p><nav class="mobile-main-actions">${mobileButton('debt',t('Debt','Dług'))}${mobileButton('quit','Menu')}${mobileButton('travel',t('Travel','Wyjazd'))}</nav><div class="mobile-primary-row">${mobileButton('mobile-sell',bank?t('Withdraw','Odbierz'):t('Sell','Sprzedaj'))}${mobileButton('mobile-buy',bank?t('Deposit','Wpłać'):t('Buy','Kup'),'class="mobile-confirm"')}</div>`};
   if(mode==='travel')return {content:'',footer:`<h2>${t('Where to?','Dokąd jedziemy?')}</h2><div class="mobile-cities">${cities().map((c,i)=>i===S.city?'':mobileButton(`city-${i}`,c)).join('')}</div><div class="mobile-operation-footer">${cancel}</div>`};
-  if(mode==='debt')return {content:`<h2>${t('Manage debt','Obsługa długu')}</h2><p>${t('Current debt','Obecny dług')}: ${money(S.debt)}</p><p>${t('Loan limit per operation: 5000 $.','Limit pożyczki na operację: 5000 $.')}</p>`,footer:`<p>${chooseAction()}</p><div class="mobile-primary-row">${mobileButton('borrow',t('Borrow','Pożyczasz'))}${mobileButton('repay',t('Repay','Oddajesz'),'class="mobile-confirm"')}</div><div class="mobile-operation-footer">${cancel}</div>`};
+  if(mode==='debt')return {content:`<h2>${t('Manage debt','Obsługa długu')}</h2><p>${t('Current debt','Obecny dług')}: ${money(S.debt)}</p><p>${t('Debt growth on the next trip','Wzrost długu przy następnym wyjeździe')}: ${S.debtRate}%</p><p>${t('Loan limit per operation: 2000 $.','Limit pożyczki na operację: 2000 $.')}</p>`,footer:`<p>${chooseAction()}</p><div class="mobile-primary-row">${mobileButton('borrow',t('Borrow','Pożyczasz'))}${mobileButton('repay',t('Repay','Oddajesz'),'class="mobile-confirm"')}</div><div class="mobile-operation-footer">${cancel}</div>`};
   if(step==='row')return {content:null,footer:`${message}<p><span class="transaction-label">${label}:</span> ${t('Select an item from the list.','Zaznacz pozycję na liście.')}</p><div class="mobile-operation-footer">${cancel}</div>`};
 
   return {content:`<h2 class="transaction-label">${label}</h2>${['borrow','repay'].includes(mode)?'':`<p>${esc(entries()[selected].label)}</p>`}<p>${t('Maximum available','Maksymalnie dostępne')}: ${maximum()}</p>`,footer:`${message}<label for="mobile-amount-input">${t('Quantity / amount','Ilość / kwota')}</label><div class="mobile-quantity">${mobileButton('amount-minus','−',`aria-label="${t('Decrease','Zmniejsz')}"`)}<input id="mobile-amount-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="10" autocomplete="off" enterkeyhint="done" value="${esc(input)}">${mobileButton('amount-plus','+',`aria-label="${t('Increase','Zwiększ')}"`)}${mobileButton('amount-max',t('Max','Maks'))}</div><div class="mobile-operation-footer">${cancel}${mobileButton('submit',t('Confirm','Zatwierdź'),'class="mobile-confirm"')}</div>`};
@@ -257,9 +259,9 @@ function showNotice(msg){
   const serial=++noticeSerial;
   if(msg&&typeof setTimeout==='function')setTimeout(()=>{if(serial===noticeSerial&&notice===msg){notice='';render(false)}},7000);
 }
-function stockPrice(i){return 80+((S.day*17+i*31)%90)}
+function stockPrice(i){return S.stockPrices[i]}
 function maximum(){
-  if(mode==='borrow')return Math.min(5000,2147483647-S.cash,2147483647-S.debt);
+  if(mode==='borrow')return Math.min(2000,2147483647-S.cash,2147483647-S.debt);
   if(mode==='repay')return Math.min(S.cash,S.debt);
   if(mode==='deposit')return Math.min(S.cash,2147483647-S.bank);
   if(mode==='withdraw')return Math.min(S.banks[selected],2147483647-S.cash);
@@ -288,7 +290,25 @@ function submit(){
   if(!ok)return showNotice(t('Operation failed.','Operacja nie powiodła się.'));
   homeNotice(t('Transaction completed.','Transakcja zakończona.'));
 }
-function updateMarkets(){S.day++;S.debt+=Math.floor(S.debt/100);S.prices=BASE.map((base,i)=>Math.max(1,Math.floor((base*(60+(S.city*17+i*11)%41+rand(61))+50)/100)))}
+function nextDebtRate(){
+  if(rand(5)===0)return S.debtRate;
+  const down=S.debtRate>=15?rand(100)<85:rand(2)===0;
+  return Math.max(1,Math.min(30,S.debtRate+(down?-1:1)*(1+rand(3))));
+}
+// Each journey mixes the previous price, an in-game day trend and fresh market noise.
+// Goods also reflect the destination city; shares follow the global market.
+function marketPrice(base,previous,i,local){
+  const trend=Math.sin((S.day+i*3)/6)*.15;
+  const city=local?((S.city*17+i*11)%41-20)/100:0;
+  const noise=(rand(51)-25)/100;
+  const target=base*(1+trend+city+noise);
+  return Math.max(1,Math.round(Math.max(base*.4,Math.min(base*1.8,previous*.6+target*.4))));
+}
+function updateMarkets(){
+  S.day++;S.debt+=Math.floor(S.debt*S.debtRate/100);S.debtRate=nextDebtRate();
+  S.prices=BASE.map((base,i)=>marketPrice(base,S.prices[i],i,true));
+  S.stockPrices=S.stockPrices.map((previous,i)=>marketPrice(120+i*4,previous,i,false));
+}
 function trigger(id){
   const cash=rand(150)+50,g=rand(10);let detail='',kind='good';
   const gain=()=>{const n=Math.min(cash,2147483647-S.cash);S.cash+=n;detail=`+${n} $`};
@@ -310,6 +330,7 @@ function trigger(id){
 function travelTo(city){
   if(city<0||city>=C.length)return;
   if(city===S.city)return homeNotice(t('You are already here.','Już tu jesteś.'));
+  if(S.debt+Math.floor(S.debt*S.debtRate/100)>2147483647)return homeNotice(t('Numeric limit reached. Trip cancelled.','Granica liczb. Podróż anulowana.'));
   let result=-1;
   const fee=0;S.cash-=fee;S.city=city;updateMarkets();if(rand(100)<35)result=rand(EVENTS.length);
   S.lastJourney=null;

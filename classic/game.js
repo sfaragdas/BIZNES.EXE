@@ -73,11 +73,11 @@ const STYLES=[{id:'current',name:'Standard'},{id:'retro',name:'DOS'},{id:'matrix
 let sponsorIndex=0,fontStyle=readLocal('bx-classic-style')||readLocal('bx-classic-font')||'current';
 if(!STYLES.some(style=>style.id===fontStyle))fontStyle='current';
 const styleName=()=>STYLES.find(style=>style.id===fontStyle).name;
-const RELEASE='2026.09.29 Classic';
+const RELEASE='Classic FINAL · 2026.10.20';
 let lang=(readLocal('bx-classic-lang')==='en'?'en':'pl'),view='welcome',notice='',selected=0,input='',step='',mode='',table='goods';
 const t=(en,pl)=>lang==='pl'?pl:en, goods=()=>lang==='pl'?GOODS:GEN, cities=()=>lang==='pl'?C:CEN, banks=()=>lang==='pl'?BANKS:BANKSEN;
 const fresh=()=>{
-  const state={schema:2,debtRate:5+(Date.now()>>>0)%6,borrowedThisStay:false,cash:1000,bank:0,debt:15000,city:0,day:1,cargo:Array(10).fill(0),shares:Array(6).fill(0),banks:Array(6).fill(0),rng:(Date.now()>>>0)||42,alive:true,seed:Date.now()>>>0};
+  const state={schema:2,debtRate:5+(Date.now()>>>0)%6,borrowedThisStay:false,cash:1000,bank:0,debt:25000,city:0,day:1,cargo:Array(10).fill(0),shares:Array(6).fill(0),banks:Array(6).fill(0),rng:(Date.now()>>>0)||42,alive:true,seed:Date.now()>>>0};
   state.prices=GOODS_RANGES.map(range=>randomPrice(state,range));
   state.stockPrices=SHARE_RANGES.map(range=>randomPrice(state,range));
   return state;
@@ -330,9 +330,9 @@ function showNotice(msg){
   if(msg&&typeof setTimeout==='function')setTimeout(()=>{if(serial===noticeSerial&&notice===msg){notice='';render(false)}},7000);
 }
 function stockPrice(i){return S.stockPrices?.[i]??(80+((S.day*17+i*31)%90))}
-const loanHint=()=>S.borrowedThisStay?t('Already borrowed. Travel to borrow again.','Już pożyczono. Kolejna pożyczka po wyjeździe.'):t('Up to 1000 $, once per stay.','Do 1000 $, raz na pobyt.');
+const loanHint=()=>S.borrowedThisStay?t('Already borrowed. Travel to borrow again.','Już pożyczono. Kolejna pożyczka po wyjeździe.'):t('Up to 2000 $, once per stay.','Do 2000 $, raz na pobyt.');
 function maximum(){
-  if(mode==='borrow')return S.borrowedThisStay?0:Math.min(1000,2147483647-S.cash,2147483647-S.debt);
+  if(mode==='borrow')return S.borrowedThisStay?0:Math.min(2000,2147483647-S.cash,2147483647-S.debt);
   if(mode==='repay')return Math.min(S.cash,S.debt);
   if(mode==='deposit')return Math.min(S.cash,2147483647-S.bank);
   if(mode==='withdraw')return Math.min(S.banks[selected],2147483647-S.cash);

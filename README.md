@@ -4,11 +4,11 @@
 
 ▶ [**Zagraj w najnowsze wydanie**](https://sfaragdas.github.io/BIZNES.EXE/): wersja rozwijana na bazie Classic, z nowymi pomysłami i poprawkami.
 
-▶ [**Zagraj w Classic**](https://sfaragdas.github.io/BIZNES.EXE/classic/): wersja inspirowana kultową grą *Biznesman* (1988) i najbliższa oryginałowi. Zachowana bez zmian jako punkt wyjścia dla kolejnych wydań.
+▶ [**Zagraj w Classic**](https://sfaragdas.github.io/BIZNES.EXE/classic/): wersja inspirowana kultową grą *Biznesman* (1988) i najbliższa oryginałowi. Wydanie Classic FINAL · 2026.10.20; punkt wyjścia dla kolejnych wydań.
 
 Trwają prace nad **BIZNES.EXE 2.0** z trybami dla dzieci, młodzieży, dorosłych i zaawansowanych ([podgląd](https://sfaragdas.github.io/BIZNES.EXE/v2/)).
 
-ALFA · PL / EN · Standard / DOS / Matrix · komputer / tablet / telefon · PWA offline
+BETA · 2026.10.20 · PL / EN · Standard / DOS / Matrix · komputer / tablet / telefon · PWA offline
 
 Niezależna adaptacja inspirowana **Biznesman (1988), M. Cwynar / SAMBA**. Własna implementacja, bez oryginalnego kodu i zasobów. Patroni projektu: [LCSE.pl](https://lcse.pl) · [MojeDostawy.pl](https://mojedostawy.pl).
 
@@ -16,11 +16,13 @@ Niezależna adaptacja inspirowana **Biznesman (1988), M. Cwynar / SAMBA**. Włas
 
 1. Wybierz **Towary**, **Akcje** lub **Banki**, a następnie działanie. Handluj po fikcyjnych cenach; banki służą do wpłat i odbioru gotówki.
 2. Wskaż pozycję, wpisz ilość albo użyj **− / + / Maks**, a następnie zatwierdź. Błędną wartość poprawisz w tym samym formularzu. Udana transakcja wraca do widoku ogólnego wybranego rynku.
-3. **Wyjazd** jest bezpłatny. Zmienia ceny, zwiększa dług o 1% i może przynieść korzyść lub wpadkę. Bieżącego miasta nie ma na liście celów.
-4. W **Długu** pożyczasz lub spłacasz pieniądze. Limit 5000 $ dotyczy jednej pożyczki, nie całego zadłużenia.
+3. **Wyjazd** jest bezpłatny. Zmienia ceny, zwiększa dług o widoczną stawkę 1–30% i może przynieść korzyść lub wpadkę. Bieżącego miasta nie ma na liście celów.
+4. W **Długu** pożyczasz lub spłacasz pieniądze. Limit 2000 $ dotyczy jednej pożyczki, nie całego zadłużenia.
 5. Postęp zapisuje się automatycznie w tej przeglądarce. **Menu** otwiera powitanie, **Kontynuuj** wznawia grę, **Nowa gra** rozpoczyna ją od początku.
 
 Zmiana zakładki podczas zakupu lub sprzedaży zachowuje kierunek operacji: kupno ↔ wpłata, sprzedaż ↔ odbiór. Podczas wyjazdu lub obsługi długu przełączenie zakładki wraca do tego rynku. Zdarzenia podróży zamykają się po 15 sekundach lub wcześniej przez „Dalej”; zwykłe komunikaty wygasają po 7 sekundach.
+
+Ceny zmieniają się przy podróży: mieszają 60% poprzedniej ceny i 40% nowej wyceny, opartej na dniu gry, losowaniu oraz — dla towarów — mieście. Akcje śledzą wspólny rynek. Ceny są ograniczone do 40–180% wartości bazowej. Dług startuje od 25 000 $; początkowa stawka to 5–10%, potem zmienia się o maksymalnie 3 punkty procentowe na podróż w zakresie 1–30%. Stawka widoczna przed podróżą określa jej koszt odsetek.
 
 ## Dwa układy, te same zasady
 
@@ -51,7 +53,7 @@ Gra nie wymaga konta, nie ma backendu ani analityki graczy. Postęp jest lokalny
 
 ## Stan projektu i ograniczenia
 
-To **alfa**, nie symulator prawdziwych inwestycji. Jest 10 towarów, 10 akcji, 6 rachunków bankowych i 9 miast. Kursy są fikcyjne. Banki obecnie nie mają oprocentowania ani różnych zasad. Nie ma jeszcze ustalonego końca rozgrywki, rankingu, kont graczy, ETF-ów ani wspólnego rynku online.
+To **beta**, nie symulator prawdziwych inwestycji. Jest 10 towarów, 10 akcji, 6 rachunków bankowych i 9 miast. Kursy są fikcyjne. Banki obecnie nie mają oprocentowania ani różnych zasad. Nie ma jeszcze ustalonego końca rozgrywki, rankingu, kont graczy, ETF-ów ani wspólnego rynku online.
 
 Znane tematy do dopracowania: odporność lokalnego zapisu, granice dużych liczb, balans zdarzeń i pożyczek oraz sprawdzenie Safari/klawiatury/PWA na fizycznych urządzeniach. Techniczny limit jednej pozycji wynosi 65 535 jednostek; dawnego limitu 100 jednostek ładowni już nie ma.
 
@@ -80,4 +82,4 @@ Kod: [Apache-2.0](LICENSE). Czcionka PxPlus IBM VGA8 autorstwa VileR: osobna lic
 
 ---
 
-**English:** A lightweight retro economic game inspired by MS-DOS. Trade goods and fictional shares, travel between cities and manage debt. Polish/English, desktop text controls, touch layout, three styles and offline PWA. No account or player analytics. This is an independent alpha implementation; see the sections above for local storage and validation limits.
+**English:** A lightweight retro economic game inspired by MS-DOS. Trade goods and fictional shares, travel between cities and manage debt. Polish/English, desktop text controls, touch layout, three styles and offline PWA. No account or player analytics. This is an independent beta implementation; see the sections above for local storage and validation limits.
