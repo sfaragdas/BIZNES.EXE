@@ -2,13 +2,27 @@
 
 **Lekka gra ekonomiczna w klimacie retro MS-DOS.** Kupuj tanio, sprzedawaj drożej, podróżuj i pilnuj długu.
 
-▶ [**Zagraj w najnowsze wydanie**](https://sfaragdas.github.io/BIZNES.EXE/): wersja rozwijana na bazie Classic, z nowymi pomysłami i poprawkami.
+## Wydania
 
-▶ [**Zagraj w Classic**](https://sfaragdas.github.io/BIZNES.EXE/classic/): wersja inspirowana kultową grą *Biznesman* (1988) i najbliższa oryginałowi. Wydanie Classic FINAL · 2026.10.20; punkt wyjścia dla kolejnych wydań.
+| Wersja | Status i data | Uruchomienie |
+|---|---|---|
+| BIZNES.EXE | **BETA · 2026.10.20** — wersja rozwijana | [Zagraj](https://sfaragdas.github.io/BIZNES.EXE/) |
+| BIZNES.EXE Classic | **FINAL · 2026.10.20** — wersja bliższa Biznesmanowi (1988) | [Zagraj](https://sfaragdas.github.io/BIZNES.EXE/classic/) |
 
-Trwają prace nad **BIZNES.EXE 2.0** z trybami dla dzieci, młodzieży, dorosłych i zaawansowanych ([podgląd](https://sfaragdas.github.io/BIZNES.EXE/v2/)).
+Obie wersje: PL / EN · Standard / DOS / Matrix · komputer / tablet / telefon · PWA offline.
 
-BETA · 2026.10.20 · PL / EN · Standard / DOS / Matrix · komputer / tablet / telefon · PWA offline
+| Zasada | BETA | Classic FINAL |
+|---|---|---|
+| Gotówka / dług na start | 1000 $ / 25 000 $ | 1000 $ / 25 000 $ |
+| Odsetki za podróż | Zmienna stawka 1–30%; start 5–10% | Zmienna stawka 1–30%; start 5–10% |
+| Pożyczka | Do 2000 $ na operację | Do 2000 $ raz na pobyt w mieście |
+| Towary / akcje | 10 / 10 | 10 / 6 |
+| Ceny | Poprzednia cena, trend dnia gry, losowanie; dla towarów także miasto | Losowanie w osobnych zakresach dla każdej pozycji |
+| Zapis | Własny zapis BETA | Własny zapis Classic; przy pierwszym uruchomieniu możliwy import wcześniejszego zapisu |
+
+Zmiana długu początkowego dotyczy nowych gier. Aktualizacja zachowuje saldo istniejącej rozgrywki. Szczegóły Classic: [classic/README.md](classic/README.md). Historia wydań: [CHANGELOG.md](CHANGELOG.md).
+
+Osobno rozwijany jest **BIZNES.EXE 2.0**, na gałęzi `v2`, z trybami dla dzieci, młodzieży, dorosłych i zaawansowanych ([podgląd eksperymentalny](https://sfaragdas.github.io/BIZNES.EXE/v2/)).
 
 Niezależna adaptacja inspirowana **Biznesman (1988), M. Cwynar / SAMBA**. Własna implementacja, bez oryginalnego kodu i zasobów. Patroni projektu: [LCSE.pl](https://lcse.pl) · [MojeDostawy.pl](https://mojedostawy.pl).
 
@@ -22,7 +36,7 @@ Niezależna adaptacja inspirowana **Biznesman (1988), M. Cwynar / SAMBA**. Włas
 
 Zmiana zakładki podczas zakupu lub sprzedaży zachowuje kierunek operacji: kupno ↔ wpłata, sprzedaż ↔ odbiór. Podczas wyjazdu lub obsługi długu przełączenie zakładki wraca do tego rynku. Zdarzenia podróży zamykają się po 15 sekundach lub wcześniej przez „Dalej”; zwykłe komunikaty wygasają po 7 sekundach.
 
-Ceny zmieniają się przy podróży: mieszają 60% poprzedniej ceny i 40% nowej wyceny, opartej na dniu gry, losowaniu oraz — dla towarów — mieście. Akcje śledzą wspólny rynek. Ceny są ograniczone do 40–180% wartości bazowej. Dług startuje od 25 000 $; początkowa stawka to 5–10%, potem zmienia się o maksymalnie 3 punkty procentowe na podróż w zakresie 1–30%. Stawka widoczna przed podróżą określa jej koszt odsetek.
+Ceny zmieniają się przy podróży: mieszają 60% poprzedniej ceny i 40% nowej wyceny, opartej na dniu gry, losowaniu oraz — dla towarów — mieście. Akcje śledzą wspólny rynek. Standardowa wycena jest ograniczona do 40–180% wartości bazowej; zdarzenie wyprzedaży może dodatkowo obniżyć cenę towaru. Dług startuje od 25 000 $; początkowa stawka to 5–10%, potem zmienia się o maksymalnie 3 punkty procentowe na podróż w zakresie 1–30%. Stawka widoczna przed podróżą określa jej koszt odsetek.
 
 ## Dwa układy, te same zasady
 

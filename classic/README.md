@@ -6,6 +6,8 @@ Lekka gra handlowa w klimacie MS-DOS. Polska i angielska wersja językowa, obsł
 
 [Uruchom grę](https://sfaragdas.github.io/BIZNES.EXE/classic/)
 
+To wydanie Classic FINAL. Dalszy rozwój odbywa się w [wersji BETA](https://sfaragdas.github.io/BIZNES.EXE/). Zmiana długu początkowego obowiązuje w nowej grze; istniejące saldo pozostaje zachowane. Zobacz [historię wydań](../CHANGELOG.md).
+
 ## Jak grać
 
 - Kupuj taniej i sprzedawaj drożej. Masz do wyboru 10 towarów i 6 akcji; ceny są fikcyjne.
