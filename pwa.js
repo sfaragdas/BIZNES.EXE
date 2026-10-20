@@ -15,6 +15,14 @@
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();prompt=e;emit()});
   window.addEventListener('appinstalled',()=>{installed=true;help='installed';emit()});
   if('serviceWorker' in navigator&&location.protocol!=='file:'){
-    navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(()=>navigator.serviceWorker.ready).then(()=>{ready=true;emit()}).catch(()=>{failed=true;emit()});
+    navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(registration=>new Promise((resolve,reject)=>{
+      const worker=registration.installing||registration.waiting||registration.active;
+      if(!worker)return reject(new Error('No offline worker'));
+      const check=()=>{
+        if(worker.state==='activated'){worker.removeEventListener?.('statechange',check);resolve()}
+        else if(worker.state==='redundant'){worker.removeEventListener?.('statechange',check);reject(new Error('Offline worker failed'))}
+      };
+      worker.addEventListener('statechange',check);check();
+    })).then(()=>{ready=true;emit()}).catch(()=>{failed=true;emit()});
   }else{failed=true;}
 })();
