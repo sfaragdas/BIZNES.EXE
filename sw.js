@@ -1,8 +1,8 @@
 'use strict';
 // Replaced with the commit hash by the publication workflow.
-const BUILD='20260927-pwa';
+const BUILD='20261021-v2a';
 const CACHE='biznes-2-retro-'+BUILD;
-const ASSETS=['./index.html','./game.js?v='+BUILD,'./style.css?v='+BUILD,'./pwa.js?v='+BUILD,'./manifest.webmanifest','./favicon.svg','./assets/icon-192.png','./assets/icon-512.png','./assets/PxPlus_IBM_VGA8.ttf'];
+const ASSETS=['./index.html','./game.js?v='+BUILD,'./style.css?v='+BUILD,'./pwa.js?v='+BUILD,'./assets/v2meta.js?v='+BUILD,'./assets/v2ui.js?v='+BUILD,'./manifest.webmanifest','./favicon.svg','./assets/icon-192.png','./assets/icon-512.png','./assets/PxPlus_IBM_VGA8.ttf'];
 self.addEventListener('install',event=>event.waitUntil((async()=>{
   const cache=await caches.open(CACHE);
   await cache.addAll(ASSETS.map(path=>new Request(new URL(path,self.registration.scope),{cache:'reload'})));

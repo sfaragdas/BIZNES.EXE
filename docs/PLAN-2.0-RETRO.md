@@ -1,6 +1,6 @@
 # BIZNES.EXE 2.0 — plan „RETRO” (gałąź `v2-retro`)
 
-Status: uzgodniony kierunek, 21.10.2026. Wersja 2.0 powstaje **na retro UI z `main`** (BETA 2026.10.20: ramka 80×25 na komputerze, widok mobilny z doku pod kciukiem).
+Status: **Etap A wdrożony** na gałęzi `v2-retro-stage-a` (21.10.2026). Etap B zostaje wyłącznie w tej dokumentacji — bez kodu, konta i rankingu online. Wersja 2.0 powstaje **na retro UI z `main`** (BETA 2026.10.20: ramka 80×25 na komputerze, widok mobilny z doku pod kciukiem).
 Gałąź `v2` (nowoczesny UI „Morska bryza”) zostaje jako archiwum — można z niej brać pomysły i dane (`data/game-data.js`, `privacy.html`, progresja trybu dziecięcego), ale nie jej wygląd.
 
 ## Zasady nienaruszalne
