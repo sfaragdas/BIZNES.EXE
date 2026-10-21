@@ -1,4 +1,5 @@
 (()=>{'use strict';
+const v2=()=>typeof globalThis!=='undefined'&&globalThis.BX2;
 const C=['Amsterdam','Bangkok','Gdynia','Hongkong','Londyn','Monachium','Nowy Jork','Rzym','Tokio'];
 const CEN=['Amsterdam','Bangkok','Gdynia','Hong Kong','London','Munich','New York','Rome','Tokyo'];
 const GOODS=['Kawa','Herbata','Tytoń','Zboże','Ropa naftowa','Leki','Złoto','Wideo','Drukarki','Samochody'];
@@ -21,27 +22,40 @@ const EVENTS=[
 const T=document.querySelector('#terminal'),D=document.querySelector('#journey-dialog');
 const SPONSORS=[['MojeDostawy.pl','https://mojedostawy.pl'],['LCSE.pl','https://lcse.pl']];
 let eventPopup=false;
-let handedness=localStorage.getItem('bx-hand')==='left'?'left':'right';
+let handedness=(localStorage.getItem('bx2r-hand')||localStorage.getItem('bx-hand'))==='left'?'left':'right';
 const STYLES=[{id:'current',name:'Standard'},{id:'retro',name:'DOS'},{id:'matrix',name:'Matrix'}];
-let sponsorIndex=0,fontStyle=localStorage.getItem('bx-style')||localStorage.getItem('bx-font')||'current';
+let sponsorIndex=0,fontStyle=localStorage.getItem('bx2r-style')||localStorage.getItem('bx-style')||localStorage.getItem('bx-font')||'current';
 if(!STYLES.some(style=>style.id===fontStyle))fontStyle='current';
 const styleName=()=>STYLES.find(style=>style.id===fontStyle).name;
 const RELEASE='BETA · 2026.10.20';
-let lang=localStorage.getItem('bx-lang')||'pl',view='welcome',notice='',selected=0,input='',step='',mode='',table='goods';
-const t=(en,pl)=>lang==='pl'?pl:en, goods=()=>lang==='pl'?GOODS:GEN, cities=()=>lang==='pl'?C:CEN, banks=()=>lang==='pl'?BANKS:BANKSEN;
+let lang=localStorage.getItem('bx2r-lang')||localStorage.getItem('bx-lang')||'pl',view='welcome',notice='',selected=0,input='',step='',mode='',table='goods';
+const t=(en,pl)=>lang==='pl'?pl:en, goods=()=>lang==='pl'?GOODS:GEN, cities=()=>{const all=lang==='pl'?C:CEN;return S.v2Cities?all.slice(0,S.v2Cities):all}, banks=()=>lang==='pl'?BANKS:BANKSEN;
 const fresh=()=>({schema:2,debtRate:5+(Date.now()>>>0)%6,cash:1000,bank:0,debt:25000,city:0,day:1,cargo:Array(10).fill(0),shares:Array(10).fill(0),banks:Array(6).fill(0),prices:[...BASE],stockPrices:Array.from({length:10},(_,i)=>80+((17+i*31)%90)),rng:(Date.now()>>>0)||42,alive:true,seed:Date.now()>>>0});
-let S;try{S=JSON.parse(localStorage.getItem('bx-save'))||fresh()}catch{S=fresh()}
-delete S.capacity;
-if(!Number.isInteger(S.debtRate)||S.debtRate<1||S.debtRate>30)S.debtRate=5+(S.rng>>>0)%6;
-const legacySave=!S.schema;
-if(!Array.isArray(S.shares))S.shares=Array(10).fill(0);while(S.shares.length<10)S.shares.push(0);
-if(!Array.isArray(S.banks)){S.banks=Array(6).fill(0);S.banks[0]=S.bank||0}while(S.banks.length<6)S.banks.push(0);
-if(S.bank!==S.banks.reduce((a,b)=>a+b,0)){S.banks[0]+=S.bank-S.banks.reduce((a,b)=>a+b,0)}
-let migratedCargo=false;if(legacySave){let recovered=0;for(let i=5;i<10;i++){recovered+=S.cargo[i]*S.prices[i];S.cargo[i]=0}for(let i=0;i<Math.min(3,S.shares.length);i++)recovered+=S.shares[i]*(80+((S.day*17+i*31)%90));if(recovered>0){S.cash+=recovered;migratedCargo=true}S.shares.fill(0);S.city=[2,2,5,0,4,6,3,8][Math.min(7,S.city)]||0;S.schema=2;if(migratedCargo)notice=t('Older goods and shares were converted to cash.','Stare towary i akcje zamieniono na gotówkę.')}
-if(!Array.isArray(S.stockPrices)||S.stockPrices.length!==10)S.stockPrices=Array.from({length:10},(_,i)=>80+((S.day*17+i*31)%90));
+function ensure(s){
+  if(!s||typeof s!=='object')s=fresh();
+  delete s.capacity;
+  if(!Number.isInteger(s.debtRate)||s.debtRate<1||s.debtRate>30)s.debtRate=5+(s.rng>>>0)%6;
+  const legacySave=!s.schema;
+  if(!Array.isArray(s.shares))s.shares=Array(10).fill(0);while(s.shares.length<10)s.shares.push(0);
+  if(!Array.isArray(s.banks)){s.banks=Array(6).fill(0);s.banks[0]=s.bank||0}while(s.banks.length<6)s.banks.push(0);
+  if(s.bank!==s.banks.reduce((a,b)=>a+b,0)){s.banks[0]+=s.bank-s.banks.reduce((a,b)=>a+b,0)}
+  if(legacySave){let recovered=0;if(!Array.isArray(s.cargo))s.cargo=Array(10).fill(0);if(!Array.isArray(s.prices))s.prices=[...BASE];for(let i=5;i<10;i++){recovered+=s.cargo[i]*s.prices[i];s.cargo[i]=0}for(let i=0;i<Math.min(3,s.shares.length);i++)recovered+=s.shares[i]*(80+((s.day*17+i*31)%90));if(recovered>0){s.cash+=recovered;notice=t('Older goods and shares were converted to cash.','Stare towary i akcje zamieniono na gotówkę.')}s.shares.fill(0);s.city=[2,2,5,0,4,6,3,8][Math.min(7,s.city)]||0;s.schema=2}
+  if(!Array.isArray(s.stockPrices)||s.stockPrices.length!==10)s.stockPrices=Array.from({length:10},(_,i)=>80+((s.day*17+i*31)%90));
+  return s;
+}
+let S;try{S=ensure(JSON.parse(localStorage.getItem('bx-save'))||fresh())}catch{S=ensure(fresh())}
 const money=n=>`${Number(n).toFixed(2)} $`, esc=s=>String(s).replace(/[&<>"]+/g,c=>c.split('').map(ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])).join(''));
 const actionToken=(id,key,label,hot=0)=>`[[${id}|${key}|${label}|${hot}]]`;
-function save(){S.bank=S.banks.reduce((a,b)=>a+b,0);localStorage.setItem('bx-save',JSON.stringify(S));document.querySelector('#save-status').textContent=t('Saved locally','Zapisano lokalnie')}
+function save(){
+  S.bank=S.banks.reduce((a,b)=>a+b,0);
+  if(v2()){
+    if(v2().playing&&typeof v2().onSave==='function')v2().onSave(S);
+    const status=document.querySelector('#save-status');if(status)status.textContent=t('Saved locally','Zapisano lokalnie');
+    return;
+  }
+  localStorage.setItem('bx-save',JSON.stringify(S));document.querySelector('#save-status').textContent=t('Saved locally','Zapisano lokalnie');
+}
+function minor(){return !!(S&&(S.v2Tier==='child'||S.v2Tier==='teen'))}
 function used(){return S.cargo.reduce((a,b)=>a+b,0)}
 function rand(n){S.rng^=S.rng<<13;S.rng^=S.rng>>>17;S.rng^=S.rng<<5;return(S.rng>>>0)%n}
 function visibleText(s){return s.replace(/\{(?:LEFT|MID|RIGHT|END|CITYROW|CITYEND)\}/g,'').replace(/\{AMOUNT\}/g,' '.repeat(10)).replace(/\{SPONSOR_LINKS\}/g,'LCSE.pl    MojeDostawy.pl').replace(/\{LANG\}/g,lang==='pl'?'L/EN':'L/PL').replace(/\{SPONSOR\}/g,SPONSORS[sponsorIndex][0]).replace(/\{([A-Z])\}/g,'$1').replace(/\[\[([^|]+)\|([^|]+)\|([^|]+)(?:\|([^\]]+))?\]\]/g,'$3')}
@@ -59,7 +73,9 @@ function frame(rows){
       html=` <span class="welcomepanel${edge?' panel-edge':''}">${esc(text)}</span> `;
     }
     html=html.replace(/\[\[([^|]+)\|([^|]+)\|([^|]+)(?:\|([^\]]+))?\]\]/g,(_,id,key,label,hot='0')=>{const n=Math.max(0,Math.min(label.length-1,Number(hot)||0));return `<button class="terminal-action" data-ui-action="${esc(id)}" data-hotkey="${esc(key)}">${esc(label.slice(0,n))}<span class="key">${esc(label.slice(n,n+1))}</span>${esc(label.slice(n+1))}</button>`});
-    html=html.replace(/\{LANG\}/g,`<button class="frame-control" data-frame-action="language">L/${lang==='pl'?'EN':'PL'}</button>`).replace(/\{SPONSOR\}/g,`<a class="sponsor-link" href="${SPONSORS[sponsorIndex][1]}" target="_blank" rel="noopener noreferrer">${SPONSORS[sponsorIndex][0]}</a>`).replace(/BIZNES\.EXE/g,'<span class="accent">BIZNES.EXE</span>').replace(/\{([A-Z])\}/g,'<span class="key">$1</span>').replace(/(\$\s*)([\d,]+(?:\.\d{2})?)/g,'$1<span class="accent">$2</span>').replace(/([\d,]+(?:\.\d{2})?)(\s*\$)/g,'<span class="accent">$1</span>$2');
+    const sponsorCell=minor()?esc(SPONSORS[sponsorIndex][0]):`<a class="sponsor-link" href="${SPONSORS[sponsorIndex][1]}" target="_blank" rel="noopener noreferrer">${SPONSORS[sponsorIndex][0]}</a>`;
+    const sponsorLinks=minor()?[...SPONSORS].reverse().map(([name])=>esc(name)).join('    '):[...SPONSORS].reverse().map(([name,url])=>`<a class="sponsor-link" href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`).join('    ');
+    html=html.replace(/\{LANG\}/g,`<button class="frame-control" data-frame-action="language">L/${lang==='pl'?'EN':'PL'}</button>`).replace(/\{SPONSOR\}/g,sponsorCell).replace(/\{SPONSOR_LINKS\}/g,sponsorLinks).replace(/BIZNES\.EXE/g,'<span class="accent">BIZNES.EXE</span>').replace(/\{([A-Z])\}/g,'<span class="key">$1</span>').replace(/(\$\s*)([\d,]+(?:\.\d{2})?)/g,'$1<span class="accent">$2</span>').replace(/([\d,]+(?:\.\d{2})?)(\s*\$)/g,'<span class="accent">$1</span>$2');
     if(view==='home'&&i===16){const city=cities()[S.city];html=html.replace(esc(city),`<span class="accent">${esc(city)}</span>`)}
 
     const cls=panel?'panel-row':raw.includes('{CITYROW}')?'city-row':raw.includes('{LEFT}')?'action-bar':raw.includes('{AMOUNT}')?'amount-row':i===22?'footer-status':i===0?'statusline':view==='welcome'&&i===12?'welcome-instructions':view==='welcome'&&i>=13&&i<=17?'welcome-copy':view==='home'&&((notice&&i===20)||(mode&&i===18))?'promptline':view==='home'&&i===1?'tablehead':view==='home'&&i===17?'market-navigation':'';
@@ -103,10 +119,18 @@ function marketTabs(){return [button('goods','T','Towary','Goods'),button('share
 const GOODS_HOT=()=>lang==='pl'?[0,0,0,0,0,0,2,0,0,0]:[0,0,2,0,0,0,2,0,0,1];
 const STOCK_LABELS=()=>lang==='pl'?["Hilton (Nowy Jork)","International (Paryż)","MacDonald's","Philips","JVC","Toyota",...STOCKS.slice(6)]:["Hilton (New York)","International (Paris)","McDonald's","Philips","JVC","Toyota",...STOCKSEN.slice(6)];
 const STOCK_HOT=[0,0,0,0,0,0,1,0,3,0];
+function goodIdx(){
+  const cap=S.v2Goods||10,tier=S.v2Tier;
+  if(typeof globalThis!=='undefined'&&globalThis.BiznesMeta)return globalThis.BiznesMeta.goodIndexes(tier,cap);
+  const skip=tier==='child'||tier==='teen'?2:-1,idx=[];
+  for(let i=0;i<10&&idx.length<cap;i++)if(i!==skip)idx.push(i);
+  return idx;
+}
 function entries(){
-  if(table==='stocks')return STOCK_LABELS().map((label,i)=>({label,hot:STOCK_HOT[i],id:`stock-${i}`,price:stockPrice(i),qty:S.shares[i],unit:t('pcs.','szt.')}));
-  if(table==='banks')return banks().map((name,i)=>({label:`Bank ${name}`,hot:5,id:`bank-${i}`,balance:S.banks[i]}));
-  return goods().map((label,i)=>({label,hot:GOODS_HOT()[i],id:`good-${i}`,price:S.prices[i],qty:S.cargo[i],unit:lang==='pl'?UNITS[i]:(UNITS[i]==='ton'?'tons':UNITS[i]==='szt.'?'pcs.':'kg')}));
+  if(table==='stocks'){const n=S.v2Stocks||10;return STOCK_LABELS().slice(0,n).map((label,i)=>({label,hot:STOCK_HOT[i],id:`stock-${i}`,price:stockPrice(i),qty:S.shares[i],unit:t('pcs.','szt.'),index:i}))}
+  if(table==='banks')return banks().map((name,i)=>({label:`Bank ${name}`,hot:5,id:`bank-${i}`,balance:S.banks[i],index:i}));
+  const names=lang==='pl'?GOODS:GEN;
+  return goodIdx().map(i=>({label:names[i],hot:GOODS_HOT()[i],id:`good-${i}`,price:S.prices[i],qty:S.cargo[i],unit:lang==='pl'?UNITS[i]:(UNITS[i]==='ton'?'tons':UNITS[i]==='szt.'?'pcs.':'kg'),index:i}));
 }
 function button(id,key,pl,en,hot=0){
   let label=t(en,pl);
@@ -165,9 +189,10 @@ const M=document.querySelector('#mobile');
 const mobileButton=(id,label,extra='')=>`<button type="button" data-ui-action="${esc(id)}" ${extra}>${esc(label)}</button>`;
 const mobileCancel=()=>mobileButton('cancel',t('Esc · Cancel','Esc · Anuluj'));
 function mobileView(){
-  const links=[...SPONSORS].reverse().map(([name,url])=>`<a href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`).join('    ');
+  const links=minor()?[...SPONSORS].reverse().map(([name])=>esc(name)).join('    '):[...SPONSORS].reverse().map(([name,url])=>`<a href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`).join('    ');
   const [sponsorName,sponsorUrl]=SPONSORS[sponsorIndex];
-  const head=`<header class="mobile-head"><div class="mobile-brand"><strong>BIZNES.EXE</strong>${view==='home'?`<span class="mobile-city">${esc(cities()[S.city])}</span>`:''}</div><nav class="mobile-sponsors" aria-label="${t('Patrons','Patroni')}"><a href="${sponsorUrl}" target="_blank" rel="noopener noreferrer">${sponsorName}</a></nav>${mobileButton('language',lang==='pl'?'EN':'PL',`aria-label="${t('Switch language','Zmień język')}"`)}</header>`;
+  const sponsorMark=minor()?esc(sponsorName):`<a href="${sponsorUrl}" target="_blank" rel="noopener noreferrer">${sponsorName}</a>`;
+  const head=`<header class="mobile-head"><div class="mobile-brand"><strong>BIZNES.EXE</strong>${view==='home'?`<span class="mobile-city">${esc(cities()[S.city])}</span>`:''}</div><nav class="mobile-sponsors" aria-label="${t('Patrons','Patroni')}">${sponsorMark}</nav>${mobileButton('language',lang==='pl'?'EN':'PL',`aria-label="${t('Switch language','Zmień język')}"`)}</header>`;
   if(view==='welcome')return head+`<section class="mobile-list mobile-welcome"><div class="mobile-manifest"><h1>${t('Small game. Big business.','Mała gra. Wielki biznes.')}</h1><p>${t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.')}</p><p>${t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:')}<br>Biznesman (1988), M. Cwynar / SAMBA.</p><p>${t('Project patrons','Patroni projektu')}:<br>${links}</p></div><h2>${t('How to play','Jak grać')}</h2>${instructions().map(([text])=>`<p>${text}</p>`).join('')}</section>${pwaMessage()?`<p class="install-help" role="status">${esc(pwaMessage())}</p>`:''}<small class="mobile-status"><span>${RELEASE}</span><span>${esc(statusText())}</span></small><section class="mobile-dock mobile-welcome-dock"><div class="mobile-hand-row">${mobileButton('hand-toggle',handedness==='right'?t('Left-handed','Leworęczny'):t('Right-handed','Praworęczny'))}<span>${handedness==='right'?t('Right-handed ✓','Praworęczny ✓'):t('Left-handed ✓','Leworęczny ✓')}</span></div><div class="mobile-font-row">${mobileButton('install-app',t('Install app','Zainstaluj'))}${mobileButton('font-toggle',t('Style: ','Styl: ')+styleName())}</div><div class="mobile-primary-row">${mobileButton('new-game',t('New game','Nowa gra'))}${mobileButton('welcome-continue',t('Continue','Kontynuuj'),'class="mobile-confirm"')}</div></section>`;
   const bank=table==='banks',totals={goods:S.cargo.reduce((n,q,i)=>n+q*S.prices[i],0),shares:S.shares.reduce((n,q,i)=>n+q*stockPrice(i),0),bank:S.bank};
   const tabs=(handedness==='left'?[['goods',t('Goods','Towary')],['shares',t('Shares','Akcje')],['bank',t('Banks','Banki')]]:[['bank',t('Banks','Banki')],['shares',t('Shares','Akcje')],['goods',t('Goods','Towary')]]).map(([id,label])=>`<button type="button" data-ui-action="${id}" aria-pressed="${({goods:'goods',shares:'stocks',bank:'banks'}[id]===table&&mode!=='travel')}"><span>${label}</span><b>${money(totals[id])}</b></button>`).join('');
@@ -221,14 +246,20 @@ function updateMobile(html){
   }
   patch(M,template.content);
 }
+function applyChrome(){
+  document.body.dataset.font=fontStyle;document.body.dataset.hand=handedness;
+  if(localStorage.getItem('bx2r-contrast')==='on')document.body.dataset.contrast='on';else delete document.body.dataset.contrast;
+}
 function render(persist=true){
   const id=document.activeElement?.id,focused=['amount-input','mobile-amount-input'].includes(id);
   if(persist)save();
-  document.body.dataset.font=fontStyle;document.body.dataset.hand=handedness;
+  applyChrome();
+  if(view==='welcome'&&v2()?.onWelcome&&!v2().playing){v2().onWelcome();return}
   T.innerHTML=screen();updateMobile(mobileView());fitTerminal();renderJourneyPopup();
   const help=document.querySelector('#desktop-install-help');
   if(help){help.textContent=view==='welcome'?pwaMessage():'';help.hidden=!help.textContent}
   if(focused&&document.activeElement?.id!==id)document.querySelector('#'+id)?.focus?.({preventScroll:true});
+  if(view==='home'&&!mode&&v2()?.playing&&typeof v2().onHome==='function'){const hook=v2().onHome,state=S;if(typeof setTimeout==='function')setTimeout(()=>{if(view==='home'&&!mode&&v2()?.playing)hook(state)},0)}
 }
 let noticeSerial=0;
 function renderJourneyPopup(){
@@ -281,7 +312,7 @@ function submit(){
   let ok=true;
   if(mode==='buy'||mode==='sell'){
     const buying=mode==='buy',e=entries()[selected];
-    S.cash+=n*e.price*(buying?-1:1);(table==='goods'?S.cargo:S.shares)[selected]+=n*(buying?1:-1);
+    const at=e.index!=null?e.index:selected;S.cash+=n*e.price*(buying?-1:1);(table==='goods'?S.cargo:S.shares)[at]+=n*(buying?1:-1);
   }else{
     const op={deposit:0,withdraw:1,repay:2,borrow:3}[mode];
     S.cash+=n*([1,3].includes(op)?1:-1);if(op<2)S.bank+=n*(op===0?1:-1);else S.debt+=n*(op===3?1:-1);
@@ -332,7 +363,7 @@ function travelTo(city){
   if(city===S.city)return homeNotice(t('You are already here.','Już tu jesteś.'));
   if(S.debt+Math.floor(S.debt*S.debtRate/100)>2147483647)return homeNotice(t('Numeric limit reached. Trip cancelled.','Granica liczb. Podróż anulowana.'));
   let result=-1;
-  const fee=0;S.cash-=fee;S.city=city;updateMarkets();if(rand(100)<35)result=rand(EVENTS.length);
+  const fee=0;S.cash-=fee;S.city=city;updateMarkets();if(rand(100)<35){result=rand(EVENTS.length);if(minor()&&(result===0||result===13))result=15}
   S.lastJourney=null;
   if(result>=0)return trigger(result);
   homeNotice(t('Trip complete. Prices changed.','Podróż zakończona. Ceny uległy zmianie.'));
@@ -341,10 +372,11 @@ function newGame(){S=fresh();table='goods';homeNotice(t('New game started.','Roz
 function select(id){
   if(eventPopup){eventPopup=false;D?.close?.();if(id==='close-event'){render(false);return}}
   if(id==='install-app'){if(typeof window!=='undefined')window.BiznesPWA?.install();return}
-  if(id==='language'){lang=lang==='pl'?'en':'pl';notice='';localStorage.setItem('bx-lang',lang);render();return}
+  if(id==='language'){lang=lang==='pl'?'en':'pl';notice='';localStorage.setItem(v2()?'bx2r-lang':'bx-lang',lang);render();return}
   if(view==='welcome'){
+    if(v2()&&typeof v2().onAction==='function'){v2().onAction(id);return}
     if(id==='hand-toggle'){handedness=handedness==='right'?'left':'right';localStorage.setItem('bx-hand',handedness)}
-    else if(id==='font-toggle'){fontStyle=STYLES[(STYLES.findIndex(style=>style.id===fontStyle)+1)%STYLES.length].id;localStorage.setItem('bx-style',fontStyle);localStorage.setItem('bx-font',fontStyle)}
+    else if(id==='font-toggle')cycleStyle()
     else if(id==='welcome-continue'){homeNotice('');return}
     else if(id==='new-game'){newGame();return}
 
@@ -360,7 +392,7 @@ function select(id){
   const pick=/^pick-(\d+)$/.exec(id);
   if(pick&&step==='row'&&Number(pick[1])<entries().length){notice='';chooseRow(Number(pick[1]));return}
   if(!mode&&['mobile-buy','mobile-sell'].includes(id)){mode=table==='banks'?(id==='mobile-buy'?'deposit':'withdraw'):(id==='mobile-buy'?'buy':'sell');step='row';notice='';input='';render();return}
-  if(id==='quit'){view='welcome';mode='';step='';notice='';render();return}
+  if(id==='quit'){if(v2())v2().playing=false;if(v2()&&typeof v2().onQuit==='function')v2().onQuit();view='welcome';mode='';step='';notice='';render();return}
   if(id==='cancel'){homeNotice('');return}
   if(id==='submit'){submit();return}
   if(step==='quantity'&&['amount-minus','amount-plus','amount-max'].includes(id)){
@@ -368,7 +400,7 @@ function select(id){
   }
   if(id.startsWith('city-')){if(mode==='travel')travelTo(Number(id.slice(5)));return}
   const row=/^(good|stock|bank)-(\d+)$/.exec(id);
-  if(row){if(row[1]==={goods:'good',stocks:'stock',banks:'bank'}[table])chooseRow(Number(row[2]));return}
+  if(row){if(row[1]!=={goods:'good',stocks:'stock',banks:'bank'}[table])return;const at=entries().findIndex(e=>e.index===Number(row[2]));if(at>=0)chooseRow(at);return}
   if(mode==='debt'&&step==='choice'&&['repay','borrow'].includes(id)){mode=id;step='quantity';input='';render();return}
   if(mode)return;
   notice='';input='';
@@ -377,8 +409,9 @@ function select(id){
   else if((table==='banks'?['deposit','withdraw']:['buy','sell']).includes(id)){mode=id;step='row'}
   render();
 }
+function cycleStyle(){fontStyle=STYLES[(STYLES.findIndex(style=>style.id===fontStyle)+1)%STYLES.length].id;localStorage.setItem(v2()?'bx2r-style':'bx-style',fontStyle);if(!v2())localStorage.setItem('bx-font',fontStyle)}
 function action(k){
-  if(view==='welcome'){const id={N:'new-game',K:'welcome-continue',C:'welcome-continue',ENTER:'welcome-continue',F:'font-toggle',I:'install-app',L:'language'}[k];if(id)select(id);return}
+  if(view==='welcome'){if(v2()&&typeof v2().onKey==='function'){v2().onKey(k);return}const id={N:'new-game',K:'welcome-continue',C:'welcome-continue',ENTER:'welcome-continue',F:'font-toggle',I:'install-app',L:'language'}[k];if(id)select(id);return}
   if(k==='ESC'){select('cancel');return}
   if(mode){
     if(mode==='travel'){const i=cities().findIndex((c,i)=>i!==S.city&&c[0].toUpperCase()===k);if(i>=0)travelTo(i);return}
@@ -400,6 +433,7 @@ root.addEventListener('click',e=>{const f=e.target.closest?.('[data-frame-action
 document.addEventListener('keydown',e=>{
   if(e.ctrlKey||e.metaKey||e.altKey)return;
   if(eventPopup&&(e.key==='Escape'||e.key==='Enter')){e.preventDefault();select('close-event');return}
+  if(e.target?.matches?.('input,textarea')&&!['amount-input','mobile-amount-input'].includes(e.target.id))return;
   if(['amount-input','mobile-amount-input'].includes(e.target?.id)){
     if(e.key==='Enter'||e.key.toUpperCase()===(lang==='pl'?'Z':'C')){e.preventDefault();submit()}
     else if(e.key==='Escape'){e.preventDefault();select('cancel')}
@@ -407,6 +441,7 @@ document.addEventListener('keydown',e=>{
   }
   // Let a focused native button handle Enter/Space once through its click event.
   if((e.key==='Enter'||e.key===' ')&&e.target?.closest?.('button,a'))return;
+  if(e.key.startsWith('Arrow')&&view==='welcome'&&v2()?.onKey){e.preventDefault();v2().onKey(e.key.slice(5).toUpperCase());return}
   let k=e.key.toUpperCase();if(k==='ESCAPE')k='ESC';
   if(k==='BACKSPACE'||k==='ENTER'||k==='ESC'||k.length===1){e.preventDefault();action(k)}
 });
@@ -432,6 +467,17 @@ if(typeof window!=='undefined'&&window.visualViewport){
 if(typeof ResizeObserver!=='undefined')new ResizeObserver(fitTerminal).observe(T);
 if(document.fonts){document.fonts.ready.then(fitTerminal);document.fonts.addEventListener?.('loadingdone',fitTerminal)}
 expireJourneyAfterDelay();
+globalThis.BiznesGame={
+  select,newGame,render,cycleStyle,getS:()=>S,
+  adopt(next){S=ensure(JSON.parse(JSON.stringify(next)));view='home';mode='';step='';table='goods';notice='';input='';selected=0},
+  setView(next){view=next;if(next!=='home'){mode='';step=''}},
+  setLang(next){lang=next==='en'?'en':'pl';localStorage.setItem(v2()?'bx2r-lang':'bx-lang',lang);render()},
+  setStyle(id){if(!STYLES.some(style=>style.id===id))return;fontStyle=id;localStorage.setItem(v2()?'bx2r-style':'bx-style',fontStyle);if(!v2())localStorage.setItem('bx-font',fontStyle);render()},
+  setHand(next){handedness=next==='left'?'left':'right';localStorage.setItem(v2()?'bx2r-hand':'bx-hand',handedness);render()},
+  flash(msg){showNotice(msg)},help:()=>instructions(),sponsors:()=>SPONSORS,release:RELEASE,status:()=>statusText(),fit:fitTerminal,
+  t:(en,pl)=>lang==='pl'?pl:en,get lang(){return lang},get style(){return fontStyle},get hand(){return handedness}
+};
 render();
+if(v2()&&typeof v2().onReady==='function')v2().onReady();
 if(typeof setInterval==='function')setInterval(()=>{sponsorIndex=(sponsorIndex+1)%SPONSORS.length;if(!eventPopup&&!['amount-input','mobile-amount-input'].includes(document.activeElement?.id))render(false)},7000);
 })();
