@@ -176,3 +176,9 @@ pre .footer-status{justify-content:space-between}
   main{padding:4px}
   .screen{max-width:100%;max-height:none;aspect-ratio:78/54}
 }
+
+/* The simplified main menu has two equally sized rows. */
+@media(max-width:900px){.v2-row2{grid-template-columns:1fr 1fr}.v2-legal button{display:inline-block}}
+
+@keyframes v2-result-in{from{opacity:.4}to{opacity:1}}
+@media(prefers-reduced-motion:no-preference){.v2-result-motion{animation:v2-result-in .2s ease-out}}
