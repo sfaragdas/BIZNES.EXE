@@ -3,7 +3,7 @@
 'use strict';
 const meta=globalThis.BiznesMeta;
 if(!meta||typeof document==='undefined'||!document.querySelector)return;
-const DB='bx2r-db';
+const DB='bx2r-db',REL='2.0 retro · 2026.10.21';
 const t=(en,pl)=>globalThis.BiznesGame&&globalThis.BiznesGame.lang==='en'?en:pl;
 const ui={screen:'menu',sel:0,buf:'',note:'',pending:null,quiz:null,gateMode:'math',gateFrom:'menu',pin1:'',result:null,fx:0,timer:0,spin:0,rot:0,mode:'career'};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -65,7 +65,7 @@ function actions(){
     act('contrast','K',t('Contrast: ','Kontrast: ')+onOff(flag('bx2r-contrast',false))),
     act('sound','D',t('Sound: ','Dźwięk: ')+onOff(flag('bx2r-sound',false))),
     act('anim','A',t('Motion: ','Ruch: ')+onOff(flag('bx2r-anim',true))),
-    act('hand','R',t('Hand: ','Ręka: ')+(g().hand==='left'?t('left','lewa'):t('right','prawa'))),
+    act('hand','R',t('Hand: ','Ręka: ')+(g().hand==='left'?t('left','lewa'):t('right','prawa'))+t(' (phone only)',' (dotyczy telefonu)')),
     act('install-app','I',t('Install','Zainstaluj')),act('wipe','X',t('Delete saves','Usuń zapis')),
     act('pin','P',db.pinHash?t('Change PIN','Zmień PIN'):t('Set PIN','Ustaw PIN'))
   ];
@@ -150,7 +150,7 @@ function lastLine(){
 const center=s=>{s=String(s);if(s.length>78)s=s.slice(0,78);const left=Math.floor((78-s.length)/2);return ' '.repeat(left)+s+' '.repeat(78-s.length-left)};
 const tok=a=>'[['+a.id+'|'+a.key+'|['+a.key+'] '+a.label+']]';
 function topBar(){
-  const token='[[language|L|'+(g().lang==='pl'?'L/EN':'L/PL')+']]',left='BIZNES.EXE  ·  '+motto(),room=78-vis(token).length,cut=left.slice(0,room);
+  const token='[[language|L|PL/EN]]',left='BIZNES.EXE  ·  '+motto(),room=78-vis(token).length,cut=left.slice(0,room);
   return cut+' '.repeat(Math.max(0,room-cut.length))+token;
 }
 function buildRows(){
@@ -166,7 +166,7 @@ function buildRows(){
     acts.forEach((a,i)=>rows.push((i===clampSel(acts.length)?'> ':'  ')+tok(a)));
     rows.push('  [[back|ESC|[Esc] '+t('Back','Wstecz')+']]');
   }
-  const body=rows.slice(0,22);while(body.length<22)body.push('');body.push((g().release+'  '+g().status()).slice(0,78));
+  const body=rows.slice(0,22);while(body.length<22)body.push('');body.push((REL+'  '+g().status()).slice(0,78));
   return body.map(padLine);
 }
 function header(){
@@ -176,7 +176,7 @@ function buttons(list){return list.map(a=>`<button type="button"${a.id==='cont'?
 function mobileHtml(){
   if(ui.screen==='menu'){
     const acts=actions(),by=id=>acts.find(a=>a.id===id),card=latest(active(loadDb()))?`<article class="v2-card"><b>${esc(t('Last game','Ostatnia gra'))}</b><br>${esc(lastLine().replace(/^.*?:\s*/,''))}</article>`:'';
-    return header()+`<section class="mobile-list"><h1>${esc(motto())}</h1><p>${esc(inspired())}</p>${card}</section><p class="v2-legal"><button type="button" data-ui-action="about">${esc(t('Privacy · About','Prywatność · O grze'))}</button></p><small class="mobile-status"><span>${esc(g().release)}</span><span>${esc(g().status())}</span></small><section class="mobile-dock"><div class="v2-row v2-row1">${buttons([by('new'),by('cont')])}</div><div class="v2-row v2-row2">${buttons([by('rec'),by('set'),by('help')])}</div></section>`;
+    return header()+`<section class="mobile-list"><h1>${esc(motto())}</h1><p>${esc(inspired())}</p>${card}</section><p class="v2-legal"><button type="button" data-ui-action="about">${esc(t('Privacy · About','Prywatność · O grze'))}</button></p><small class="mobile-status"><span>${esc(REL)}</span><span>${esc(g().status())}</span></small><section class="mobile-dock"><div class="v2-row v2-row1">${buttons([by('new'),by('cont')])}</div><div class="v2-row v2-row2">${buttons([by('rec'),by('set'),by('help')])}</div></section>`;
   }
   const max=typeMax(),field=max?`<input class="v2-field" maxlength="${max}" value="${esc(ui.buf)}" aria-label="${esc(title())}" ${'year,gate,pin,pin2'.includes(ui.screen)?'inputmode="numeric"':''}>`:'';
   const blocks=extraLines().map(line=>`<p>${esc(line)}</p>`).join('');
