@@ -66,7 +66,7 @@ jobs:
             done
             V2=$(git rev-parse "$REF")
             sed -i -E "s/BUILD='[^']*'/BUILD='$V2'/" _site/v2/sw.js
-            sed -i -E "s/(style\.css|game\.js|pwa\.js|data\/game-data\.js)\?v=[^\"[:space:]]+/\1?v=$V2/g" _site/v2/index.html $( [ -f _site/v2/privacy.html ] && echo _site/v2/privacy.html )
+            sed -i -E "s/(style\.css|game\.js|pwa\.js|data\/game-data\.js|assets\/v2meta\.js|assets\/v2ui\.js)\?v=[^\"[:space:]]+/\1?v=$V2/g" _site/v2/index.html $( [ -f _site/v2/privacy.html ] && echo _site/v2/privacy.html )
           fi
       - uses: actions/upload-pages-artifact@v3
         with:
