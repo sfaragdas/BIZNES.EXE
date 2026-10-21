@@ -22,7 +22,7 @@ Obie wersje: PL / EN · Standard / DOS / Matrix · komputer / tablet / telefon �
 
 Zmiana długu początkowego dotyczy nowych gier. Aktualizacja zachowuje saldo istniejącej rozgrywki. Szczegóły Classic: [classic/README.md](classic/README.md). Historia wydań: [CHANGELOG.md](CHANGELOG.md).
 
-Osobno rozwijany jest **BIZNES.EXE 2.0** ([podgląd eksperymentalny · 2026.10.20](https://sfaragdas.github.io/BIZNES.EXE/v2/), gałąź `v2`). Dostępne są cztery prototypowe tryby: dziecko (handel), nastolatek (pożyczka), dorosły (podatek od zysku) i zaawansowany (fikcyjne akcje). Własny zapis i rekordy, PL/EN, obsługa dotyku i PWA offline. Balans i działanie na fizycznych urządzeniach wymagają dalszych testów.
+Osobno rozwijany jest **BIZNES.EXE 2.0 retro** ([podgląd](https://sfaragdas.github.io/BIZNES.EXE/v2/), gałąź `v2-retro`): profile lokalne, sloty, rangi i Rynek dnia. Poprawki z 2026.10.22 obejmują wyniki rund, wycenę akcji, ograniczenia zapisów i testy publikacji. Starszy prototyp z interfejsem Morska bryza, podatkami i czterema trybami pozostaje w [archiwalnej gałęzi `v2`](https://github.com/sfaragdas/BIZNES.EXE/tree/v2).
 
 Niezależna adaptacja inspirowana **Biznesman (1988), M. Cwynar / SAMBA**. Własna implementacja, bez oryginalnego kodu i zasobów. Patroni projektu: [LCSE.pl](https://lcse.pl) · [MojeDostawy.pl](https://mojedostawy.pl).
 
