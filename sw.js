@@ -1,7 +1,7 @@
 'use strict';
 // Replaced with the commit hash by the publication workflow.
 const BUILD='20260927-pwa';
-const CACHE='biznes-offline-'+BUILD;
+const CACHE='biznes-2-retro-'+BUILD;
 const ASSETS=['./index.html','./game.js?v='+BUILD,'./style.css?v='+BUILD,'./pwa.js?v='+BUILD,'./manifest.webmanifest','./favicon.svg','./assets/icon-192.png','./assets/icon-512.png','./assets/PxPlus_IBM_VGA8.ttf'];
 self.addEventListener('install',event=>event.waitUntil((async()=>{
   const cache=await caches.open(CACHE);
@@ -9,7 +9,7 @@ self.addEventListener('install',event=>event.waitUntil((async()=>{
   await self.skipWaiting();
 })()));
 self.addEventListener('activate',event=>event.waitUntil((async()=>{
-  for(const name of await caches.keys())if(name.startsWith('biznes-offline-')&&name!==CACHE)await caches.delete(name);
+  for(const name of await caches.keys())if(name.startsWith('biznes-2-retro-')&&name!==CACHE)await caches.delete(name);
   await self.clients.claim();
 })()));
 self.addEventListener('fetch',event=>{
