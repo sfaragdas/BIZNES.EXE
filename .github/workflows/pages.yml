@@ -53,17 +53,20 @@ jobs:
           cp -r assets _site/
       - name: Add the v2 preview
         run: |
-          # Preview of the BIZNES.EXE 2.0 work branch at /v2/ (rebuilt on each main deploy or manual run).
-          if git fetch origin v2:refs/remotes/origin/v2; then
-            mkdir -p _site/v2
-            git archive origin/v2 index.html privacy.html game.js style.css pwa.js sw.js manifest.webmanifest favicon.svg NOTICE LICENSE assets data | tar -x -C _site/v2
-            git show origin/v2:test-game.cjs > _site/v2/test-game.cjs
-            git show origin/v2:test-pwa.cjs > _site/v2/test-pwa.cjs
-            (cd _site/v2 && node test-game.cjs && node test-pwa.cjs)
-            rm _site/v2/test-game.cjs _site/v2/test-pwa.cjs
-            V2=$(git rev-parse origin/v2)
+          # Preview of the BIZNES.EXE 2.0 retro work branch (v2-retro) at /v2/ (rebuilt on each main deploy or manual run).
+          # The old modern-UI branch v2 is kept only as an archive.
+          if git fetch origin v2-retro:refs/remotes/origin/v2-retro; then
+            REF=origin/v2-retro
+            # Test the preview in a full copy of the branch, then publish only runtime files.
+            rm -rf "$RUNNER_TEMP/v2src" && mkdir -p "$RUNNER_TEMP/v2src" _site/v2
+            git archive "$REF" | tar -x -C "$RUNNER_TEMP/v2src"
+            (cd "$RUNNER_TEMP/v2src" && node test-game.cjs && if [ -f test-pwa.cjs ]; then node test-pwa.cjs; fi)
+            for f in index.html privacy.html game.js style.css pwa.js sw.js manifest.webmanifest favicon.svg NOTICE LICENSE assets data; do
+              if [ -e "$RUNNER_TEMP/v2src/$f" ]; then cp -r "$RUNNER_TEMP/v2src/$f" _site/v2/; fi
+            done
+            V2=$(git rev-parse "$REF")
             sed -i -E "s/BUILD='[^']*'/BUILD='$V2'/" _site/v2/sw.js
-            sed -i -E "s/(style\.css|game\.js|pwa\.js|data\/game-data\.js)\?v=[^\"[:space:]]+/\1?v=$V2/g" _site/v2/index.html _site/v2/privacy.html
+            sed -i -E "s/(style\.css|game\.js|pwa\.js|data\/game-data\.js)\?v=[^\"[:space:]]+/\1?v=$V2/g" _site/v2/index.html $( [ -f _site/v2/privacy.html ] && echo _site/v2/privacy.html )
           fi
       - uses: actions/upload-pages-artifact@v3
         with:
