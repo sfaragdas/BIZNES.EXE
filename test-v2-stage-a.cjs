@@ -236,3 +236,81 @@ assert.ok(screenText().includes('Trzy litery')||screenText().includes('Wynik'));
 assert.equal(shellStore.get('bx-save'),shellRaw);
 
 console.log('PASS stage A: profiles, slots, migration, ranks, records, daily seed, parental gate, bx-save untouched.');
+
+{
+// Regression coverage for the 2026-10-22 review findings.
+assert.equal(meta.wealth({cash:0,debt:0,cargo:[],prices:[],banks:[],shares:[10],stockPrices:[100]}),1000);
+assert.equal(meta.wealth({cash:1000,debt:0,cargo:[],prices:[],banks:[],shares:[0],stockPrices:[100]}),1000);
+const bigRecord=meta.addProfile(meta.emptyDb());
+meta.addRecord(bigRecord,'adult|magnat',{score:3000000000,days:40,date:'2026-10-22',initials:'ABC'});
+assert.equal(meta.best(bigRecord,'adult|magnat'),3000000000);
+
+function newCareer(){
+  const memory=new Map([['bx2r-anim','off']]),shell=bootShell(memory);
+  shell.context.BX2.onAction('create');shell.context.BX2.onAction('skip-year');shell.context.BX2.onAction('career');
+  return {...shell,memory};
+}
+const regression=newCareer(),api=regression.context.BX2,engine=regression.context.BiznesGame;
+const winning=engine.getS();winning.cash+=winning.v2Goal;engine.render();
+let database=JSON.parse(regression.memory.get('bx2r-db'));
+meta.writeSlot(database.profiles[0],'1',winning,{tier:'child',rank:'handlarz'});
+regression.memory.set('bx2r-db',JSON.stringify(database));
+api.onHome(winning);api.onAction('ok');
+database=JSON.parse(regression.memory.get('bx2r-db'));
+assert.equal(database.profiles[0].rank,'kupiec');
+assert.equal(database.profiles[0].records['child|handlarz'].length,1);
+for(const slot of ['auto','1','auto']){
+  api.onAction('menu');api.onAction('cont');api.onAction('slot-'+slot);api.onHome(engine.getS());
+  const reloaded=JSON.parse(regression.memory.get('bx2r-db')).profiles[0];
+  assert.equal(reloaded.rank,'kupiec','Loading any snapshot of the finished round cannot promote twice');
+  assert.equal(reloaded.records['child|handlarz'].length,1,'A finished round cannot enter the table twice');
+}
+const formerAdult=meta.arm({...base,cash:2000,bank:0,shares:Array(10).fill(0),stockPrices:Array(10).fill(100),rng:4,seed:4,schema:2,alive:true},{mode:'career',rank:'handlarz',tier:'adult'});
+formerAdult.cargo[2]=2;formerAdult.cargo[5]=3;formerAdult.shares[8]=4;
+const restricted=meta.resumeState(formerAdult,{id:'p1',tier:'child',rank:'handlarz'});
+assert.equal(restricted.v2Tier,'child');
+assert.equal(restricted.cargo[2],0);
+assert.equal(restricted.shares[8],0);
+assert.equal(meta.wealth(restricted),meta.wealth(formerAdult),'Hidden holdings convert to cash without losing assets');
+for(const raw of ['{}','null','{"profiles":null}','{"v":1,"profiles":[null]}']){
+  const memory=new Map([['bx2r-db',raw]]);
+  const recovered=bootShell(memory);
+  assert.ok(recovered.el('#terminal').textContent.includes('Nowa gra'));
+  assert.equal(memory.get('bx2r-db-backup'),raw,'Keep a recovery copy of invalid profile data');
+  recovered.context.BX2.onAction('create');recovered.context.BX2.onAction('skip-year');recovered.context.BX2.onAction('career');
+  assert.equal(recovered.context.BiznesGame.getS().cash,1000);
+}
+const imported=bootShell(new Map([['bx-save',shellRaw]]));
+imported.context.BX2.onAction('cont');imported.context.BX2.onAction('slot-auto');
+assert.equal(imported.context.BiznesGame.getS().v2Tier,'child');
+assert.equal(imported.el('#terminal').textContent.includes('Tytoń'),false);
+assert.equal(imported.el('#mobile').innerHTML.includes('href='),false);
+
+for(const rank of ranks){
+  const state=meta.arm(structuredClone(base),{mode:'daily',rank,tier:'adult',seed:123});
+  assert.equal(state.v2Days,14,'The same daily market has the same day budget at every rank');
+  assert.equal(state.seed,123);
+}
+const dailyCase=newCareer(),dailyApi=dailyCase.context.BX2;
+dailyCase.context.BiznesGame.select('quit');dailyApi.onAction('daily');
+const dailyState=dailyCase.context.BiznesGame.getS();dailyState.day=dailyState.v2Days+1;
+dailyApi.onHome(dailyState);dailyApi.onAction('ok');
+const dailyProfile=JSON.parse(dailyCase.memory.get('bx2r-db')).profiles[0];
+assert.equal(dailyProfile.records['daily|child'].length,1);
+assert.equal(dailyProfile.records.daily,undefined);
+
+const helpCase=newCareer(),helpApi=helpCase.context.BX2,helpGame=helpCase.context.BiznesGame;
+helpCase.context.window=helpCase.context;
+let installationHelp='';
+helpCase.context.BiznesPWA={status:()=> 'Offline ready',message:()=>installationHelp,install:()=>{installationHelp='INSTALL_HELP_SENTINEL';helpGame.render(false)}};
+helpGame.select('quit');helpApi.onAction('set');helpApi.onAction('install-app');
+assert.ok(helpCase.el('#terminal').textContent.includes('INSTALL_HELP_SENTINEL'));
+assert.ok(helpCase.el('#mobile').innerHTML.includes('INSTALL_HELP_SENTINEL'));
+const childState=helpGame.getS();childState.debt=0;
+helpApi.onAction('menu');helpApi.onAction('cont');helpApi.onAction('slot-auto');helpGame.getS().debt=0;
+for(let trip=0;trip<150;trip++){
+  helpGame.select('travel');helpGame.select('city-'+((helpGame.getS().city+1)%4));
+  assert.equal(helpGame.getS().cargo[2],0,'Minor travel gifts cannot introduce tobacco');
+}
+console.log('PASS review fixes: one result per round, share valuation, safe restore, equal daily duration, recovery and install help.');
+}

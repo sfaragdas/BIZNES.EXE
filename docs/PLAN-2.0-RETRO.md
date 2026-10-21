@@ -85,14 +85,14 @@ Próg zmienia **tylko treści i zakres**, nie samą ekonomię.
 ### A6. Rangi (automatyczne w obrębie progu)
 
 - Przykład: **Handlarz → Kupiec → Hurtownik → Magnat**.
-- Każda ranga ma: cel (majątek = gotówka + towary − długi), limit dni, większą liczbę towarów i miast.
+- Każda ranga ma: cel (majątek = gotówka + banki + towary + akcje − długi), limit dni, większą liczbę towarów i miast.
 - Runda kończy się ekranem wyniku: wynik, dni, ile brakowało do rekordu („jeszcze raz” bez presji), awans rangi jeśli cel osiągnięty.
 - Dorosły po randze Magnat dostaje propozycję przejścia do trybu **Zaawansowany**.
 - Próg wieku nigdy nie zmienia się sam.
 
 ### A7. Rekordy lokalne
 
-- Top 5 na kombinację **próg + ranga** (+ osobna tabela „Rynek dnia”): wynik, dni, data, 3 litery inicjałów.
+- Top 5 na kombinację **próg + ranga** (+ osobna tabela „Rynek dnia” dla każdego progu): wynik, dni, data, 3 litery inicjałów.
 - **Nowy rekord → konfetti DOS**: znaki `* + . ░ ▒ ★` w kolorach aktywnego stylu, 2–3 s, duża ramka ASCII „NOWY REKORD!”, opcjonalny pisk. Przy wyłączonych animacjach / `prefers-reduced-motion` — statyczna ramka.
 
 ### A8. Udostępnianie
@@ -103,13 +103,13 @@ Próg zmienia **tylko treści i zakres**, nie samą ekonomię.
 
 ### A9. Rynek dnia i wyzwanie
 
-- Deterministyczne ziarno z daty (ten sam rynek dla wszystkich danego dnia), jedna punktowana runda dziennie, **bez licznika serii**.
+- Deterministyczne ziarno z daty (ten sam rynek w obrębie progu), zawsze 14 dni niezależnie od rangi, jedna punktowana runda dziennie, **bez licznika serii**.
 - **Wyzwanie dla znajomego**: kod rynku (np. `BX-7F3K`), który ustawia to samo ziarno. Gra kodem jest nieoficjalna (bez wpływu na rynek dnia).
 - Wszystko offline, bez serwera.
 
 ### A10. Testy
 
-- `test-game.cjs` (Node, bez zależności) — dopisać testy: profile (limit 4, domyślny próg), sloty i migracja zapisu, rangi i koniec rundy, rekordy top 5, ziarno rynku dnia i kod wyzwania (deterministyczne), bramka rodzica (podwyższenie wymaga bramki, obniżenie nie).
+- `test-game.cjs` oraz `test-v2-stage-a.cjs` (Node, bez zależności) — testy: profile (limit 4, domyślny próg), sloty i migracja zapisu, rangi i koniec rundy, rekordy top 5, ziarno rynku dnia i kod wyzwania (deterministyczne), bramka rodzica (podwyższenie wymaga bramki, obniżenie nie).
 - `test-classic.cjs` bez zmian i ma przechodzić.
 
 ---
@@ -146,3 +146,15 @@ Próg zmienia **tylko treści i zakres**, nie samą ekonomię.
 
 - Praca na gałęzi `v2-retro` (z `main`). Podgląd: https://sfaragdas.github.io/BIZNES.EXE/v2/ (workflow `pages.yml` na `main` buduje `/v2/` z `origin/v2-retro`).
 - Implementacja Etapu A: Codex (PiXPS), małe commity, testy zielone.
+
+## Poprawki po review — 22.10.2026
+
+- Jeden wynik i najwyżej jeden awans na rundę, również po ponownym wczytaniu autozapisu lub slotu sprzed zakończenia.
+- Majątek uwzględnia banki, towary i akcje; rekordy nie są zawężane do liczb 32-bitowych.
+- Przy wczytaniu obowiązuje niższy z progów: aktualnego profilu i zapisu. Niedostępne zasoby są zamieniane na gotówkę po cenie zapisu. Import BETA otrzymuje ograniczenia bieżącego profilu.
+- Rynek dnia: wspólny limit 14 dni i osobne rekordy dla progów. Starsza tabela `daily` jest zachowana w danych, ale nie miesza się z nowymi tabelami.
+- Nieprawidłowa baza profili nie blokuje startu; aplikacja podejmuje próbę kopii do `bx2r-db-backup`. Wadliwy slot nie jest uruchamiany.
+- Instrukcje instalacji ręcznej i Safari są widoczne w Ustawieniach.
+- Walidacja gałęzi retro i publikacja podglądu uruchamiają także `test-v2-stage-a.cjs`.
+
+Uproszczenie menu i pytań o próg wieku pozostaje osobnym etapem.

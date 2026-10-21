@@ -3,7 +3,7 @@
 'use strict';
 const meta=globalThis.BiznesMeta;
 if(!meta||typeof document==='undefined'||!document.querySelector)return;
-const DB='bx2r-db',REL='2.0 retro · 2026.10.21';
+const DB='bx2r-db',REL='2.0 retro · 2026.10.22';
 const t=(en,pl)=>globalThis.BiznesGame&&globalThis.BiznesGame.lang==='en'?en:pl;
 const ui={screen:'menu',sel:0,buf:'',note:'',pending:null,quiz:null,gateMode:'math',gateFrom:'menu',pin1:'',result:null,fx:0,timer:0,spin:0,rot:0,mode:'career'};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -11,7 +11,15 @@ const fmt=n=>String(Math.round(Number(n)||0)).replace(/\B(?=(\d{3})+(?!\d))/g,' 
 const vis=s=>String(s).replace(/\[\[([^|]+)\|([^|]+)\|(.*?)\]\]/g,(_,id,key,label)=>label);
 const padLine=s=>{s=String(s);const n=vis(s).length;return n>=78?s:s+' '.repeat(78-n)};
 const g=()=>globalThis.BiznesGame;
-const loadDb=()=>{try{const raw=localStorage.getItem(DB);if(raw)return JSON.parse(raw)}catch{}return meta.emptyDb()};
+const installHelp=()=>globalThis.BiznesPWA?.message?.(g().lang)||'';
+const loadDb=()=>{
+  let raw=null;
+  try{raw=localStorage.getItem(DB);if(raw){const db=JSON.parse(raw);if(meta.validDb(db))return db;throw Error('Invalid profiles')}}catch{
+    if(raw)try{localStorage.setItem(DB+'-backup',raw)}catch{}
+    ui.note=t('Invalid profiles. A local backup was attempted.','Nieprawidłowy zapis profili. Podjęto próbę zachowania kopii.');
+  }
+  return meta.emptyDb();
+};
 const saveDb=db=>{try{localStorage.setItem(DB,JSON.stringify(db))}catch{}};
 const active=db=>db.profiles.find(p=>p.id===db.active)||db.profiles[0]||null;
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
@@ -114,13 +122,13 @@ function extraLines(){
     lines.push(t('Band: ','Próg: ')+tierLabel(p?p.tier:'child')+' · '+rankLabel(p?p.rank:'handlarz'));
     return lines;
   }
-  if(screen==='set')return [t('Language: ','Język: ')+(g().lang==='pl'?'PL':'EN')+' (L)'];
+  if(screen==='set')return [t('Language: ','Język: ')+(g().lang==='pl'?'PL':'EN')+' (L)',...chunks(installHelp())];
   if(screen==='help')return chunks(g().help().map(pair=>pair[1]).join(' '));
   if(screen==='about')return chunks(t('Local: profile, year, PIN hash. No account, alerts, or stranger ranks. Share card is the score.','Lokalnie: profil, rok, skrót PIN. Bez konta, alertów i rankingu z obcymi. Kartka to wynik.'));
   if(screen==='rec'){
     if(!p)return [t('No profile yet.','Nie ma jeszcze profilu.')];
     const lines=[];
-    [[p.tier+'|'+p.rank,tierLabel(p.tier)+' · '+rankLabel(p.rank)],['daily',t('Daily market','Rynek dnia')]].forEach(([key,heading])=>{
+    [[p.tier+'|'+p.rank,tierLabel(p.tier)+' · '+rankLabel(p.rank)],['daily|'+p.tier,t('Daily market','Rynek dnia')]].forEach(([key,heading])=>{
       lines.push(heading);const list=meta.records(p,key);
       lines.push(...(list.length?list.map((row,i)=>' '+(i+1)+' '+row.initials+' '+fmt(row.score)+' $ '+row.days+'d '+row.date):[t(' empty',' pusto')]));
     });
@@ -240,8 +248,13 @@ function submitPin(){
 const freshRecord=(p,key,score)=>{const list=meta.records(p,key);return list.length<5||score>list[list.length-1].score};
 function submitInitials(){
   const db=loadDb(),p=active(db);if(!p||!ui.result)return;
-  ui.result.fresh=meta.addRecord(p,ui.result.key,{score:ui.result.score,days:ui.result.o.days|0,date:today(),initials:(ui.buf.toUpperCase().replace(/[^A-Z]/g,'')+'???').slice(0,3)});
-  saveDb(db);ui.screen='result';ui.buf='';if(ui.result.fresh)celebrate();else paint();
+  const saved=p.roundResults?.[ui.result.roundId];
+  if(!saved?.recorded){
+    ui.result.fresh=meta.addRecord(p,ui.result.key,{score:ui.result.score,days:ui.result.o.days,date:today(),initials:(ui.buf.toUpperCase().replace(/[^A-Z]/g,'')+'???').slice(0,3)});
+    if(saved){saved.recorded=true;saved.result={...ui.result,fresh:false}}
+    saveDb(db);
+  }else ui.result.fresh=false;
+  ui.screen='result';ui.buf='';if(ui.result.fresh)celebrate();else paint();
 }
 function confirmBuf(){
   ({year:submitYear,name:submitName,code:submitCode,gate:submitGate,pin:submitPin,pin2:submitPin,initials:submitInitials}[ui.screen]||(()=>{}))();
@@ -254,9 +267,11 @@ function startGame(mode,seed){
   if(mode==='daily'&&p.dailyDone===today())use='practice';
   if(use==='daily'){p.dailyDone=today();saveDb(db)}
   ui.mode=use==='practice'?'daily':mode;ui.seed=seed;
+  db.roundSeq=(Number.isSafeInteger(db.roundSeq)?db.roundSeq:0)+1;saveDb(db);
   const shell=globalThis.BX2;
   shell.playing=false;shell.done=false;shell.profileId=p.id;g().newGame();
   meta.arm(g().getS(),{mode:use,rank:p.rank,tier:p.tier,seed});
+  g().getS().v2Round=p.id+':'+Date.now().toString(36)+':'+db.roundSeq;
   shell.playing=true;
   const notes=[];
   if(use==='practice')notes.push(t('Scored today. This is practice.','Dziś punktowane. To trening.'));
@@ -266,17 +281,27 @@ function startGame(mode,seed){
 function resume(slot){
   const db=loadDb(),p=active(db),data=p&&p.slots[slot];
   if(!data){ui.note=t('Empty slot.','Pusty slot.');paint();return}
-  const shell=globalThis.BX2;shell.playing=false;shell.done=false;shell.profileId=p.id;g().adopt(data.state);shell.playing=true;g().render();
+  const next=meta.resumeState(data.state,p);
+  if(!next){ui.note=t('This slot is invalid. The original save is preserved.','Ten slot jest nieprawidłowy. Oryginalny zapis zachowano.');paint();return}
+  next.v2Round=meta.roundId(next,p);
+  const shell=globalThis.BX2;shell.playing=false;shell.done=false;shell.profileId=p.id;g().adopt(next);shell.playing=true;g().render();
 }
 function finish(state,outcome){
   const shell=globalThis.BX2,db=loadDb(),p=db.profiles.find(item=>item.id===shell.profileId)||active(db);
   const rank=state.v2Rank||(p&&p.rank)||'handlarz',tier=state.v2Tier||(p&&p.tier)||'child';
-  ui.result={o:outcome,tier,rank,score:outcome.gain|0,daily:!!state.v2Daily,challenge:!!state.v2Challenge,practice:!!state.v2Practice,promoted:outcome.promoted,fresh:false,offerAdv:false,seed:state.seed,key:state.v2Daily?'daily':tier+'|'+rank};
-  ui.mode=state.v2Daily?'daily':state.v2Challenge?'challenge':'career';
-  if(p&&outcome.promoted&&state.v2Career){const next=meta.nextRank(p.rank);if(next){p.rank=next;ui.result.promotedTo=next}else if(p.tier==='adult')ui.result.offerAdv=true}
-  if(p)saveDb(db);
+  const id=p?meta.roundId(state,p):state.v2Round;
+  const saved=p?.roundResults?.[id];
+  if(saved)ui.result={...saved.result,fresh:false};
+  else{
+    ui.result={o:outcome,tier,rank,roundId:id,score:outcome.gain,daily:!!state.v2Daily,challenge:!!state.v2Challenge,practice:!!state.v2Practice,promoted:outcome.promoted,fresh:false,offerAdv:false,seed:state.seed,key:state.v2Daily?'daily|'+tier:tier+'|'+rank};
+    if(p&&outcome.promoted&&state.v2Career&&p.rank===rank){const next=meta.nextRank(rank);if(next){p.rank=next;ui.result.promotedTo=next}else if(p.tier==='adult')ui.result.offerAdv=true}
+    if(p){p.roundResults??={};p.roundResults[id]={result:{...ui.result},recorded:!(state.v2Daily||state.v2Career)||!freshRecord(p,ui.result.key,ui.result.score)}}
+  }
+  state.v2Round=id;state.v2Finished=true;
+  if(p){meta.writeSlot(p,'auto',state,{tier,rank,wealth:meta.wealth(state),date:today(),at:Date.now()});saveDb(db)}
+  ui.mode=ui.result.daily?'daily':ui.result.challenge?'challenge':'career';
   ui.sel=0;ui.buf='';ui.note='';shell.playing=false;shell.done=true;g().setView('welcome');
-  if((state.v2Daily||state.v2Career)&&p&&freshRecord(p,ui.result.key,ui.result.score))open('initials');
+  if(p&&!p.roundResults[id].recorded)open('initials');
   else {ui.screen='result';paint()}
 }
 function shareText(){
@@ -372,7 +397,7 @@ globalThis.BX2={
   onWelcome(){if(ui.fx)return;const field=document.activeElement;if(field&&field.classList&&field.classList.contains('v2-field'))return;paint()},
   onQuit(){this.playing=false;this.done=false;ui.screen='menu';ui.sel=0;ui.note=''},
   onSave(state){const db=loadDb(),p=db.profiles.find(item=>item.id===this.profileId)||active(db);if(!p)return;meta.writeSlot(p,'auto',state,{tier:p.tier,rank:state.v2Rank||p.rank,wealth:meta.wealth(state),date:today(),at:Date.now()});db.active=p.id;saveDb(db)},
-  onHome(state){if(this.done||!this.playing)return;const outcome=meta.outcome(state);if(outcome.ended)finish(state,outcome)},
+  onHome(state){if(this.done||!this.playing)return;const outcome=meta.outcome(state);if(outcome.ended||state.v2Finished)finish(state,outcome)},
   onReady(){
     const db=loadDb();
     if(!db.legacy){if(localStorage.getItem('bx-save')){try{meta.importLegacy(db,g().getS());saveDb(db)}catch{}}else{db.legacy=true;saveDb(db)}}

@@ -1,0 +1,27 @@
+name: Validate retro 2.0
+on:
+  push:
+    branches: [v2-retro, v2-retro-stage-a]
+  pull_request:
+    branches: [v2-retro]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Gameplay, Classic and retro regressions
+        run: |
+          node --check game.js
+          node --check assets/v2meta.js
+          node --check assets/v2ui.js
+          node test-game.cjs
+          node test-classic.cjs
+          node test-v2-stage-a.cjs

@@ -38,6 +38,7 @@ function ensure(s){
   const legacySave=!s.schema;
   if(!Array.isArray(s.shares))s.shares=Array(10).fill(0);while(s.shares.length<10)s.shares.push(0);
   if(!Array.isArray(s.banks)){s.banks=Array(6).fill(0);s.banks[0]=s.bank||0}while(s.banks.length<6)s.banks.push(0);
+  if(!Number.isSafeInteger(s.bank))s.bank=s.banks.reduce((a,b)=>a+b,0);
   if(s.bank!==s.banks.reduce((a,b)=>a+b,0)){s.banks[0]+=s.bank-s.banks.reduce((a,b)=>a+b,0)}
   if(legacySave){let recovered=0;if(!Array.isArray(s.cargo))s.cargo=Array(10).fill(0);if(!Array.isArray(s.prices))s.prices=[...BASE];for(let i=5;i<10;i++){recovered+=s.cargo[i]*s.prices[i];s.cargo[i]=0}for(let i=0;i<Math.min(3,s.shares.length);i++)recovered+=s.shares[i]*(80+((s.day*17+i*31)%90));if(recovered>0){s.cash+=recovered;notice=t('Older goods and shares were converted to cash.','Stare towary i akcje zamieniono na gotówkę.')}s.shares.fill(0);s.city=[2,2,5,0,4,6,3,8][Math.min(7,s.city)]||0;s.schema=2}
   if(!Array.isArray(s.stockPrices)||s.stockPrices.length!==10)s.stockPrices=Array.from({length:10},(_,i)=>80+((s.day*17+i*31)%90));
@@ -329,7 +330,7 @@ function updateMarkets(){
   S.stockPrices=S.stockPrices.map((previous,i)=>marketPrice(120+i*4,previous,i,false));
 }
 function trigger(id){
-  const cash=rand(150)+50,g=rand(10);let detail='',kind='good';
+  const cash=rand(150)+50,pool=minor()?goodIdx():null,g=pool?pool[rand(pool.length)]:rand(10);let detail='',kind='good';
   const gain=()=>{const n=Math.min(cash,2147483647-S.cash);S.cash+=n;detail=`+${n} $`};
   const loss=()=>{const n=Math.min(S.cash,cash);S.cash-=n;detail=`-${n} $`;kind='bad'};
   if(id===12&&!S.cargo[1]||id===13&&!S.cargo[2]||id===3&&!used()||id===14&&!used())id=15;
