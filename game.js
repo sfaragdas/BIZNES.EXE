@@ -46,15 +46,7 @@ function ensure(s){
 let S;try{S=ensure(JSON.parse(localStorage.getItem('bx-save'))||fresh())}catch{S=ensure(fresh())}
 const money=n=>`${Number(n).toFixed(2)} $`, esc=s=>String(s).replace(/[&<>"]+/g,c=>c.split('').map(ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])).join(''));
 const actionToken=(id,key,label,hot=0)=>`[[${id}|${key}|${label}|${hot}]]`;
-function save(){
-  S.bank=S.banks.reduce((a,b)=>a+b,0);
-  if(v2()){
-    if(v2().playing&&typeof v2().onSave==='function')v2().onSave(S);
-    const status=document.querySelector('#save-status');if(status)status.textContent=t('Saved locally','Zapisano lokalnie');
-    return;
-  }
-  localStorage.setItem('bx-save',JSON.stringify(S));document.querySelector('#save-status').textContent=t('Saved locally','Zapisano lokalnie');
-}
+function save(){S.bank=S.banks.reduce((a,b)=>a+b,0);const status=document.querySelector('#save-status');if(v2()){if(v2().playing&&typeof v2().onSave==='function')v2().onSave(S);if(status)status.textContent=t('Saved locally','Zapisano lokalnie');return}localStorage.setItem('bx-save',JSON.stringify(S));status.textContent=t('Saved locally','Zapisano lokalnie')}
 function minor(){return !!(S&&(S.v2Tier==='child'||S.v2Tier==='teen'))}
 function used(){return S.cargo.reduce((a,b)=>a+b,0)}
 function rand(n){S.rng^=S.rng<<13;S.rng^=S.rng>>>17;S.rng^=S.rng<<5;return(S.rng>>>0)%n}
@@ -73,8 +65,8 @@ function frame(rows){
       html=` <span class="welcomepanel${edge?' panel-edge':''}">${esc(text)}</span> `;
     }
     html=html.replace(/\[\[([^|]+)\|([^|]+)\|([^|]+)(?:\|([^\]]+))?\]\]/g,(_,id,key,label,hot='0')=>{const n=Math.max(0,Math.min(label.length-1,Number(hot)||0));return `<button class="terminal-action" data-ui-action="${esc(id)}" data-hotkey="${esc(key)}">${esc(label.slice(0,n))}<span class="key">${esc(label.slice(n,n+1))}</span>${esc(label.slice(n+1))}</button>`});
-    const sponsorCell=minor()?esc(SPONSORS[sponsorIndex][0]):`<a class="sponsor-link" href="${SPONSORS[sponsorIndex][1]}" target="_blank" rel="noopener noreferrer">${SPONSORS[sponsorIndex][0]}</a>`;
-    const sponsorLinks=minor()?[...SPONSORS].reverse().map(([name])=>esc(name)).join('    '):[...SPONSORS].reverse().map(([name,url])=>`<a class="sponsor-link" href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`).join('    ');
+    const link=(name,url)=>minor()?esc(name):`<a class="sponsor-link" href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`;
+    const sponsorCell=link(SPONSORS[sponsorIndex][0],SPONSORS[sponsorIndex][1]),sponsorLinks=[...SPONSORS].reverse().map(([name,url])=>link(name,url)).join('    ');
     html=html.replace(/\{LANG\}/g,`<button class="frame-control" data-frame-action="language">L/${lang==='pl'?'EN':'PL'}</button>`).replace(/\{SPONSOR\}/g,sponsorCell).replace(/\{SPONSOR_LINKS\}/g,sponsorLinks).replace(/BIZNES\.EXE/g,'<span class="accent">BIZNES.EXE</span>').replace(/\{([A-Z])\}/g,'<span class="key">$1</span>').replace(/(\$\s*)([\d,]+(?:\.\d{2})?)/g,'$1<span class="accent">$2</span>').replace(/([\d,]+(?:\.\d{2})?)(\s*\$)/g,'<span class="accent">$1</span>$2');
     if(view==='home'&&i===16){const city=cities()[S.city];html=html.replace(esc(city),`<span class="accent">${esc(city)}</span>`)}
 
@@ -115,7 +107,6 @@ function welcome(){
 const operationLabel=()=>({buy:t('Buy','Kupno'),sell:t('Sell','Sprzedaż'),deposit:t('Deposit','Wpłata'),withdraw:t('Withdraw','Odbiór'),borrow:t('Borrow','Pożyczka'),repay:t('Repay','Spłata')}[mode]||'');
 const chooseAction=()=>t('Choose an action:','Wybierz akcję:');
 function marketTabs(){return [button('goods','T','Towary','Goods'),button('shares','A','Akcje','Shares'),button('bank','B','Banki','Banks')].join('   ')}
-// Two screens; the active table is independent of the inline operation.
 const GOODS_HOT=()=>lang==='pl'?[0,0,0,0,0,0,2,0,0,0]:[0,0,2,0,0,0,2,0,0,1];
 const STOCK_LABELS=()=>lang==='pl'?["Hilton (Nowy Jork)","International (Paryż)","MacDonald's","Philips","JVC","Toyota",...STOCKS.slice(6)]:["Hilton (New York)","International (Paris)","McDonald's","Philips","JVC","Toyota",...STOCKSEN.slice(6)];
 const STOCK_HOT=[0,0,0,0,0,0,1,0,3,0];
@@ -233,7 +224,6 @@ function updateMobile(html){
     for(let i=0;i<next.childNodes.length;i++){
       const fresh=next.childNodes[i],old=parent.childNodes[i];
       if(!old){parent.appendChild(fresh.cloneNode(true));continue}
-      // A different action is a new control; never carry focus to an unrelated button.
       if(old.nodeType!==fresh.nodeType||old.nodeName!==fresh.nodeName||old.nodeType===1&&(old.id!==fresh.id||old.getAttribute('data-ui-action')!==fresh.getAttribute('data-ui-action'))){old.replaceWith(fresh.cloneNode(true));continue}
       if(old.nodeType===3){if(old.nodeValue!==fresh.nodeValue)old.nodeValue=fresh.nodeValue;continue}
       if(old.nodeType!==1)continue;
@@ -326,8 +316,6 @@ function nextDebtRate(){
   const down=S.debtRate>=15?rand(100)<85:rand(2)===0;
   return Math.max(1,Math.min(30,S.debtRate+(down?-1:1)*(1+rand(3))));
 }
-// Each journey mixes the previous price, an in-game day trend and fresh market noise.
-// Goods also reflect the destination city; shares follow the global market.
 function marketPrice(base,previous,i,local){
   const trend=Math.sin((S.day+i*3)/6)*.15;
   const city=local?((S.city*17+i*11)%41-20)/100:0;
@@ -344,7 +332,6 @@ function trigger(id){
   const cash=rand(150)+50,g=rand(10);let detail='',kind='good';
   const gain=()=>{const n=Math.min(cash,2147483647-S.cash);S.cash+=n;detail=`+${n} $`};
   const loss=()=>{const n=Math.min(S.cash,cash);S.cash-=n;detail=`-${n} $`;kind='bad'};
-  // Select only applicable events: a plague cannot destroy goods you do not own.
   if(id===12&&!S.cargo[1]||id===13&&!S.cargo[2]||id===3&&!used()||id===14&&!used())id=15;
   if([1,4,5,9,14].includes(id)&&!S.cash)id=2;
   switch(id){
@@ -420,7 +407,6 @@ function action(k){
     if(step==='quantity'){if(/^\d$/.test(k)&&input.length<10)input+=k;else if(k==='BACKSPACE')input=input.slice(0,-1);else if(k==='ENTER'||k===(lang==='pl'?'Z':'C')){submit();return}render()}
     return;
   }
-  // A notice never intercepts the next command.
   const common={T:'goods',A:'shares',B:'bank',W:'travel',D:'debt',Q:'quit',L:'language'};
   const id=common[k]||(table==='banks'?{P:'deposit',O:'withdraw'}:{K:'buy',S:'sell'})[k];
   if(id)select(id);
@@ -439,13 +425,11 @@ document.addEventListener('keydown',e=>{
     else if(e.key==='Escape'){e.preventDefault();select('cancel')}
     return;
   }
-  // Let a focused native button handle Enter/Space once through its click event.
   if((e.key==='Enter'||e.key===' ')&&e.target?.closest?.('button,a'))return;
   if(e.key.startsWith('Arrow')&&view==='welcome'&&v2()?.onKey){e.preventDefault();v2().onKey(e.key.slice(5).toUpperCase());return}
   let k=e.key.toUpperCase();if(k==='ESCAPE')k='ESC';
   if(k==='BACKSPACE'||k==='ENTER'||k==='ESC'||k.length===1){e.preventDefault();action(k)}
 });
-// Keep the bottom dock above the on-screen keyboard on mobile browsers.
 if(typeof window!=='undefined')window.addEventListener('pwa-state',()=>{if(view==='welcome')render(false)});
 if(typeof window!=='undefined'&&window.visualViewport){
   const viewport=window.visualViewport;let queued=false;
@@ -453,7 +437,6 @@ if(typeof window!=='undefined'&&window.visualViewport){
     if(queued)return;queued=true;
     requestAnimationFrame(()=>{
       queued=false;
-      // Anchor BOTH edges to Safari's visible viewport. Flex only shrinks the middle.
       M?.style.setProperty('--visible-top',`${viewport.offsetTop}px`);
       M?.style.setProperty('--visible-height',`${viewport.height}px`);
     });

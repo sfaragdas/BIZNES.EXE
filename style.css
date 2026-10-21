@@ -40,7 +40,6 @@ pre .footer-status{font-size:.56em;display:flex;align-items:flex-end;justify-con
 pre .city-row{overflow:visible;line-height:1.35}
 pre .city-row-inner{display:flex;width:100%;height:100%;align-items:center;justify-content:space-around;gap:2ch}
 
-/* One action row with separate navigation, shared actions and transactions. */
 pre .action-bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1ch;white-space:normal;overflow:visible;color:var(--fg);background:var(--bg)}
 .action-group{display:flex;align-items:center;gap:1ch;white-space:nowrap}
 .group-left{justify-content:flex-start}
@@ -53,7 +52,6 @@ pre .terminal-action:focus-visible{color:#000}
 #amount-input{width:10ch;flex:none;font:inherit;line-height:1.2;color:var(--yellow);background:#111;border:1px solid var(--fg);border-radius:0;padding:0 .35ch;vertical-align:middle;text-align:right}
 #amount-input:focus{outline:2px solid var(--yellow);outline-offset:1px}
 
-/* Paint the entire row, including space below the font's glyph box. */
 pre .panel-row{background:linear-gradient(to right,transparent 1ch,var(--dosbar) 1ch,var(--dosbar) calc(100% - 1ch),transparent calc(100% - 1ch))}
 pre .welcomepanel{font-size:.94em;width:calc(100% - 2ch);height:100%;vertical-align:top;background:transparent}
 pre .city-row-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;align-items:center}
@@ -141,7 +139,6 @@ body[data-hand='left'] #journey-dialog button{margin-left:0;margin-right:auto}
 .mobile-notice.has-message{color:var(--yellow)}
 #mobile>.install-help{flex:none;max-height:24dvh;overflow:auto;margin:0;padding:8px;border:0;border-top:1px dashed var(--dim);font-size:.85em}
 
-/* Styles are palette + type choices; no animation or extra font download. */
 body[data-font='matrix']{--yellow:#008f39}
 body[data-font='matrix'] pre,body[data-font='matrix'] #mobile{font-family:'DOS PL',monospace;font-synthesis:none}
 @media(max-width:900px){
@@ -167,25 +164,10 @@ body[data-contrast='on'][data-font='matrix']{--fg:#f4fff6;--yellow:#b8ff9a;--dim
 body[data-contrast='on'] .sponsor-link,body[data-contrast='on'] .v2-legal button{color:var(--fg);text-decoration:underline}
 pre .menu-on{background:#181800}
 body[data-contrast='on'] pre .menu-on,body[data-contrast='on'] pre .menu-on .terminal-action{background:var(--fg);color:#000}
-.v2-card{border:1px solid var(--dim);padding:8px;margin:8px 0}
-.v2-legal{margin:0;text-align:center}
-.v2-legal button{min-height:44px;border:0;background:transparent;color:var(--dim);text-decoration:underline;box-shadow:none}
-.v2-field{width:100%;min-height:44px;font:inherit;background:#111;color:var(--yellow);border:1px solid var(--fg);padding:6px}
-.v2-stack{display:grid;gap:8px}
-.v2-note{color:var(--yellow)}
-.v2-fx{margin:24px 12px;color:var(--yellow);white-space:pre-wrap}
-@media(max-width:900px){
-  .v2-row1,.v2-row2{display:grid;gap:8px}
-  .v2-row1{grid-template-columns:1fr 1fr}
-  .v2-row2{grid-template-columns:1fr 1fr 1fr;margin-top:8px}
-  #mobile .v2-row1 button{min-height:52px}
-  #mobile .v2-row2 button{min-height:44px;font-size:.8em}
-  body[data-hand='left'] .v2-row{direction:rtl}
-  body[data-hand='left'] .v2-row>*{direction:ltr}
-}
+.v2-card{border:1px solid var(--dim);padding:8px;margin:8px 0}.v2-legal{margin:0;text-align:center}.v2-legal button{min-height:44px;border:0;background:transparent;color:var(--dim);text-decoration:underline;box-shadow:none}.v2-field{width:100%;min-height:44px;font:inherit;background:#111;color:var(--yellow);border:1px solid var(--fg);padding:6px}.v2-stack{display:grid;gap:8px}.v2-note{color:var(--yellow)}.v2-fx{margin:24px 12px;color:var(--yellow);white-space:pre-wrap}
+@media(max-width:900px){.v2-row1,.v2-row2{display:grid;gap:8px}.v2-row1{grid-template-columns:1fr 1fr}.v2-row2{grid-template-columns:1fr 1fr 1fr;margin-top:8px}#mobile .v2-row1 button{min-height:52px}#mobile .v2-row2 button{min-height:44px;font-size:.8em}body[data-hand=left] .v2-row{direction:rtl}body[data-hand=left] .v2-row>*{direction:ltr}}
 @media (prefers-reduced-motion:reduce){.v2-fx{display:block}}
 
-/* Desktop and landscape tablets retain text controls and the terminal table. */
 .screen{position:relative}
 pre .market-navigation{border-top:1px dashed var(--dim);color:var(--fg);text-align:center;white-space:normal}
 pre .footer-status{justify-content:space-between}
