@@ -22,7 +22,7 @@ Obie wersje: PL / EN · Standard / DOS / Matrix · komputer / tablet / telefon �
 
 Zmiana długu początkowego dotyczy nowych gier. Aktualizacja zachowuje saldo istniejącej rozgrywki. Szczegóły Classic: [classic/README.md](classic/README.md). Historia wydań: [CHANGELOG.md](CHANGELOG.md).
 
-Osobno rozwijany jest **BIZNES.EXE 2.0 retro** ([podgląd](https://sfaragdas.github.io/BIZNES.EXE/v2/), gałąź `v2-retro`): profile lokalne, sloty, rangi i Rynek dnia. Poprawki z 2026.10.22 obejmują wyniki rund, wycenę akcji, ograniczenia zapisów i testy publikacji. Starszy prototyp z interfejsem Morska bryza, podatkami i czterema trybami pozostaje w [archiwalnej gałęzi `v2`](https://github.com/sfaragdas/BIZNES.EXE/tree/v2).
+Osobno rozwijany jest **BIZNES.EXE 2.0 retro** ([podgląd PREVIEW · 2026.10.22](https://sfaragdas.github.io/BIZNES.EXE/v2/), gałąź `v2-retro`): trzy poziomy **Handlarz, Kupiec, Magnat**, wspólne treści rodzinne, autozapis i lokalne rekordy. Nowa gra prowadzi prosto do wyboru poziomu; dodatkowe profile są opcjonalne w Ustawieniach. Bez pytań o wiek, PIN-u, udostępniania i Rynku dnia. Dawne zapisy i rekordy są zachowane przy migracji. Poziom trudności nie jest oceną PEGI. [Zasady i migracja](https://github.com/sfaragdas/BIZNES.EXE/blob/v2-retro/docs/PLAN-2.0-RETRO.md). Starszy prototyp Morska bryza pozostaje w [archiwalnej gałęzi `v2`](https://github.com/sfaragdas/BIZNES.EXE/tree/v2).
 
 Niezależna adaptacja inspirowana **Biznesman (1988), M. Cwynar / SAMBA**. Własna implementacja, bez oryginalnego kodu i zasobów. Patroni projektu: [LCSE.pl](https://lcse.pl) · [MojeDostawy.pl](https://mojedostawy.pl).
 
