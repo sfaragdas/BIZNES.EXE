@@ -5,11 +5,30 @@ Główna BETA i Classic FINAL zachowują swoje zasady. Starszy prototyp `v2` poz
 
 ## Menu i początek gry
 
-Menu: Nowa gra, Kontynuuj, Rekordy, Ustawienia. Pomoc i Prywatność są poniżej.
-Nowa gra otwiera wyłącznie wybór trzech poziomów. Domyślny lokalny profil to Gracz 1;
-do czterech profili można opcjonalnie wybrać lub dodać w Ustawieniach.
-Nie pytamy o wiek, rok urodzenia, PIN ani dane osobowe. Poziomy oznaczają trudność,
-nie ocenę PEGI. Nie deklarujemy oficjalnej klasyfikacji wieku.
+Interfejs nie wymaga profilu ani jego zakładania. Kontynuuj od razu wznawia zapis gry.
+Dawne profile pozostają w danych; używany jest ostatni aktywny zapis.
+
+Na telefonie panel jest stale u dołu. Rzędy od góry:
+- Wiek: <18 / 18+, Pomoc, Instaluj (3 przyciski).
+- Rekordy, Ustawienia (2 przyciski).
+- Nowa gra, Kontynuuj (2 większe przyciski, ostatni rząd).
+
+Na komputerze zostaje oryginalny panel retro DOS, nagłówek, tekstowe skróty i 23 wiersze.
+Styl Matrix ma jasny akcent `#00FF41`; kolor przyjęty roboczo, bez potwierdzenia próbnikiem z załącznika.
+Pomoc i informacje grupuje zasady, prywatność/zapis lokalny, patronów/linki oraz licencje.
+Ustawienia zawierają język, styl, kontrast, dźwięk, animacje, rękę i usuwanie zapisu gry.
+Nowa gra otwiera wyłącznie wybór poziomu. Poziom jest niezależny od deklaracji wieku.
+
+### Deklaracja wieku
+
+Domyślnie <18; brak odpowiedzi oznacza ten sam wariant.
+Przejście na 18+ wymaga krótkiego potwierdzenia; wyłączenie jest natychmiastowe.
+Zapamiętujemy tylko deklarację lokalnie, bez daty urodzenia, dokumentów lub zewnętrznej weryfikacji.
+Restart odtwarza wybór, a usunięcie danych strony go resetuje.
+18+ włącza zwykłe linki patronów; poniżej 18 są same nazwy.
+Linki otwierają osobną kartę i nie przekazują referrera.
+To własne ustawienie ostrożnościowe, nie deklaracja prawnego obowiązku blokowania tych linków.
+Nie jest to zweryfikowany wiek ani zgoda rodzica. Treści i zasady gry pozostają neutralne dla wszystkich.
 
 ## Poziomy
 
@@ -32,7 +51,7 @@ Po sukcesie można wybrać kolejny poziom; nie ma osobnej automatycznej rangi.
 ## Treści i prywatność
 
 Wszystkie poziomy mają ten sam rodzinny zestaw treści: kakao zamiast tytoniu,
-bez alkoholu, broni i loterii. Patroni są stałym tekstem bez linków w grze.
+bez alkoholu, broni i loterii. Patroni są stali; ich linki działają wyłącznie po lokalnej deklaracji 18+.
 Nie ma kont, czatu, analityki graczy, płatności, profilowanych reklam, powiadomień,
 serii codziennych logowań ani kar za nieobecność. Hosting może rejestrować techniczne połączenia.
 
@@ -59,3 +78,5 @@ Testy obejmują silnik, poziomy, migrację, izolację profili, potwierdzenie nad
 jednokrotny zapis wyniku, wycenę akcji, odzyskiwanie bazy i instrukcję instalacji.
 Workflow `validate-retro.yml` sprawdza gałąź. Workflow Pages z `main` publikuje ją pod `/v2/`.
 Balans i zachowanie PWA na fizycznych urządzeniach nadal wymagają testów graczy.
+
+Zmiana menu zachowuje rejestr zakończonych rund i rekordy. Testy obejmują także kolejność rzędów, deklarację wieku, restart i brak linków w wariancie <18.

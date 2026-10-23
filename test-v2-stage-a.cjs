@@ -1,4 +1,4 @@
-// Simplified retro shell: levels, autosave, local profiles and automatic records.
+// Retro shell: single-player menu, remembered age declaration and legacy-save preservation.
 // Run with Node; no browser or dependencies required.
 const fs = require('node:fs');
 const path = require('node:path');
@@ -176,8 +176,8 @@ const shell = bootShell();
 desktopRows(shell);
 assert.equal(shell.db().profiles.length, 1);
 assert.equal(shell.db().profiles[0].name, 'Gracz 1');
-for (const action of ['new', 'cont', 'rec', 'set', 'help', 'about']) menuHas(shell, action);
-assert.ok(shell.el('#mobile').innerHTML.includes('v2-row2'));
+for (const action of ['new', 'cont', 'rec', 'set', 'help', 'age', 'install-app']) menuHas(shell, action);
+assert.ok(shell.el('#mobile').innerHTML.includes('v2-row-primary'));
 shell.ui.onAction('new');
 for (const [id] of levels) menuHas(shell, 'level-' + id);
 assert.doesNotMatch(shell.text(), /Rok urodzenia|PIN|inicjał|Rynek dnia|birth year|initials/i);
@@ -272,27 +272,23 @@ assert.equal(pendingResult.db().profiles[0].roundResults[oldRoundId].recorded, t
 pendingResult.ui.onAction('cont'); pendingResult.flush();
 assert.equal(pendingResult.db().profiles[0].records.handlarz.length, 1);
 
-// Optional profiles keep their own saves, selected difficulty, records and completion ledger.
-const family = bootShell(); family.start('handlarz'); family.flush();
-family.engine.getS().cash = 432;
-family.engine.render(); family.flush(); family.exit();
-const firstFamily = clone(family.db().profiles[0]);
-family.ui.onAction('set'); menuHas(family, 'profiles');
-family.ui.onAction('profiles'); family.ui.onAction('create');
-assert.equal(family.db().profiles.length, 2);
-assert.equal(family.db().active, 'p2');
-family.ui.onAction('menu'); family.ui.onAction('cont');
-assert.equal(family.ui.playing, false, 'A new profile cannot resume another profile');
-family.start('kupiec'); family.flush();
-assert.equal(family.engine.getS().v2Level, 'kupiec');
-family.finish();
-assert.equal(family.db().profiles[1].records.kupiec.length, 1);
-assert.deepEqual(family.db().profiles[0], firstFamily);
-family.ui.onAction('set'); family.ui.onAction('profiles'); family.ui.onAction('use-p1');
-family.ui.onAction('cont'); family.flush();
-assert.equal(family.engine.getS().cash, 432);
-assert.equal(family.engine.getS().v2Level, 'handlarz');
-assert.deepEqual(family.db().profiles[0].records, {});
+// Old profiles remain intact, but there is no profile creation or selection UI.
+const familyDb=meta.emptyDb(),oldFirst=meta.addProfile(familyDb),oldSecond=meta.addProfile(familyDb);
+oldFirst.slots.auto={state:meta.arm({...base(),cash:432},{level:'handlarz'}),date,at:1};
+oldSecond.slots.auto={state:meta.arm({...base(),cash:876},{level:'kupiec'}),date,at:2};
+oldFirst.records.handlarz=[{score:123,days:10,date}];familyDb.active=oldSecond.id;familyDb.legacy=true;
+const family=bootShell(new Map([['bx2r-db',JSON.stringify(familyDb)]]));
+assert.equal(family.db().profiles.length,2);
+assert.equal(family.db().active,oldSecond.id);
+family.ui.onAction('set');
+assert.doesNotMatch(family.el('#terminal').innerHTML,/data-ui-action="(?:profiles|create|rename|use-)/);
+family.ui.onAction('create');family.ui.onAction('use-'+oldFirst.id);
+assert.equal(family.db().profiles.length,2);
+assert.equal(family.db().active,oldSecond.id,'Removed actions cannot switch hidden legacy profiles');
+family.ui.onAction('cont');family.flush();
+assert.equal(family.engine.getS().cash,876,'Continue keeps the last active legacy game');
+assert.equal(family.engine.getS().v2Level,'kupiec');
+assert.deepEqual(family.db().profiles[0],familyDb.profiles[0],'Other legacy saves and records stay intact');
 
 // Invalid data keeps a recovery copy and never blocks a fresh game.
 for (const raw of ['{}', 'null', '{broken', '{"profiles":null}', '{"v":2,"seq":0,"profiles":[null]}']) {
@@ -334,7 +330,7 @@ help.context.BiznesPWA = {
   status: () => 'Offline ready', message: () => installMessage,
   install() { installMessage = 'INSTALL_HELP_SENTINEL'; help.engine.render(false); }
 };
-help.ui.onAction('set'); help.ui.onAction('install-app');
+help.ui.onAction('menu'); help.ui.onAction('install-app');
 assert.ok(help.text().includes('INSTALL_HELP_SENTINEL'));
 assert.ok(help.el('#mobile').innerHTML.includes('INSTALL_HELP_SENTINEL'));
 
@@ -346,7 +342,7 @@ for (const [id] of levels) {
 layout.store.set('bx2r-db', JSON.stringify(layoutDb));
 for (const lang of ['pl', 'en']) {
   layout.engine.setLang(lang);
-  for (const screen of ['menu', 'new', 'set', 'help', 'about', 'rec']) {
+  for (const screen of ['menu', 'new', 'set', 'help', 'play', 'about', 'patrons', 'licenses', 'rec']) {
     layout.ui.onAction(screen); desktopRows(layout);
   }
   for (const [id] of levels) {
@@ -358,7 +354,7 @@ for (const lang of ['pl', 'en']) {
   layout.ui.onAction('style');
   assert.notEqual(layout.context.document.body.dataset.font, beforeStyle, 'Changing style repaints immediately');
   layout.ui.onAction('wipe'); desktopRows(layout);
-  layout.ui.onAction('back'); menuHas(layout, 'install-app');
+  layout.ui.onAction('back'); menuHas(layout, 'wipe');
   assert.deepEqual(layout.db().profiles[0].records, layoutDb.profiles[0].records, 'Cancelling deletion preserves records');
 }
 
@@ -378,4 +374,51 @@ const sw = source('sw.js');
 assert.match(sw, /biznes-2-retro-/);
 assert.ok(sw.includes('assets/v2meta.js') && sw.includes('assets/v2ui.js'));
 assert.equal(source('classic/game.js').includes('bx2r-'), false);
-console.log('PASS simplified retro: three levels, autosave, confirmation, profiles, records, migration, dedupe, recovery, family content and install help.');
+
+// The three dock rows end with New game / Continue, including left-hand mode.
+const dock=bootShell();
+for(const hand of ['right','left']){
+ dock.engine.setHand(hand);dock.ui.onAction('menu');
+ const html=dock.el('#mobile').innerHTML;
+ const rows=[...html.matchAll(/<div class="v2-row ([^"]+)">([\s\S]*?)<\/div>/g)];
+ assert.equal(rows.length,3);
+ const ids=rows.map(r=>[...r[2].matchAll(/data-ui-action="([^"]+)"/g)].map(m=>m[1]));
+ assert.deepEqual(ids,[['age','help','install-app'],['rec','set'],['new','cont']]);
+ assert.match(html,/mobile-manifest/);
+ desktopRows(dock);
+}
+dock.ui.onAction('help');
+for(const action of ['play','about','patrons','licenses'])menuHas(dock,action);
+dock.ui.onAction('about');dock.ui.onAction('back');menuHas(dock,'play');
+dock.ui.onAction('set');
+assert.doesNotMatch(dock.el('#terminal').innerHTML,/data-ui-action="(?:profiles|play|about|patrons|licenses)"/);
+
+// Age is a local declaration, never a game difficulty or a verified identity.
+const age=bootShell(),ageApi=age.ui;
+assert.equal(ageApi.adult(),false);
+assert.doesNotMatch(age.el('#mobile').innerHTML,/href=/);
+ageApi.onAction('age');desktopRows(age);
+assert.equal(ageApi.adult(),false);
+ageApi.onAction('back');
+assert.equal(ageApi.adult(),false);
+ageApi.onAction('age');ageApi.onAction('confirm-yes');
+assert.equal(ageApi.adult(),true);
+assert.equal(age.store.get('bx2r-adult'),'on');
+assert.match(age.el('#mobile').innerHTML,/referrerpolicy="no-referrer"/);
+assert.match(age.el('#terminal').innerHTML,/href="https:\/\/lcse.pl"/);
+const restart=bootShell(age.store);
+assert.equal(restart.ui.adult(),true);
+restart.start('magnat');restart.flush();
+const beforeAgeChange=clone(restart.engine.getS());
+assert.match(restart.el('#mobile').innerHTML,/href=/);
+restart.exit();restart.ui.onAction('age');
+assert.equal(restart.ui.adult(),false);
+assert.doesNotMatch(restart.el('#mobile').innerHTML,/href=/);
+assert.deepEqual(restart.db().profiles[0].slots.auto.state,beforeAgeChange);
+restart.ui.onAction('cont');restart.flush();
+assert.doesNotMatch(restart.el('#mobile').innerHTML,/href=/);
+assert.deepEqual(clone(restart.engine.getS()),meta.resumeState(beforeAgeChange,restart.db().profiles[0]),'Age does not change resumed game state');
+assert.equal(bootShell(restart.store).ui.adult(),false);
+assert.equal(source('style.css').includes("body[data-font='matrix']{--yellow:#00ff41}"),true);
+console.log('PASS retro menu: dock rows, legacy saves, age confirmation/persistence, links, Help, levels, records and recovery.');
+

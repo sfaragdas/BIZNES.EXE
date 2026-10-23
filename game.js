@@ -50,6 +50,7 @@ const money=n=>`${Number(n).toFixed(2)} $`, esc=s=>String(s).replace(/[&<>"]+/g,
 const actionToken=(id,key,label,hot=0)=>`[[${id}|${key}|${label}|${hot}]]`;
 function save(){S.bank=S.banks.reduce((a,b)=>a+b,0);const status=document.querySelector('#save-status');if(v2()){if(v2().playing&&typeof v2().onSave==='function')v2().onSave(S);if(status)status.textContent=t('Saved locally','Zapisano lokalnie');return}localStorage.setItem('bx-save',JSON.stringify(S));status.textContent=t('Saved locally','Zapisano lokalnie')}
 function safeContent(){return !!v2()}
+function patronLink(name,url){return v2()&&!v2().adult?.()?esc(name):`<a class="sponsor-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">${esc(name)}</a>`}
 function banksEnabled(){return !v2()||(S.v2Banks??S.v2Level!=='handlarz')}
 function stocksEnabled(){return !v2()||(S.v2Stocks??(S.v2Level==='magnat'?10:0))>0}
 function debtMaxRate(s=S){return v2()?Math.max(1,Math.min(30,s.v2DebtMaxRate??({handlarz:3,kupiec:10,magnat:30}[s.v2Level]??30))):30}
@@ -71,8 +72,8 @@ function frame(rows){
       html=` <span class="welcomepanel${edge?' panel-edge':''}">${esc(text)}</span> `;
     }
     html=html.replace(/\[\[([^|]+)\|([^|]+)\|([^|]+)(?:\|([^\]]+))?\]\]/g,(_,id,key,label,hot='0')=>{const n=Math.max(0,Math.min(label.length-1,Number(hot)||0));return `<button class="terminal-action" data-ui-action="${esc(id)}" data-hotkey="${esc(key)}">${esc(label.slice(0,n))}<span class="key">${esc(label.slice(n,n+1))}</span>${esc(label.slice(n+1))}</button>`});
-    const link=(name,url)=>safeContent()?esc(name):`<a class="sponsor-link" href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`;
-    const sponsorCell=safeContent()?esc(patronLabel()):link(SPONSORS[sponsorIndex][0],SPONSORS[sponsorIndex][1]),sponsorLinks=[...SPONSORS].reverse().map(([name,url])=>link(name,url)).join('    ');
+    const link=patronLink;
+    const sponsorCell=v2()?SPONSORS.map(([name,url])=>link(name,url)).join(' / '):link(SPONSORS[sponsorIndex][0],SPONSORS[sponsorIndex][1]),sponsorLinks=[...SPONSORS].reverse().map(([name,url])=>link(name,url)).join('    ');
     html=html.replace(/\{LANG\}/g,`<button class="frame-control" data-frame-action="language">L/${lang==='pl'?'EN':'PL'}</button>`).replace(/\{SPONSOR\}/g,sponsorCell).replace(/\{SPONSOR_LINKS\}/g,sponsorLinks).replace(/BIZNES\.EXE/g,'<span class="accent">BIZNES.EXE</span>').replace(/\{([A-Z])\}/g,'<span class="key">$1</span>').replace(/(\$\s*)([\d,]+(?:\.\d{2})?)/g,'$1<span class="accent">$2</span>').replace(/([\d,]+(?:\.\d{2})?)(\s*\$)/g,'<span class="accent">$1</span>$2');
     if(view==='home'&&i===16){const city=cities()[S.city];html=html.replace(esc(city),`<span class="accent">${esc(city)}</span>`)}
 
@@ -198,9 +199,9 @@ const M=document.querySelector('#mobile');
 const mobileButton=(id,label,extra='')=>`<button type="button" data-ui-action="${esc(id)}" ${extra}>${esc(label)}</button>`;
 const mobileCancel=()=>mobileButton('cancel',t('Esc · Cancel','Esc · Anuluj'));
 function mobileView(){
-  const links=safeContent()?[...SPONSORS].reverse().map(([name])=>esc(name)).join('    '):[...SPONSORS].reverse().map(([name,url])=>`<a href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`).join('    ');
+  const links=[...SPONSORS].reverse().map(([name,url])=>patronLink(name,url)).join('    ');
   const [sponsorName,sponsorUrl]=SPONSORS[sponsorIndex];
-  const sponsorMark=safeContent()?esc(patronLabel()):`<a href="${sponsorUrl}" target="_blank" rel="noopener noreferrer">${sponsorName}</a>`;
+  const sponsorMark=v2()?SPONSORS.map(([name,url])=>patronLink(name,url)).join(' / '):patronLink(sponsorName,sponsorUrl);
   const head=`<header class="mobile-head"><div class="mobile-brand"><strong>BIZNES.EXE</strong>${view==='home'?`<span class="mobile-city">${esc(cities()[S.city])}</span>`:''}</div><nav class="mobile-sponsors" aria-label="${t('Patrons','Patroni')}">${sponsorMark}</nav>${mobileButton('language',lang==='pl'?'EN':'PL',`aria-label="${t('Switch language','Zmień język')}"`)}</header>`;
   if(view==='welcome')return head+`<section class="mobile-list mobile-welcome"><div class="mobile-manifest"><h1>${t('Small game. Big business.','Mała gra. Wielki biznes.')}</h1><p>${t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.')}</p><p>${t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:')}<br>Biznesman (1988), M. Cwynar / SAMBA.</p><p>${t('Project patrons','Patroni projektu')}:<br>${links}</p></div><h2>${t('How to play','Jak grać')}</h2>${instructions().map(([text])=>`<p>${text}</p>`).join('')}</section>${pwaMessage()?`<p class="install-help" role="status">${esc(pwaMessage())}</p>`:''}<small class="mobile-status"><span>${RELEASE}</span><span>${esc(statusText())}</span></small><section class="mobile-dock mobile-welcome-dock"><div class="mobile-hand-row">${mobileButton('hand-toggle',handedness==='right'?t('Left-handed','Leworęczny'):t('Right-handed','Praworęczny'))}<span>${handedness==='right'?t('Right-handed ✓','Praworęczny ✓'):t('Left-handed ✓','Leworęczny ✓')}</span></div><div class="mobile-font-row">${mobileButton('install-app',t('Install app','Zainstaluj'))}${mobileButton('font-toggle',t('Style: ','Styl: ')+styleName())}</div><div class="mobile-primary-row">${mobileButton('new-game',t('New game','Nowa gra'))}${mobileButton('welcome-continue',t('Continue','Kontynuuj'),'class="mobile-confirm"')}</div></section>`;
   const bank=table==='banks',totals={goods:S.cargo.reduce((n,q,i)=>n+q*S.prices[i],0),shares:S.shares.reduce((n,q,i)=>n+q*stockPrice(i),0),bank:S.bank};

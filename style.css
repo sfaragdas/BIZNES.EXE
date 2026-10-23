@@ -139,7 +139,7 @@ body[data-hand='left'] #journey-dialog button{margin-left:0;margin-right:auto}
 .mobile-notice.has-message{color:var(--yellow)}
 #mobile>.install-help{flex:none;max-height:24dvh;overflow:auto;margin:0;padding:8px;border:0;border-top:1px dashed var(--dim);font-size:.85em}
 
-body[data-font='matrix']{--yellow:#008f39}
+body[data-font='matrix']{--yellow:#00ff41}
 body[data-font='matrix'] pre,body[data-font='matrix'] #mobile{font-family:'DOS PL',monospace;font-synthesis:none}
 @media(max-width:900px){
   body[data-font='matrix'] #mobile{font-size:15px}
@@ -182,3 +182,17 @@ pre .footer-status{justify-content:space-between}
 
 @keyframes v2-result-in{from{opacity:.4}to{opacity:1}}
 @media(prefers-reduced-motion:no-preference){.v2-result-motion{animation:v2-result-in .2s ease-out}}
+
+/* Original welcome panel and three menu rows; primary actions are last. */
+pre .v2-choice-on{background:#181800}
+body[data-contrast='on'] pre .v2-choice-on{background:var(--fg);color:#000}
+@media(max-width:900px){
+ .v2-menu-dock .v2-row{display:grid;gap:8px;margin:0 0 8px}
+ .v2-menu-dock .v2-row-short{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .v2-menu-dock .v2-row-secondary,.v2-menu-dock .v2-row-primary{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .v2-menu-dock .v2-row-primary{margin-bottom:0}
+ #mobile .v2-menu-dock .v2-row-primary button{min-height:52px}
+ #mobile .v2-menu-dock .v2-row-short button{font-size:.85em}
+ #mobile .v2-menu-dock [aria-pressed=true]{border-color:var(--yellow)}
+ #mobile .mobile-manifest .sponsor-link{color:#000;text-decoration:underline}
+}
