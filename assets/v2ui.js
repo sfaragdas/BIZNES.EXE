@@ -109,11 +109,11 @@ function paint(){
  const button=(a,desktop=false)=>`<button type="button" class="${desktop?'terminal-action'+(menu&&a===acts[ui.sel]?' v2-choice-on':''):a.id==='cont'?'mobile-confirm':''}" data-ui-action="${esc(a.id)}" data-hotkey="${esc(a.key)}"${a.id==='age'?` aria-pressed="${adult()}"`:''}>${desktop?'<span class="key">['+esc(a.key)+']</span> '+esc(a.text):esc(a.text)}</button>`;
  let rows;
  if(menu){
-  const center=text=>' '.repeat(Math.max(0,Math.floor((78-text.length)/2)))+esc(text);
-  const panel=text=>`<span class="welcomepanel">${esc(text)}</span>`;
-  rows=[desktopHeader(),'','',panel('*'.repeat(76)),panel(t('Small game. Big business.','Mała gra. Wielki biznes.')),panel(t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.')),panel(t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:')),panel('Biznesman (1988), M. Cwynar / SAMBA.'),panel(t('Project patrons:','Patroni projektu:')),`<span class="welcomepanel" data-static-patrons>${patrons(true)}</span>`,panel('*'.repeat(76)),center(t('How to play','Jak grać')),...miniHelp().map(center),ui.note?esc(ui.note):center(body[0])];
+  const left=text=>'  '+esc(text);
+  const panel=text=>`<span class="welcomepanel${text.startsWith('*')?' panel-edge':''}">${esc(text)}</span>`;
+  rows=[desktopHeader(),'','',panel('*'.repeat(76)),panel(t('Small game. Big business.','Mała gra. Wielki biznes.')),panel(t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.')),panel(t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:')),panel('Biznesman (1988), M. Cwynar / SAMBA.'),panel(t('Project patrons:','Patroni projektu:')),`<span class="welcomepanel" data-static-patrons>${patrons(true)}</span>`,panel('*'.repeat(76)),left(t('How to play','Jak grać')),...miniHelp().map(left),ui.note?left(ui.note):left(body[0])];
   const by=id=>acts.find(a=>a.id===id);
-  rows.push(['age','help','install-app'].map(id=>button(by(id),true)).join('    '),center(body[1]),['rec','set'].map(id=>button(by(id),true)).join('    '),['new','cont'].map(id=>button(by(id),true)).join('    '),helpLinks().map(a=>`<button type="button" class="terminal-action v2-text-link" data-ui-action="${a.id}" data-hotkey="${a.key}">${esc(a.text)}</button>`).join(' | '));
+  rows.push(['age','help','install-app'].map(id=>button(by(id),true)).join('    '),left(body[1]),['rec','set'].map(id=>button(by(id),true)).join('    '),['new','cont'].map(id=>button(by(id),true)).join('    '),helpLinks().map(a=>`<button type="button" class="terminal-action v2-text-link" data-ui-action="${a.id}" data-hotkey="${a.key}">${esc(a.text)}</button>`).join(' | '));
  }else{
   rows=[desktopHeader(),esc(nameOfScreen()),...wrapped(body).slice(0,Math.max(1,22-2-1-acts.length-2-(ui.note?1:0))).map(esc)];
   if(ui.note)rows.push(esc(ui.note));rows.push('');acts.forEach((a,i)=>rows.push((ui.sel===i?'&gt; ':'  ')+button(a,true)));rows.push('',button(act('back','ESC',t('Back','Wstecz')),true));

@@ -212,3 +212,7 @@ pre .desktop-header{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2f
 .desktop-header .header-brand{justify-self:start;white-space:nowrap}
 .desktop-header .header-patrons{justify-self:stretch;text-align:center;min-width:0;white-space:nowrap}
 .desktop-header .header-language{justify-self:end;text-align:right;white-space:nowrap}
+
+/* Welcome copy and its quick instructions share a left margin. */
+pre .panel-row .welcomepanel:not(.panel-edge){text-align:left;padding-inline:2ch}
+.mobile-manifest,.v2-mini-help{text-align:left}
