@@ -121,7 +121,7 @@ assert.equal(meta.wealth(restored), meta.wealth(restricted), 'Unavailable holdin
 assert.equal(meta.resumeState({ ...restricted, cargo: null }, first), null);
 
 function bootShell(store = new Map()) {
-  const elements = {}, zeroTimers = [], legacyWrites = [];
+  const elements = {}, zeroTimers = [], legacyWrites = [], intervals = [];
   function el(id) {
     if (!elements[id]) {
       const e = {
@@ -138,7 +138,7 @@ function bootShell(store = new Map()) {
     return elements[id];
   }
   const context = {
-    setTimeout(fn, delay) { if (!delay) zeroTimers.push(fn); return 0; }, setInterval: () => 0, clearInterval() {},
+    setTimeout(fn, delay) { if (!delay) zeroTimers.push(fn); return 0; }, setInterval(fn, delay) { intervals.push({fn,delay}); return intervals.length; }, clearInterval() {},
     console, Date, matchMedia: () => ({ matches: false }),
     document: { body: { dataset: {} }, hidden: false, activeElement: null, querySelector: el, querySelectorAll: () => [], addEventListener() {} },
     localStorage: {
@@ -153,7 +153,7 @@ function bootShell(store = new Map()) {
   };
   vm.runInNewContext(['assets/v2meta.js', 'assets/v2ui.js', 'game.js'].map(source).join('\n'), context);
   return {
-    store, context, el, legacyWrites, ui: context.BX2, engine: context.BiznesGame,
+    store, context, el, legacyWrites, intervals, ui: context.BX2, engine: context.BiznesGame,
     db: () => JSON.parse(store.get('bx2r-db')),
     text: () => el('#terminal').textContent,
     flush() {
@@ -405,7 +405,7 @@ ageApi.onAction('age');ageApi.onAction('confirm-yes');
 assert.equal(ageApi.adult(),true);
 assert.equal(age.store.get('bx2r-adult'),'on');
 assert.match(age.el('#mobile').innerHTML,/referrerpolicy="no-referrer"/);
-assert.match(age.el('#terminal').innerHTML,/href="https:\/\/lcse.pl"/);
+assert.match(age.el('#terminal').innerHTML,/href="https:\/\/(?:lcse|mojedostawy|sejmpage).pl"/);
 const restart=bootShell(age.store);
 assert.equal(restart.ui.adult(),true);
 restart.start('magnat');restart.flush();
@@ -422,3 +422,44 @@ assert.equal(bootShell(restart.store).ui.adult(),false);
 assert.equal(source('style.css').includes("body[data-font='matrix']{--yellow:#00ff41}"),true);
 console.log('PASS retro menu: dock rows, legacy saves, age confirmation/persistence, links, Help, levels, records and recovery.');
 
+
+// Actual engine click routing must open install help, not silently leave the menu.
+const installClicks=bootShell();let installationCalls=0,installationText='';
+installClicks.context.BiznesPWA={
+ status:()=> 'Offline ready',message:()=>installationText,
+ install(){installationCalls++;installationText='INSTALL_FROM_CLICK';installClicks.engine.render(false);}
+};
+for(const root of ['#terminal','#mobile']){
+ installClicks.ui.onAction('menu');
+ installClicks.el(root).handlers.click({target:{closest(selector){return selector==='[data-ui-action]'?{dataset:{uiAction:'install-app'}}:null}}});
+ assert.match(installClicks.text(),/INSTALL_FROM_CLICK/);
+ assert.match(installClicks.el('#mobile').innerHTML,/INSTALL_FROM_CLICK/);
+}
+assert.equal(installationCalls,2,'Each actual click reaches installation exactly once');
+installClicks.ui.onAction('menu');installClicks.ui.onKey('I');
+assert.equal(installationCalls,3,'Keyboard uses the same path');
+
+// Rotation covers all three patrons using distinct pairs and never changes game state.
+const rotation=bootShell();
+assert.deepEqual(Array.from(rotation.engine.sponsors(),p=>p[0]).sort(),['LCSE.pl','MojeDostawy.pl','SejmPage.pl']);
+const seenPatrons=new Set(),pairs=new Set(),rotationTick=rotation.intervals.find(i=>i.delay===12000);
+assert.ok(rotationTick,'A patron rotation timer is registered');
+for(let i=0;i<3;i++){
+ const names=Array.from(rotation.ui.patrons(),p=>p[0]);
+ assert.equal(names.length,2);assert.equal(new Set(names).size,2);
+ names.forEach(n=>seenPatrons.add(n));pairs.add(names.slice().sort().join('|'));
+ rotationTick.fn();
+}
+assert.equal(seenPatrons.size,3);assert.equal(pairs.size,3);
+const beforeHidden=JSON.stringify(rotation.ui.patrons());
+rotation.context.document.hidden=true;rotationTick.fn();
+assert.equal(JSON.stringify(rotation.ui.patrons()),beforeHidden);
+rotation.context.document.hidden=false;rotation.start('magnat');rotation.flush();
+const beforeRotation=clone(rotation.engine.getS());rotationTick.fn();
+assert.deepEqual(clone(rotation.engine.getS()),beforeRotation,'UI rotation cannot change prices, inventory, seed or cash');
+rotation.exit();rotation.ui.onAction('menu');
+assert.match(rotation.text(),/Kupuj tanio/);
+assert.match(rotation.text(),/Pożyczka/);
+assert.match(rotation.el('#mobile').innerHTML,/v2-help-links/);
+for(const action of ['play','about','patrons','licenses'])menuHas(rotation,action);
+desktopRows(rotation);

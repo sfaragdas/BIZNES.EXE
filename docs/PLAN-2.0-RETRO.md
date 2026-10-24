@@ -80,3 +80,9 @@ Workflow `validate-retro.yml` sprawdza gałąź. Workflow Pages z `main` publiku
 Balans i zachowanie PWA na fizycznych urządzeniach nadal wymagają testów graczy.
 
 Zmiana menu zachowuje rejestr zakończonych rund i rekordy. Testy obejmują także kolejność rzędów, deklarację wieku, restart i brak linków w wariancie <18.
+
+## Poprawki 2026.10.24
+
+- Dodano SejmPage.pl. Losowana jest początkowa kolejność trzech patronów, wyświetlane są dwie różne nazwy naraz. Para zmienia się co 12 sekund, bez ingerencji w stan gry i pola transakcji. Przy ukrytej karcie rotacja jest wstrzymana.
+- Wróciła miniinstrukcja na powitanie. Pełna instrukcja, Prywatność, Patroni oraz O grze i licencje są dostępne także przez tekstowe linki nad dolnym panelem na telefonie i w dolnym wierszu terminala.
+- Instalacja przechodzi przez jeden handler zarówno z kliknięcia, jak i klawiatury. Wyświetla systemowy prompt, jeśli przeglądarka go udostępniła; w pozostałych przypadkach pokazuje instrukcję dla danej przeglądarki. Obsługiwane są anulowanie, błąd promptu i już dodana aplikacja.

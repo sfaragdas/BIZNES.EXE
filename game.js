@@ -20,14 +20,15 @@ const EVENTS=[
 ['TEA','Szkodniki zniszczyły liście herbaty.','Pests damaged your tea leaves.'],['TOBACCO','Plaga uszkodziła liście tytoniu.','A blight damaged your tobacco leaves.'],
 ['TAX','Podatek od przewożonych towarów.','A tax on transported goods.'],['FIND','Znalazłeś pieniądze w drodze.','You found money along the way.']];
 const T=document.querySelector('#terminal'),D=document.querySelector('#journey-dialog');
-const SPONSORS=[['MojeDostawy.pl','https://mojedostawy.pl'],['LCSE.pl','https://lcse.pl']];
+const SPONSORS=[['MojeDostawy.pl','https://mojedostawy.pl'],['LCSE.pl','https://lcse.pl'],...(v2()?[['SejmPage.pl','https://sejmpage.pl']]:[])];
+const displayedPatrons=()=>v2()?.patrons?.()||SPONSORS;
 let eventPopup=false;
 let handedness=(localStorage.getItem('bx2r-hand')||localStorage.getItem('bx-hand'))==='left'?'left':'right';
 const STYLES=[{id:'current',name:'Standard'},{id:'retro',name:'DOS'},{id:'matrix',name:'Matrix'}];
 let sponsorIndex=0,fontStyle=localStorage.getItem('bx2r-style')||localStorage.getItem('bx-style')||localStorage.getItem('bx-font')||'current';
 if(!STYLES.some(style=>style.id===fontStyle))fontStyle='current';
 const styleName=()=>STYLES.find(style=>style.id===fontStyle).name;
-const RELEASE=v2()?'2.0 retro · PREVIEW 2026.10.22':'BETA · 2026.10.20';
+const RELEASE=v2()?'2.0 retro · PREVIEW 2026.10.24':'BETA · 2026.10.20';
 let lang=localStorage.getItem('bx2r-lang')||localStorage.getItem('bx-lang')||'pl',view='welcome',notice='',selected=0,input='',step='',mode='',table='goods';
 const t=(en,pl)=>lang==='pl'?pl:en, goods=()=>lang==='pl'?GOODS:GEN, cities=()=>{const all=lang==='pl'?C:CEN;return all.slice(0,S.v2Cities??all.length)}, banks=()=>lang==='pl'?BANKS:BANKSEN;
 const fresh=()=>({schema:2,debtRate:5+(Date.now()>>>0)%6,cash:1000,bank:0,debt:25000,city:0,day:1,cargo:Array(10).fill(0),shares:Array(10).fill(0),banks:Array(6).fill(0),prices:[...BASE],stockPrices:Array.from({length:10},(_,i)=>80+((17+i*31)%90)),rng:(Date.now()>>>0)||42,alive:true,seed:Date.now()>>>0});
@@ -54,7 +55,7 @@ function patronLink(name,url){return v2()&&!v2().adult?.()?esc(name):`<a class="
 function banksEnabled(){return !v2()||(S.v2Banks??S.v2Level!=='handlarz')}
 function stocksEnabled(){return !v2()||(S.v2Stocks??(S.v2Level==='magnat'?10:0))>0}
 function debtMaxRate(s=S){return v2()?Math.max(1,Math.min(30,s.v2DebtMaxRate??({handlarz:3,kupiec:10,magnat:30}[s.v2Level]??30))):30}
-function patronLabel(){return safeContent()?SPONSORS.map(([name])=>name).join(' / '):SPONSORS[sponsorIndex][0]}
+function patronLabel(){return safeContent()?displayedPatrons().map(([name])=>name).join(' / '):SPONSORS[sponsorIndex][0]}
 function used(){return S.cargo.reduce((a,b)=>a+b,0)}
 function rand(n){S.rng^=S.rng<<13;S.rng^=S.rng>>>17;S.rng^=S.rng<<5;return(S.rng>>>0)%n}
 function visibleText(s){return s.replace(/\{(?:LEFT|MID|RIGHT|END|CITYROW|CITYEND)\}/g,'').replace(/\{AMOUNT\}/g,' '.repeat(10)).replace(/\{SPONSOR_LINKS\}/g,'LCSE.pl    MojeDostawy.pl').replace(/\{LANG\}/g,lang==='pl'?'L/EN':'L/PL').replace(/\{SPONSOR\}/g,patronLabel()).replace(/\{([A-Z])\}/g,'$1').replace(/\[\[([^|]+)\|([^|]+)\|([^|]+)(?:\|([^\]]+))?\]\]/g,'$3')}
@@ -73,7 +74,7 @@ function frame(rows){
     }
     html=html.replace(/\[\[([^|]+)\|([^|]+)\|([^|]+)(?:\|([^\]]+))?\]\]/g,(_,id,key,label,hot='0')=>{const n=Math.max(0,Math.min(label.length-1,Number(hot)||0));return `<button class="terminal-action" data-ui-action="${esc(id)}" data-hotkey="${esc(key)}">${esc(label.slice(0,n))}<span class="key">${esc(label.slice(n,n+1))}</span>${esc(label.slice(n+1))}</button>`});
     const link=patronLink;
-    const sponsorCell=v2()?SPONSORS.map(([name,url])=>link(name,url)).join(' / '):link(SPONSORS[sponsorIndex][0],SPONSORS[sponsorIndex][1]),sponsorLinks=[...SPONSORS].reverse().map(([name,url])=>link(name,url)).join('    ');
+    const sponsorCell=v2()?'<span data-patrons>'+displayedPatrons().map(([name,url])=>link(name,url)).join(' / ')+'</span>':link(SPONSORS[sponsorIndex][0],SPONSORS[sponsorIndex][1]),sponsorLinks=[...SPONSORS].reverse().map(([name,url])=>link(name,url)).join('    ');
     html=html.replace(/\{LANG\}/g,`<button class="frame-control" data-frame-action="language">L/${lang==='pl'?'EN':'PL'}</button>`).replace(/\{SPONSOR\}/g,sponsorCell).replace(/\{SPONSOR_LINKS\}/g,sponsorLinks).replace(/BIZNES\.EXE/g,'<span class="accent">BIZNES.EXE</span>').replace(/\{([A-Z])\}/g,'<span class="key">$1</span>').replace(/(\$\s*)([\d,]+(?:\.\d{2})?)/g,'$1<span class="accent">$2</span>').replace(/([\d,]+(?:\.\d{2})?)(\s*\$)/g,'<span class="accent">$1</span>$2');
     if(view==='home'&&i===16){const city=cities()[S.city];html=html.replace(esc(city),`<span class="accent">${esc(city)}</span>`)}
 
@@ -201,7 +202,7 @@ const mobileCancel=()=>mobileButton('cancel',t('Esc · Cancel','Esc · Anuluj'))
 function mobileView(){
   const links=[...SPONSORS].reverse().map(([name,url])=>patronLink(name,url)).join('    ');
   const [sponsorName,sponsorUrl]=SPONSORS[sponsorIndex];
-  const sponsorMark=v2()?SPONSORS.map(([name,url])=>patronLink(name,url)).join(' / '):patronLink(sponsorName,sponsorUrl);
+  const sponsorMark=v2()?'<span data-patrons>'+displayedPatrons().map(([name,url])=>patronLink(name,url)).join(' / ')+'</span>':patronLink(sponsorName,sponsorUrl);
   const head=`<header class="mobile-head"><div class="mobile-brand"><strong>BIZNES.EXE</strong>${view==='home'?`<span class="mobile-city">${esc(cities()[S.city])}</span>`:''}</div><nav class="mobile-sponsors" aria-label="${t('Patrons','Patroni')}">${sponsorMark}</nav>${mobileButton('language',lang==='pl'?'EN':'PL',`aria-label="${t('Switch language','Zmień język')}"`)}</header>`;
   if(view==='welcome')return head+`<section class="mobile-list mobile-welcome"><div class="mobile-manifest"><h1>${t('Small game. Big business.','Mała gra. Wielki biznes.')}</h1><p>${t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.')}</p><p>${t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:')}<br>Biznesman (1988), M. Cwynar / SAMBA.</p><p>${t('Project patrons','Patroni projektu')}:<br>${links}</p></div><h2>${t('How to play','Jak grać')}</h2>${instructions().map(([text])=>`<p>${text}</p>`).join('')}</section>${pwaMessage()?`<p class="install-help" role="status">${esc(pwaMessage())}</p>`:''}<small class="mobile-status"><span>${RELEASE}</span><span>${esc(statusText())}</span></small><section class="mobile-dock mobile-welcome-dock"><div class="mobile-hand-row">${mobileButton('hand-toggle',handedness==='right'?t('Left-handed','Leworęczny'):t('Right-handed','Praworęczny'))}<span>${handedness==='right'?t('Right-handed ✓','Praworęczny ✓'):t('Left-handed ✓','Leworęczny ✓')}</span></div><div class="mobile-font-row">${mobileButton('install-app',t('Install app','Zainstaluj'))}${mobileButton('font-toggle',t('Style: ','Styl: ')+styleName())}</div><div class="mobile-primary-row">${mobileButton('new-game',t('New game','Nowa gra'))}${mobileButton('welcome-continue',t('Continue','Kontynuuj'),'class="mobile-confirm"')}</div></section>`;
   const bank=table==='banks',totals={goods:S.cargo.reduce((n,q,i)=>n+q*S.prices[i],0),shares:S.shares.reduce((n,q,i)=>n+q*stockPrice(i),0),bank:S.bank};
@@ -382,7 +383,7 @@ function select(id){
   if(!banksEnabled()&&(['bank','deposit','withdraw'].includes(id)||id.startsWith('bank-')))return;
   if(!stocksEnabled()&&(id==='shares'||id.startsWith('stock-')))return;
   if(eventPopup){eventPopup=false;D?.close?.();if(id==='close-event'){render(false);return}}
-  if(id==='install-app'){if(typeof window!=='undefined')window.BiznesPWA?.install();return}
+  if(id==='install-app'){if(v2()?.onInstall){v2().onInstall();return}if(typeof window!=='undefined')window.BiznesPWA?.install();return}
   if(id==='language'){lang=lang==='pl'?'en':'pl';notice='';localStorage.setItem(v2()?'bx2r-lang':'bx-lang',lang);render();return}
   if(view==='welcome'){
     if(v2()&&typeof v2().onAction==='function'){v2().onAction(id);return}

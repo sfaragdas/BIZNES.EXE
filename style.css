@@ -196,3 +196,11 @@ body[data-contrast='on'] pre .v2-choice-on{background:var(--fg);color:#000}
  #mobile .v2-menu-dock [aria-pressed=true]{border-color:var(--yellow)}
  #mobile .mobile-manifest .sponsor-link{color:#000;text-decoration:underline}
 }
+
+/* Compact help links stay separate from the pinned game actions. */
+pre .v2-text-link{text-decoration:underline;text-underline-offset:2px}
+@media(max-width:900px){
+ .v2-mini-help h2{color:var(--yellow)}
+ .v2-help-links{display:flex;flex-wrap:wrap;justify-content:center;gap:0 12px;flex:none;padding:0 2px}
+ #mobile .v2-help-links button{background:transparent;border:0;box-shadow:none;color:var(--dim);text-decoration:underline;font-size:.8em;min-height:36px;padding:4px 0}
+}

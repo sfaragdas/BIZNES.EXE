@@ -25,3 +25,4 @@ jobs:
           node test-game.cjs
           node test-classic.cjs
           node test-v2-stage-a.cjs
+          node test-pwa.cjs

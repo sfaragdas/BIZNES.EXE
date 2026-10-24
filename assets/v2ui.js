@@ -1,7 +1,7 @@
 (()=>{
 'use strict';
 const meta=globalThis.BiznesMeta;if(!meta||typeof document==='undefined')return;
-const DB='bx2r-db',REL='2.0 retro · PREVIEW 2026.10.22';
+const DB='bx2r-db',REL='2.0 retro · PREVIEW 2026.10.24';
 const ui={screen:'menu',sel:0,note:'',pending:null,result:null,recLevel:'handlarz'};
 const g=()=>globalThis.BiznesGame,t=(en,pl)=>g()?.lang==='en'?en:pl;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -14,7 +14,36 @@ function saveDb(db){try{localStorage.setItem(DB,JSON.stringify(db));return true}
 function loadDb(){let raw;try{raw=localStorage.getItem(DB);if(raw){const db=JSON.parse(raw);if(meta.validDb(db))return meta.migrate(db);throw Error('Invalid database')}}catch{if(raw)try{localStorage.setItem(DB+'-backup',raw)}catch{}ui.note=t('Invalid save. A recovery copy was attempted.','Nieprawidłowy zapis. Podjęto próbę zachowania kopii.')}const db=meta.emptyDb();meta.addProfile(db,{name:'Gracz 1'});return db}
 let ageEnabled=flag('adult');
 const adult=()=>ageEnabled;
-const patrons=()=>g().sponsors().map(([name,url])=>adult()?`<a class="sponsor-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">${esc(name)}</a>`:esc(name)).join(' · ');
+let patronOrder=[],patronOffset=0;
+const visiblePatrons=()=>patronOrder.length?Array.from({length:Math.min(2,patronOrder.length)},(_,i)=>patronOrder[(patronOffset+i)%patronOrder.length]):g().sponsors().slice(0,2);
+const patrons=(all=false)=>(all?g().sponsors():visiblePatrons()).map(([name,url])=>adult()?`<a class="sponsor-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">${esc(name)}</a>`:esc(name)).join(' · ');
+function startPatrons(){
+ patronOrder=[...g().sponsors()];
+ for(let i=patronOrder.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[patronOrder[i],patronOrder[j]]=[patronOrder[j],patronOrder[i]]}
+ setInterval(()=>{
+  if(document.hidden||patronOrder.length<3||document.activeElement?.closest?.('[data-patrons]'))return;
+  patronOffset=(patronOffset+1)%patronOrder.length;
+  document.querySelectorAll('[data-patrons]').forEach(node=>{node.innerHTML=patrons()});
+ },12000);
+}
+const miniHelp=()=>[
+ t('Buy low and sell higher. Prices are fictional.','Kupuj tanio i sprzedawaj drożej. Ceny są fikcyjne.'),
+ t('Free trips change prices and may bring gains or losses.','Podróże są bezpłatne: zmieniają ceny i mogą przynieść zysk lub stratę.'),
+ t('Debt per trip: 1–3 / 1–10 / 1–30%, depending on difficulty.','Dług za wyjazd: 1–3 / 1–10 / 1–30%, zależnie od poziomu.'),
+ t('Loan: max 2,000 $ per operation. Reach the profit goal in time. Autosave.','Pożyczka: do 2 000 $ na operację. Zdobądź zysk w limicie dni. Autozapis.')
+];
+const helpLinks=()=>[
+ {id:'play',key:'1',text:t('Full instructions','Pełna instrukcja')},
+ {id:'about',key:'2',text:t('Privacy','Prywatność')},
+ {id:'patrons',key:'3',text:t('Patrons','Patroni')},
+ {id:'licenses',key:'4',text:t('About and licences','O grze i licencje')}
+];
+function installGame(){
+ open('install');
+ // Call directly in the click/keyboard gesture; do not route back through game.select.
+ const pwa=globalThis.BiznesPWA;
+ if(pwa?.install){Promise.resolve(pwa.install()).catch(()=>{}).finally(()=>{if(ui.screen==='install')paint()})}
+}
 const act=(id,key,text)=>({id,key,text});
 const nameOfScreen=()=>({menu:'BIZNES.EXE',levels:t('New game','Nowa gra'),set:t('Settings','Ustawienia'),rec:t('Records','Rekordy'),help:t('Help and information','Pomoc i informacje'),play:t('How to play','Jak grać'),about:t('Privacy and local saves','Prywatność i zapis lokalny'),patrons:t('Patrons and links','Patroni i linki'),licenses:t('About and licences','O grze i licencje'),install:t('Install / offline','Instalacja / offline'),result:t('Result','Wynik'),confirm:t('Confirm','Potwierdzenie')})[ui.screen]||'';
 function actions(){switch(ui.screen){
@@ -49,7 +78,8 @@ case 'about':return [
  t('External sites have their own privacy policies.','Zewnętrzne strony mają własne polityki prywatności.'),
  t('Old profiles remain in local data; the last selected save is used.','Dawne profile pozostają w danych lokalnych; używany jest ostatnio wybrany zapis.')];
 case 'patrons':return [
- t('Project patrons: MojeDostawy.pl and LCSE.pl.','Patroni projektu: MojeDostawy.pl i LCSE.pl.'),
+ t('Project patrons: MojeDostawy.pl, LCSE.pl and SejmPage.pl.','Patroni projektu: MojeDostawy.pl, LCSE.pl i SejmPage.pl.'),
+ t('Two patrons are shown at a time, rotating every 12 seconds.','Wyświetlamy dwóch patronów naraz; para zmienia się co 12 sekund.'),
  t('Below 18 / no declaration: names without links.','Poniżej 18 lat / brak deklaracji: nazwy bez linków.'),
  t('18+: external links enabled. This is our precautionary setting.','18+: włączone linki zewnętrzne. To nasze ustawienie ostrożnościowe.'),
  t('The declaration is not verified age, identity or parental consent.','Deklaracja nie jest potwierdzeniem wieku, tożsamości ani zgodą rodzica.'),
@@ -80,20 +110,19 @@ function paint(){
  if(menu){
   const center=text=>' '.repeat(Math.max(0,Math.floor((78-text.length)/2)))+esc(text);
   const panel=text=>`<span class="welcomepanel">${esc(text)}</span>`;
-  rows=[`<span class="accent">BIZNES.EXE</span>  ·  ${esc(t('Small game. Big business.','Mała gra. Wielki biznes.'))}  ${button(act('language','L','PL/EN'),true)}`,'','',panel('*'.repeat(76)),panel(t('Small game. Big business.','Mała gra. Wielki biznes.')),panel(t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.')),panel(t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:')),panel('Biznesman (1988), M. Cwynar / SAMBA.'),panel(t('Project patrons:','Patroni projektu:')),`<span class="welcomepanel">${patrons()}</span>`,panel('*'.repeat(76)),'',...body.map(center),'',ui.note?esc(ui.note):''];
-  while(rows.length<17)rows.push('');
+  rows=[`<span class="accent">BIZNES.EXE</span>  ·  ${esc(t('Small game. Big business.','Mała gra. Wielki biznes.'))}  ${button(act('language','L','PL/EN'),true)}`,'','',panel('*'.repeat(76)),panel(t('Small game. Big business.','Mała gra. Wielki biznes.')),panel(t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.')),panel(t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:')),panel('Biznesman (1988), M. Cwynar / SAMBA.'),panel(t('Project patrons:','Patroni projektu:')),`<span class="welcomepanel" data-patrons>${patrons()}</span>`,panel('*'.repeat(76)),center(t('How to play','Jak grać')),...miniHelp().map(center),ui.note?esc(ui.note):center(body[0])];
   const by=id=>acts.find(a=>a.id===id);
-  rows.push(['age','help','install-app'].map(id=>button(by(id),true)).join('    '),'',['rec','set'].map(id=>button(by(id),true)).join('    '),['new','cont'].map(id=>button(by(id),true)).join('    '),'');
+  rows.push(['age','help','install-app'].map(id=>button(by(id),true)).join('    '),center(body[1]),['rec','set'].map(id=>button(by(id),true)).join('    '),['new','cont'].map(id=>button(by(id),true)).join('    '),helpLinks().map(a=>`<button type="button" class="terminal-action v2-text-link" data-ui-action="${a.id}" data-hotkey="${a.key}">${esc(a.text)}</button>`).join(' | '));
  }else{
   rows=[esc('BIZNES.EXE · '+nameOfScreen())+' '+button(act('language','L','PL/EN'),true),'',...wrapped(body).slice(0,Math.max(1,22-2-1-acts.length-2-(ui.note?1:0))).map(esc)];
   if(ui.note)rows.push(esc(ui.note));rows.push('');acts.forEach((a,i)=>rows.push((ui.sel===i?'&gt; ':'  ')+button(a,true)));rows.push('',button(act('back','ESC',t('Back','Wstecz')),true));
  }
  while(rows.length<22)rows.push('');rows=rows.slice(0,22);rows.push(esc(REL+' · '+g().status()));
  if(term)term.innerHTML=rows.map((r,i)=>`<span class="terminal-row${menu&&i>=3&&i<=10?' panel-row':''}${i===22?' footer-status':''}">${r}</span>`).join('\n');
- const header=`<header class="mobile-head"><strong>BIZNES.EXE</strong><nav class="mobile-sponsors" aria-label="${esc(t('Patrons','Patroni'))}">${patrons()}</nav>${button(act('language','L',g().lang==='pl'?'EN':'PL'))}</header>`;
- const intro=menu?`<div class="mobile-manifest"><h1>${esc(t('Small game. Big business.','Mała gra. Wielki biznes.'))}</h1><p>${esc(t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.'))}</p><p>${esc(t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:'))}<br>Biznesman (1988), M. Cwynar / SAMBA.</p><p>${esc(t('Project patrons:','Patroni projektu:'))}<br>${patrons()}</p></div>`:`<h1>${esc(nameOfScreen())}</h1>`;
+ const header=`<header class="mobile-head"><strong>BIZNES.EXE</strong><nav class="mobile-sponsors" data-patrons aria-label="${esc(t('Patrons','Patroni'))}">${patrons()}</nav>${button(act('language','L',g().lang==='pl'?'EN':'PL'))}</header>`;
+ const intro=menu?`<div class="mobile-manifest"><h1>${esc(t('Small game. Big business.','Mała gra. Wielki biznes.'))}</h1><p>${esc(t('A lightweight game with an MS-DOS retro feel.','Lekka gra w klimacie retro MS-DOS.'))}</p><p>${esc(t('An independent adaptation inspired by:','Niezależna adaptacja inspirowana:'))}<br>Biznesman (1988), M. Cwynar / SAMBA.</p><p>${esc(t('Project patrons:','Patroni projektu:'))}<br><span data-patrons>${patrons()}</span></p></div><section class="v2-mini-help"><h2>${esc(t('How to play','Jak grać'))}</h2>${miniHelp().map(l=>`<p>${esc(l)}</p>`).join('')}</section>`:`<h1>${esc(nameOfScreen())}</h1>`;
  const dockRow=(ids,cls)=>`<div class="v2-row ${cls}">${ids.map(id=>button(acts.find(a=>a.id===id))).join('')}</div>`;
- if(mobile)mobile.innerHTML=header+`<section class="mobile-list${ui.screen==='result'&&flag('anim',true)?' v2-result-motion':''}">${intro}${body.map(l=>`<p>${esc(l)}</p>`).join('')}${ui.screen==='patrons'?`<p>${patrons()}</p>`:''}${ui.note?`<p role="status" class="v2-note">${esc(ui.note)}</p>`:''}${menu?'':'<div class="v2-stack">'+acts.map(a=>button(a)).join('')+'</div>'}</section><small class="mobile-status">${esc(REL+' · '+g().status())}</small>`+(menu?`<section class="mobile-dock v2-menu-dock" aria-label="${esc(t('Main menu','Menu główne'))}">${dockRow(['age','help','install-app'],'v2-row-short')}${dockRow(['rec','set'],'v2-row-secondary')}${dockRow(['new','cont'],'v2-row-primary')}</section>`:`<section class="mobile-dock">${button(act('back','ESC',t('Back','Wstecz')))}</section>`);
+ if(mobile)mobile.innerHTML=header+`<section class="mobile-list${ui.screen==='result'&&flag('anim',true)?' v2-result-motion':''}">${intro}${body.map(l=>`<p>${esc(l)}</p>`).join('')}${ui.screen==='patrons'?`<p>${patrons(true)}</p>`:''}${ui.note?`<p role="status" class="v2-note">${esc(ui.note)}</p>`:''}${menu?'':'<div class="v2-stack">'+acts.map(a=>button(a)).join('')+'</div>'}</section>${menu?`<nav class="v2-help-links" aria-label="${esc(t('Help and information','Pomoc i informacje'))}">${helpLinks().map(a=>`<button type="button" data-ui-action="${a.id}">${esc(a.text)}</button>`).join('')}</nav>`:''}<small class="mobile-status">${esc(REL+' · '+g().status())}</small>`+(menu?`<section class="mobile-dock v2-menu-dock" aria-label="${esc(t('Main menu','Menu główne'))}">${dockRow(['age','help','install-app'],'v2-row-short')}${dockRow(['rec','set'],'v2-row-secondary')}${dockRow(['new','cont'],'v2-row-primary')}</section>`:`<section class="mobile-dock">${button(act('back','ESC',t('Back','Wstecz')))}</section>`);
  const help=document.querySelector('#desktop-install-help');if(help){help.hidden=true;help.textContent=''}g().fit?.();
 }
 function open(screen,note=''){ui.screen=screen;ui.sel=0;ui.note=note;paint()}
@@ -120,13 +149,13 @@ function go(id){
  if(id==='style'){g().cycleStyle();return g().render(false)}
  if(id==='hand')return g().setHand(g().hand==='left'?'right':'left');
  if(['contrast','sound','anim'].includes(id)){try{localStorage.setItem('bx2r-'+id,flag(id,id==='anim')?'off':'on')}catch{}return g().render(false)}
- if(id==='install-app'){open('install');return g().select('install-app')}
+ if(id==='install-app')return installGame();
 }
 function onKey(key){
  if(key==='L')return go('language');if(key==='ESC')return go('back');const acts=actions();
  if(key==='UP'||key==='DOWN'){ui.sel+=key==='DOWN'?1:-1;return paint()}
  if(key==='ENTER')return acts[ui.sel]&&go(acts[ui.sel].id);
- const a=acts.find(a=>a.key===key);if(a)return go(a.id);
+ const a=acts.find(a=>a.key===key)||(ui.screen==='menu'?helpLinks().find(a=>a.key===key):null);if(a)return go(a.id);
 }
-globalThis.BX2={adult,playing:false,done:false,profileId:null,onKey,onAction:go,onWelcome(){paint()},onQuit(){this.playing=false;this.done=false;ui.screen='menu';ui.note=''},onSave(s){const db=loadDb(),p=db.profiles.find(p=>p.id===this.profileId)||active(db);meta.writeSlot(p,'auto',s,{date:date(),at:Date.now()});db.active=p.id;saveDb(db)},onHome(s){if(this.playing&&!this.done){const o=meta.outcome(s);if(o.ended||s.v2Finished)finish(s,o)}},onReady(){const db=loadDb();if(!db.legacy){let raw;try{raw=localStorage.getItem('bx-save')}catch{}if(raw)meta.importLegacy(db,g().getS());else db.legacy=true;}saveDb(db);paint()}};
+globalThis.BX2={adult,patrons:visiblePatrons,onInstall:installGame,playing:false,done:false,profileId:null,onKey,onAction:go,onWelcome(){paint()},onQuit(){this.playing=false;this.done=false;ui.screen='menu';ui.note=''},onSave(s){const db=loadDb(),p=db.profiles.find(p=>p.id===this.profileId)||active(db);meta.writeSlot(p,'auto',s,{date:date(),at:Date.now()});db.active=p.id;saveDb(db)},onHome(s){if(this.playing&&!this.done){const o=meta.outcome(s);if(o.ended||s.v2Finished)finish(s,o)}},onReady(){const db=loadDb();if(!db.legacy){let raw;try{raw=localStorage.getItem('bx-save')}catch{}if(raw)meta.importLegacy(db,g().getS());else db.legacy=true;}saveDb(db);startPatrons();paint()}};
 })();
