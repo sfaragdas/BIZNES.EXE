@@ -206,3 +206,9 @@ pre .v2-text-link{text-decoration:underline;text-underline-offset:2px}
 }
 
 @media(max-width:900px){.mobile-sponsors{flex:1;justify-content:center;text-align:center;white-space:normal;overflow-wrap:anywhere;flex-wrap:wrap}.mobile-sponsors [data-patrons]{min-width:0}}
+
+/* Independent header slots keep the language control fixed during patron rotation. */
+pre .desktop-header{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr);align-items:center;gap:0;white-space:normal}
+.desktop-header .header-brand{justify-self:start;white-space:nowrap}
+.desktop-header .header-patrons{justify-self:stretch;text-align:center;min-width:0;white-space:nowrap}
+.desktop-header .header-language{justify-self:end;text-align:right;white-space:nowrap}

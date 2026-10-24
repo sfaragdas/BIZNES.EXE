@@ -86,3 +86,7 @@ Zmiana menu zachowuje rejestr zakończonych rund i rekordy. Testy obejmują tak�
 - Dodano SejmPage.pl. Losowana jest początkowa kolejność trzech patronów, wyświetlane są dwie różne nazwy naraz. Para zmienia się co 12 sekund, bez ingerencji w stan gry i pola transakcji. Przy ukrytej karcie rotacja jest wstrzymana.
 - Wróciła miniinstrukcja na powitanie. Pełna instrukcja, Prywatność, Patroni oraz O grze i licencje są dostępne także przez tekstowe linki nad dolnym panelem na telefonie i w dolnym wierszu terminala.
 - Instalacja przechodzi przez jeden handler zarówno z kliknięcia, jak i klawiatury. Wyświetla systemowy prompt, jeśli przeglądarka go udostępniła; w pozostałych przypadkach pokazuje instrukcję dla danej przeglądarki. Obsługiwane są anulowanie, błąd promptu i już dodana aplikacja.
+
+### Korekta nagłówka 2026.10.24
+
+Szary panel pokazuje stałą listę wszystkich trzech patronów. Rotacja par dotyczy wyłącznie górnej belki. Nagłówek desktopowy ma niezależne pola: marka po lewej, patroni na środku i PL/EN po prawej, wspólne dla menu i rozgrywki. Zmienna długość nazw nie przesuwa przycisku języka. Hasła opisowe są tylko na szarym panelu.

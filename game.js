@@ -63,6 +63,7 @@ function frame(rows){
   const content=rows.slice(0,22);while(content.length<22)content.push('');
   content.push((view==='welcome'?statusText():'').padStart(78));
   return content.map((raw,i)=>{
+    if(i===0&&v2()?.header)return `<span class="terminal-row statusline desktop-header">${v2().header()}</span>`;
     const width=78+(raw.length-visibleText(raw).length);
     const r=raw.slice(0,width).padEnd(width);
     let html=esc(r);
@@ -88,7 +89,7 @@ const center=s=>{const length=visibleText(s).length,left=Math.max(0,Math.floor((
 function pwaMessage(){return typeof window!=='undefined'?window.BiznesPWA?.message(lang)||'':''}
 function statusText(){return typeof window!=='undefined'&&window.BiznesPWA?window.BiznesPWA.status(lang):'Offline'}
 
-function topbar(){const tail='  {SPONSOR}  {LANG}',brand='BIZNES.EXE  ·  '+t('Tiny economic game','Mała gra ekonomiczna');return `${brand.padEnd(78-visibleText(tail).length)}${tail}`}
+function topbar(){const tail='  {SPONSOR}  {LANG}',brand='BIZNES.EXE'+(v2()?'':'  ·  '+t('Tiny economic game','Mała gra ekonomiczna'));return `${brand.padEnd(78-visibleText(tail).length)}${tail}`}
 function v2Instructions(){
   const level={handlarz:t('Trader','Handlarz'),kupiec:t('Merchant','Kupiec'),magnat:t('Magnate','Magnat')}[S.v2Level]||t('Trading','Handel');
   const count=goodIdx().length,places=cities().length,max=debtMaxRate();

@@ -463,3 +463,52 @@ assert.match(rotation.text(),/Pożyczka/);
 assert.match(rotation.el('#mobile').innerHTML,/v2-help-links/);
 for(const action of ['play','about','patrons','licenses'])menuHas(rotation,action);
 desktopRows(rotation);
+
+// The grey panel is static; only the dedicated middle header slot rotates.
+const fixedHeader=bootShell();
+const staticPanel=html=>{
+ const match=html.match(/data-static-patrons>([\s\S]*?)<\/span>/);
+ assert.ok(match,'The welcome panel has a dedicated static patron list');
+ return match[1];
+};
+const checkHeader=html=>{
+ const first=html.split('\n')[0];
+ assert.match(first,/class="terminal-row[^"]*desktop-header/);
+ const brand=first.indexOf('class="header-brand');
+ const middle=first.indexOf('class="header-patrons" data-patrons');
+ const language=first.indexOf('class="header-language"');
+ assert.ok(brand>=0&&middle>brand&&language>middle);
+ assert.match(first,/>PL\/EN<\/button>/);
+ assert.doesNotMatch(first,/Tiny economic game|Mała gra ekonomiczna|Small game\. Big business|Mała gra\. Wielki biznes/);
+ return first;
+};
+for(const lang of ['pl','en']){
+ fixedHeader.engine.setLang(lang);
+ for(const style of ['current','retro','matrix']){
+  fixedHeader.engine.setStyle(style);fixedHeader.ui.onAction('menu');
+  const desktopStatic=staticPanel(fixedHeader.el('#terminal').innerHTML);
+  const mobileStatic=staticPanel(fixedHeader.el('#mobile').innerHTML);
+  for(const name of ['MojeDostawy.pl','LCSE.pl','SejmPage.pl']){
+   assert.ok(desktopStatic.includes(name));assert.ok(mobileStatic.includes(name));
+  }
+  let liveHeader=checkHeader(fixedHeader.el('#terminal').innerHTML);
+  const languageSlot=liveHeader.slice(liveHeader.indexOf('<span class="header-language"'));
+  fixedHeader.context.document.querySelectorAll=selector=>selector==='[data-patrons]'?[{
+   set innerHTML(value){liveHeader=liveHeader.replace(/(<span class="header-patrons" data-patrons>)[\s\S]*?(<\/span>)/,(_,open,close)=>open+value+close)}
+  }]:[];
+  fixedHeader.intervals.find(i=>i.delay===12000).fn();
+  assert.equal(liveHeader.slice(liveHeader.indexOf('<span class="header-language"')),languageSlot,'Rotation cannot rewrite the language slot');
+  fixedHeader.engine.render(false);
+  assert.equal(staticPanel(fixedHeader.el('#terminal').innerHTML),desktopStatic);
+  assert.equal(staticPanel(fixedHeader.el('#mobile').innerHTML),mobileStatic);
+  checkHeader(fixedHeader.el('#terminal').innerHTML);desktopRows(fixedHeader);
+ }
+}
+fixedHeader.start('magnat');fixedHeader.flush();
+for(let i=0;i<6;i++){
+ fixedHeader.intervals.find(i=>i.delay===12000).fn();
+ fixedHeader.engine.render(false);
+ checkHeader(fixedHeader.el('#terminal').innerHTML);desktopRows(fixedHeader);
+}
+assert.match(source('style.css'),/grid-template-columns:minmax\(0,1fr\) minmax\(0,2fr\) minmax\(0,1fr\)/);
+console.log('PASS header: static grey-panel patrons, rotating middle slot and fixed language control in PL/EN and all styles.');
