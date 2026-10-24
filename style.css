@@ -204,3 +204,5 @@ pre .v2-text-link{text-decoration:underline;text-underline-offset:2px}
  .v2-help-links{display:flex;flex-wrap:wrap;justify-content:center;gap:0 12px;flex:none;padding:0 2px}
  #mobile .v2-help-links button{background:transparent;border:0;box-shadow:none;color:var(--dim);text-decoration:underline;font-size:.8em;min-height:36px;padding:4px 0}
 }
+
+@media(max-width:900px){.mobile-sponsors{flex:1;justify-content:center;text-align:center;white-space:normal;overflow-wrap:anywhere;flex-wrap:wrap}.mobile-sponsors [data-patrons]{min-width:0}}
