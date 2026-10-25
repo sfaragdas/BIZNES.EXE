@@ -3,11 +3,6 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  # Rebuild /v2/ after a successful push validation on the v2-retro preview branch.
-  workflow_run:
-    workflows: [Validate retro 2.0]
-    types: [completed]
-    branches: [v2-retro]
 
 permissions:
   contents: read
@@ -20,7 +15,6 @@ concurrency:
 
 jobs:
   publish:
-    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -57,23 +51,6 @@ jobs:
           classic_worker.write_text(classic_worker.read_text(encoding='utf-8').replace('classic-20260929', os.environ['GITHUB_SHA']), encoding='utf-8')
           PY
           cp -r assets _site/
-      - name: Add the v2 preview
-        run: |
-          # Preview of the BIZNES.EXE 2.0 retro work branch (v2-retro) at /v2/ (rebuilt on each main deploy or manual run).
-          # The old modern-UI branch v2 is kept only as an archive.
-          if git fetch origin v2-retro:refs/remotes/origin/v2-retro; then
-            REF=origin/v2-retro
-            # Test the preview in a full copy of the branch, then publish only runtime files.
-            rm -rf "$RUNNER_TEMP/v2src" && mkdir -p "$RUNNER_TEMP/v2src" _site/v2
-            git archive "$REF" | tar -x -C "$RUNNER_TEMP/v2src"
-            (cd "$RUNNER_TEMP/v2src" && node test-game.cjs && node test-classic.cjs && node test-v2-stage-a.cjs && if [ -f test-pwa.cjs ]; then node test-pwa.cjs; fi)
-            for f in index.html privacy.html game.js style.css pwa.js sw.js manifest.webmanifest favicon.svg NOTICE LICENSE assets data; do
-              if [ -e "$RUNNER_TEMP/v2src/$f" ]; then cp -r "$RUNNER_TEMP/v2src/$f" _site/v2/; fi
-            done
-            V2=$(git rev-parse "$REF")
-            sed -i -E "s/BUILD='[^']*'/BUILD='$V2'/" _site/v2/sw.js
-            sed -i -E "s/(style\.css|game\.js|pwa\.js|data\/game-data\.js|assets\/v2meta\.js|assets\/v2ui\.js)\?v=[^\"[:space:]]+/\1?v=$V2/g" _site/v2/index.html $( [ -f _site/v2/privacy.html ] && echo _site/v2/privacy.html )
-          fi
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
