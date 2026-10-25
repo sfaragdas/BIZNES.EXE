@@ -1,5 +1,15 @@
 # Historia wydań
 
+## 2026.10.25 — BIZNES.EXE BETA
+
+- Oznaczenie wydania: BETA · 2026.10.25.
+- Koniec rundy: spłata całego długu to wygrana (dzień i majątek netto); majątek netto poniżej −250 000 $ po podróży albo granica liczb to bankructwo. Ekran końca oferuje nową grę.
+- Gra działa przy zablokowanej lub pełnej pamięci przeglądarki (zapis w pamięci, komunikat „Nie zapisano”). Uszkodzony zapis trafia do kopii `bx-save-backup`.
+- Treści przyjazne dzieciom: Kakao zamiast tytoniu, konkurs kupców zamiast loterii, fikcyjne spółki zamiast prawdziwych marek. Stare zapisy zachowują ilości.
+- Dostępność: rotacja patronów bez przerysowania ekranu i utraty fokusu, komunikaty w jednym regionie aria-live, atrybut lang zgodny z językiem, większe czcionki i przyciski na telefonie.
+- Strona prywatności (PL/EN), ikona maskable, kategorie i zrzuty w manifeście.
+- Service worker podaje kopię offline tylko bez sieci; błędne adresy zwracają 404. Dawny podgląd /v2/ przekierowuje do gry i usuwa swój service worker.
+
 ## 2026.10.20 — BIZNES.EXE BETA
 
 - Oznaczenie wydania: BETA · 2026.10.20.
