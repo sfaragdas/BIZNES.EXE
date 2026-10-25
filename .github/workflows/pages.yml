@@ -28,10 +28,11 @@ jobs:
         run: |
           node test-game.cjs
           node test-classic.cjs
+          node test-root-safety.cjs
       - name: Assemble the public site
         run: |
           mkdir -p _site
-          cp index.html game.js style.css pwa.js sw.js manifest.webmanifest favicon.svg NOTICE LICENSE _site/
+          cp index.html privacy.html game.js style.css pwa.js sw.js manifest.webmanifest favicon.svg NOTICE LICENSE _site/
           cp -r classic _site/
           # Each deployment gets unique asset URLs, bypassing older browser/CDN entries.
           python - <<'PY'
@@ -51,6 +52,26 @@ jobs:
           classic_worker.write_text(classic_worker.read_text(encoding='utf-8').replace('classic-20260929', os.environ['GITHUB_SHA']), encoding='utf-8')
           PY
           cp -r assets _site/
+      - name: Retire the old /v2/ preview
+        run: |
+          # The 2.0 preview is archived (tag archive/v2-retro). Old links go to the game,
+          # and an installed /v2/ service worker removes itself and its caches.
+          mkdir -p _site/v2
+          cat > _site/v2/index.html <<'HTML'
+          <!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="3;url=../"><title>BIZNES.EXE</title></head><body style="background:#000;color:#bdbdbd;font-family:monospace">
+          <p>Podgląd 2.0 został zarchiwizowany. Przechodzę do gry… / The 2.0 preview was archived. Opening the game… <a href="../" style="color:#ffff55">BIZNES.EXE</a></p>
+          <script>(async()=>{try{for(const r of await navigator.serviceWorker?.getRegistrations?.()||[])if(r.scope.endsWith('/v2/'))await r.unregister();for(const k of await caches.keys())if(k.startsWith('biznes-2-retro-'))await caches.delete(k)}catch{}location.replace('../')})()</script>
+          </body></html>
+          HTML
+          cat > _site/v2/sw.js <<'JS'
+          // Retired /v2/ preview: clear its caches, unregister and send open tabs to the game.
+          self.addEventListener('install',()=>self.skipWaiting());
+          self.addEventListener('activate',event=>event.waitUntil((async()=>{
+            for(const k of await caches.keys())if(k.startsWith('biznes-2-retro-'))await caches.delete(k);
+            await self.registration.unregister();
+            for(const c of await self.clients.matchAll({type:'window'}))c.navigate(new URL('../',self.registration.scope).href);
+          })()));
+          JS
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
