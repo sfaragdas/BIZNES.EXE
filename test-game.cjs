@@ -25,9 +25,9 @@ const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
   key('P');key('S');pressAmount(100);assert.equal(state().banks[0],100);checkScreen('Saldo:');key('Escape');
   key('O');key('S');pressAmount(40);assert.equal(state().banks[0],60);key('Escape');
   key('D');checkScreen('Saldo:');checkScreen('Pożyczasz');key('P');pressAmount(1000);assert.equal(state().debt,26000);checkScreen('Saldo:');
-  key('A');checkScreen('Akcje:');checkScreen('Excellence (NC)');assert.equal(state().shares.length,10);
+  key('A');checkScreen('Akcje:');checkScreen('Jutrzenka Tech');assert.equal(state().shares.length,10);
   for(let i=0;i<10;i++){click('buy');click('stock-'+i);pressAmount(1);assert.equal(state().shares[i],1);key('Escape')}
-  key('S');key('E');pressAmount(1);assert.equal(state().shares[9],0);checkScreen('Akcje:');key('Escape');
+  key('S');key('J');pressAmount(1);assert.equal(state().shares[9],0);checkScreen('Akcje:');key('Escape');
   key('B');key('D');key('P');checkScreen('Ile pożyczasz?');key('Escape');key('A');
   key('D');key('O');pressAmount(10);assert.equal(state().debt,25990);checkScreen('Akcje:');
   const before=state().cash;key('W');checkScreen('Akcje:');checkScreen('Tokio');assert.ok(el('#terminal').innerHTML.includes('city-row-inner'));assert.ok(el('#terminal').innerHTML.indexOf('data-ui-action=\"city-1\"')<el('#terminal').innerHTML.indexOf('data-ui-action=\"cancel\"'));key('B');assert.equal(state().city,1);checkScreen('Akcje:');
@@ -98,9 +98,9 @@ const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
   }
   await reload();key('Enter');key('A');
   assert.deepEqual(state().shares,[1,2,3,4,5,6,0,0,0,0]);
-  key('K');key('E');pressAmount(1);assert.equal(state().shares[9],1);key('Escape');
+  key('K');key('J');pressAmount(1);assert.equal(state().shares[9],1);key('Escape');
   key('Q');const savedTen=state();await reload();key('Enter');assert.deepEqual(state(),savedTen);
-  key('A');key('S');key('E');pressAmount(1);assert.equal(state().shares[9],0);
+  key('A');key('S');key('J');pressAmount(1);assert.equal(state().shares[9],0);
   console.log(`PASS: two screens, 10 stocks, all inline operations, notices, travel/events, PL/EN, fonts, save and 23x78 rows.`);
 })().catch(e=>{console.error(e);process.exitCode=1});
 

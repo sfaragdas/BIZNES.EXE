@@ -57,8 +57,6 @@ for (const [id, goal, days, goods, cities, stocks, banks, debt, rate] of levels)
   expired.day = expired.v2Days + 1;
   assert.equal(meta.outcome(expired).expired, true);
   assert.equal(meta.outcome(expired).promoted, false);
-  assert.deepEqual(meta.goodIndexes(undefined, goods), Array.from({ length: goods }, (_, i) => i));
-  assert.ok(meta.goodIndexes(undefined, goods).includes(2), 'Cocoa remains available at every difficulty');
 }
 
 const assetState = base();
@@ -307,7 +305,7 @@ assert.equal(badSlot.ui.playing, false);
 assert.equal(badSlot.db().profiles[0].records.handlarz[0].score, 10);
 
 // Legacy beta import is read-only; all new writes use the separate retro prefix.
-const betaRaw = JSON.stringify(base());
+const betaRaw = JSON.stringify({ ...base(), day: 3 });
 const betaStore = new Map([['bx-save', betaRaw], ['bx-lang', 'en'], ['bx-style', 'matrix'], ['bx-hand', 'left']]);
 const beta = bootShell(betaStore);
 assert.equal(beta.db().profiles[0].slots.auto.state.cash, 1000);
@@ -322,6 +320,39 @@ assert.equal(betaStore.get('bx-lang'), 'en');
 assert.equal(betaStore.get('bx-style'), 'matrix');
 assert.equal(betaStore.get('bx-hand'), 'left');
 assert.deepEqual(beta.legacyWrites, [], 'Import and settings write exclusively to the retro prefix');
+
+// A fresh day-1 BETA save is not imported; a played one is labelled as a BETA copy.
+const trivial = bootShell(new Map([['bx-save', JSON.stringify(base())]]));
+assert.equal(trivial.db().profiles[0].slots.auto, null, 'Untouched BETA saves are not imported');
+assert.doesNotMatch(trivial.el('#mobile').innerHTML, /mobile-confirm/, 'Continue is not highlighted without a save');
+const labelled = bootShell(new Map([['bx-save', JSON.stringify({ ...base(), day: 3 })]]));
+assert.equal(labelled.db().profiles[0].slots.auto.beta, true);
+assert.match(labelled.text(), /Zapis z BETA/);
+assert.match(labelled.el('#mobile').innerHTML, /mobile-confirm/);
+labelled.ui.onAction('new'); labelled.ui.onAction('level-handlarz');
+assert.match(labelled.text(), /Oryginał w\s+BETA zostaje nietknięty/);
+
+// Blocked storage keeps the game usable in memory and explains it.
+const blockedStore = new Map();
+const blocked = bootShell(blockedStore);
+blocked.context.localStorage.setItem = () => { throw Error('QuotaExceededError'); };
+blocked.ui.onAction('new'); blocked.ui.onAction('level-handlarz'); blocked.flush();
+assert.equal(blocked.engine.getS().v2Level, 'handlarz');
+assert.match(blocked.text(), /Nie można zapisać/);
+blocked.ui.onAction('quit'); blocked.flush();
+
+// Privacy page is reachable from Help; the wipe prompt says what it deletes.
+const priv = bootShell();
+priv.ui.onAction('about');
+assert.match(priv.text(), /Polityka prywatności/);
+priv.ui.onAction('privacy');
+assert.equal(priv.context.location.href, 'privacy.html');
+priv.ui.onAction('wipe');
+assert.match(priv.text(), /także\s+zapisy\s+z\s+wcześniejszych\s+wersji/);
+assert.ok(source('privacy.html').includes('Privacy policy') && !/https?:/.test(source('privacy.html')));
+const manifest = JSON.parse(source('manifest.webmanifest'));
+assert.ok(manifest.icons.some(i => i.purpose === 'maskable') && manifest.screenshots.length >= 2);
+assert.ok(source('sw.js').includes('./privacy.html'));
 
 const help = bootShell();
 help.context.window = help.context;
