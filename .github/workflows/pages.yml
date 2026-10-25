@@ -3,6 +3,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Rebuild /v2/ after a successful push validation on the v2-retro preview branch.
+  workflow_run:
+    workflows: [Validate retro 2.0]
+    types: [completed]
+    branches: [v2-retro]
 
 permissions:
   contents: read
@@ -15,6 +20,7 @@ concurrency:
 
 jobs:
   publish:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
     environment:
       name: github-pages
