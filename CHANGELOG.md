@@ -1,5 +1,15 @@
 # Historia wydań
 
+## 2026.10.26 — BIZNES.EXE BETA
+
+- Oznaczenie wydania: BETA · 2026.10.26.
+- Poziomy wybierane przy nowej grze (1/2/3 lub dotyk): Handlarz (cel 3000 $ w 14 dni, 4 towary, 4 miasta, dług 1000 $, odsetki do 3%), Kupiec (8000 $ w 21 dni, 6 towarów, 6 miast, banki, dług 5000 $, do 10%), Magnat (50 000 $ w 40 dni, wszystkie towary, miasta, akcje i banki, dług 25 000 $, do 30%). Cel to majątek netto: gotówka + banki + towary + akcje − dług.
+- Runda kończy się po osiągnięciu celu albo po ostatnim dniu. Bankructwo nadal kończy grę bez wyniku. Spłata długu nie kończy już gry.
+- Wynik: (majątek netto na końcu − na starcie) / liczba rozegranych dni, w $ na dzień. Przy remisie wygrywa wcześniejsza spłata długu. Lokalna tabela top 5 dla każdego poziomu (`bx-records`, kopia `bx-records-backup`) na ekranie końca i w menu (Wyniki).
+- Przełącznik wieku <18 / 18+ w menu (domyślnie <18, zapis `bx-age`). Poniżej 18 lat nazwy patronów są zwykłym tekstem; 18+ włącza linki.
+- 18+: po rundzie na poziomie Kupiec lub Magnat można grać dalej bez końca; wynik zostaje zamrożony.
+- Zapisy sprzed poziomów wczytują się jako gra swobodna (limity Magnata, bez celu, bez wpisu do wyników). Zapis z dawną „wygraną” po spłacie długu wraca do gry.
+
 ## 2026.10.25 — BIZNES.EXE BETA
 
 - Oznaczenie wydania: BETA · 2026.10.25.

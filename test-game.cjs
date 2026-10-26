@@ -11,7 +11,7 @@ const state=()=>JSON.parse(store.get('bx-save'));
 const checkScreen=(text)=>{const e=el('#terminal');assert.ok(e.textContent.includes(text),`screen should contain: ${text}; got ${e.textContent}`);const rows=e.textContent.split('\n');assert.equal(rows.length,23);assert.equal(rows.find(r=>r.length!==78),undefined,rows.map(r=>r.length).join(','))};
 const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
 (async()=>{
-  checkScreen('Patroni projektu');checkScreen('Styl');checkScreen('-'.repeat(78));assert.ok(el('#terminal').innerHTML.includes('href=\"https://mojedostawy.pl\"'));assert.ok(el('#terminal').innerHTML.includes('href=\"https://lcse.pl\"'));checkScreen('Offline');assert.ok(!el('#terminal').textContent.includes('WASM'));
+  checkScreen('Patroni projektu');checkScreen('Styl');checkScreen('-'.repeat(78));assert.ok(!el('#terminal').innerHTML.includes('href="https://'));checkScreen('Wiek <18');key('A');checkScreen('Wiek 18+');assert.ok(el('#terminal').innerHTML.includes('href=\"https://mojedostawy.pl\"'));assert.ok(el('#terminal').innerHTML.includes('href=\"https://lcse.pl\"'));key('A');assert.ok(!el('#terminal').innerHTML.includes('href="https://'));checkScreen('Offline');assert.ok(!el('#terminal').textContent.includes('WASM'));
   assert.ok(!el('#terminal').innerHTML.includes('welcome-save'));
   const welcomeRows=el('#terminal').textContent.split('\n');assert.equal(welcomeRows[7].trim(),'*                                                                          *'.trim());assert.equal(welcomeRows[11].trim(),'');
   click('font-toggle');assert.equal(document.body.dataset.font,'retro');click('font-toggle');assert.equal(document.body.dataset.font,'matrix');click('font-toggle');assert.equal(document.body.dataset.font,'current');
@@ -38,7 +38,7 @@ const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
   click('language');checkScreen('Goods:');key('K');checkScreen('Buy: Select an item from the list.');key('Escape');key('A');checkScreen('Shares:');key('B');checkScreen('Balance:');
   key('P');key('S');pressAmount(1);checkScreen('Transaction completed.');key('Escape');key('D');checkScreen('Choose an action:');key('Escape');
   click('language');key('Q');checkScreen('Kontynuuj');const saved=state();key('Enter');assert.deepEqual(state(),saved);
-  key('Q');key('N');assert.equal(state().cash,1000);assert.equal(state().shares.length,10);
+  key('Q');key('N');key('3');assert.equal(state().cash,1000);assert.equal(state().shares.length,10);
   // Touch cards use the same state and input handlers as the terminal.
   const tap=id=>click(id,'#mobile');
   assert.equal((el('#mobile').innerHTML.match(/class="mobile-card"/g)||[]).length,10);
@@ -54,7 +54,7 @@ const pressAmount=s=>{for(const c of String(s))key(c);key('Enter')};
   tap('city-1');assert.equal(state().city,1);tap('travel');assert.ok(!el('#mobile').innerHTML.includes('data-ui-action="city-1"'));tap('cancel');
   tap('debt');tap('borrow');el('#mobile').handlers.input({target:{...mobileField,value:'10'}});tap('submit');
   tap('language');tap('debt');tap('repay');el('#mobile').handlers.input({target:{...mobileField,value:'10'}});listeners.keydown({key:'c',target:mobileField,preventDefault(){}});assert.ok(el('#mobile').textContent.includes('Transaction completed.'));tap('language');
-  tap('quit');tap('new-game');tap('mobile-buy');
+  tap('quit');tap('new-game');tap('level-3');tap('mobile-buy');
   assert.ok(el('#mobile').textContent.includes('Kupno: Zaznacz'));
   tap('shares');assert.ok(el('#mobile').textContent.includes('Kupno: Zaznacz'));
   tap('bank');assert.ok(el('#mobile').textContent.includes('Wpłata: Zaznacz'));
