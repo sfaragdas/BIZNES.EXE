@@ -173,3 +173,9 @@ pre .footer-status{justify-content:space-between}
   main{padding:4px}
   .screen{max-width:100%;max-height:none;aspect-ratio:78/54}
 }
+.patron-off{color:var(--dim)}.welcomepanel .patron-off,.mobile-manifest .patron-off{color:#000;margin-right:8px}
+#mobile .mobile-goal{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;min-height:44px;margin:0 0 8px;text-align:left}
+#mobile .mobile-goal[aria-pressed=true]{outline:2px solid var(--yellow)}
+#mobile .mobile-goal span,.mobile-summary .mobile-goal-status{font-size:12px;color:var(--fg)}
+.mobile-records{margin:0 0 12px;padding-left:2em}
+.mobile-sponsors span{color:var(--dim);padding:3px 2px;display:inline-flex;align-items:center;min-height:44px}

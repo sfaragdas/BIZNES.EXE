@@ -6,7 +6,7 @@
 
 | Wersja | Status i data | Uruchomienie |
 |---|---|---|
-| BIZNES.EXE | **BETA · 2026.10.25** — wersja rozwijana | [Zagraj](https://sfaragdas.github.io/BIZNES.EXE/) |
+| BIZNES.EXE | **BETA · 2026.10.26** — wersja rozwijana: poziomy Handlarz, Kupiec, Magnat; przełącznik <18 / 18+ | [Zagraj](https://sfaragdas.github.io/BIZNES.EXE/) |
 | BIZNES.EXE Classic | **FINAL · 2026.10.20** — wersja bliższa Biznesmanowi (1988) | [Zagraj](https://sfaragdas.github.io/BIZNES.EXE/classic/) |
 
 Obie wersje: PL / EN · Standard / DOS / Matrix · komputer / tablet / telefon · PWA offline.
